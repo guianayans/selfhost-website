@@ -1,0 +1,39 @@
+services:
+  website-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: selfhost-website:latest
+    ports:
+      - "${PORT:-4050}:4050"
+    volumes:
+      - ./sites:/app/sites
+      - website_manager_data:/app/data
+    environment:
+      NODE_ENV: production
+      PORT: "4050"
+      SITES_ROOT: /app/sites
+      DATA_DIR: /app/data
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-trocar_senha}
+      SESSION_SECRET: ${SESSION_SECRET:-troque-por-um-segredo-longo}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:-http://localhost:4050}
+      RSYNC_SSH_HOST: ${RSYNC_SSH_HOST:-servidor.example.com}
+      RSYNC_LOCAL_PATH: ${RSYNC_LOCAL_PATH:-/caminho/local/selfhost-website}
+      RSYNC_REMOTE_PATH: ${RSYNC_REMOTE_PATH:-/opt/selfhost-website}
+      RSYNC_REMOTE_SITES: ${RSYNC_REMOTE_SITES:-/opt/selfhost-website/sites}
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - '-e'
+        - "require('http').get('http://127.0.0.1:4050/health',r=>process.exit(r.statusCode>=200&&r.statusCode<500?0:1)).on('error',()=>process.exit(1));"
+      interval: 20s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+volumes:
+  website_manager_data:

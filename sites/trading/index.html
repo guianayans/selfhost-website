@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VertexTrade — Plataforma de trading inteligente com IA, execução ultrarrápida e analytics em tempo real.">
+  <title>VertexTrade — Trading Inteligente</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="#top" class="logo">
+        <span class="logo-mark">VT</span>
+        <span class="logo-text">VertexTrade</span>
+      </a>
+      <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#features">Recursos</a></li>
+        <li><a href="#platform">Plataforma</a></li>
+        <li><a href="#pricing">Planos</a></li>
+        <li><a href="#testimonials">Traders</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#" class="btn btn-ghost">Entrar</a>
+        <a href="#cta" class="btn btn-primary">Começar grátis</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <canvas id="chart-canvas" aria-hidden="true"></canvas>
+      </div>
+
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="pill reveal">
+            <span class="pulse-dot"></span>
+            Mercados abertos · Latência 0.4ms
+          </div>
+          <h1 class="hero-title reveal">
+            Trade com <span class="gradient-text">precisão</span>,<br>
+            escale com <span class="gradient-text alt">inteligência</span>
+          </h1>
+          <p class="hero-subtitle reveal">
+            VertexTrade combina execução institucional, sinais com IA e dashboards em tempo real
+            para traders que exigem velocidade, clareza e controle total.
+          </p>
+          <div class="hero-actions reveal">
+            <a href="#cta" class="btn btn-primary btn-lg">
+              Abrir conta demo
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#platform" class="btn btn-glass btn-lg">Ver plataforma</a>
+          </div>
+          <div class="hero-stats reveal">
+            <div class="stat">
+              <strong data-count="2400000">0</strong>
+              <span>Trades/dia</span>
+            </div>
+            <div class="stat">
+              <strong data-count="98.7" data-decimals="1">0</strong>
+              <span>Uptime %</span>
+            </div>
+            <div class="stat">
+              <strong data-count="140" data-suffix="+">0</strong>
+              <span>Mercados</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-panel reveal">
+          <div class="panel-card floating">
+            <div class="panel-header">
+              <span class="live-badge"><span class="pulse-dot"></span> LIVE</span>
+              <span class="mono">BTC/USDT</span>
+            </div>
+            <div class="panel-price">
+              <span class="price" id="live-price">$67,842.50</span>
+              <span class="change positive" id="live-change">+2.34%</span>
+            </div>
+            <div class="mini-chart" id="mini-chart"></div>
+            <div class="panel-row">
+              <div><small>Volume 24h</small><strong>$4.2B</strong></div>
+              <div><small>Spread</small><strong>0.01%</strong></div>
+              <div><small>Execução</small><strong>0.4ms</strong></div>
+            </div>
+            <div class="order-book">
+              <div class="book-side bids">
+                <div class="book-line" style="--w: 85%"></div>
+                <div class="book-line" style="--w: 72%"></div>
+                <div class="book-line" style="--w: 60%"></div>
+              </div>
+              <div class="book-side asks">
+                <div class="book-line" style="--w: 55%"></div>
+                <div class="book-line" style="--w: 68%"></div>
+                <div class="book-line" style="--w: 90%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="floating-card card-signal">
+            <div class="signal-icon">⚡</div>
+            <div>
+              <strong>Sinal IA detectado</strong>
+              <p>Breakout em EUR/USD · Confiança 94%</p>
+            </div>
+          </div>
+
+          <div class="floating-card card-alert">
+            <strong>Ordem executada</strong>
+            <p class="mono">BUY 0.5 BTC @ 67,840</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticker-wrap">
+        <div class="ticker">
+          <span>BTC/USDT <em class="up">+2.34%</em></span>
+          <span>ETH/USDT <em class="up">+1.87%</em></span>
+          <span>SOL/USDT <em class="down">-0.42%</em></span>
+          <span>EUR/USD <em class="up">+0.12%</em></span>
+          <span>XAU/USD <em class="up">+0.68%</em></span>
+          <span>NVDA <em class="up">+3.21%</em></span>
+          <span>AAPL <em class="down">-0.15%</em></span>
+          <span>BTC/USDT <em class="up">+2.34%</em></span>
+          <span>ETH/USDT <em class="up">+1.87%</em></span>
+          <span>SOL/USDT <em class="down">-0.42%</em></span>
+          <span>EUR/USD <em class="up">+0.12%</em></span>
+          <span>XAU/USD <em class="up">+0.68%</em></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="logos section-compact">
+      <div class="container">
+        <p class="logos-label reveal">Confiado por mesas proprietárias e traders profissionais</p>
+        <div class="logos-track reveal">
+          <span>Quantum Capital</span>
+          <span>NordFX Labs</span>
+          <span>Apex Markets</span>
+          <span>Helix Trading</span>
+          <span>BlueWave Fund</span>
+          <span>Vertex Prime</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Recursos</span>
+          <h2>Tudo que um trader profissional precisa</h2>
+          <p>Ferramentas de nível institucional, interface limpa e automações que trabalham enquanto você dorme.</p>
+        </div>
+        <div class="features-grid">
+          <article class="feature-card reveal">
+            <div class="feature-icon">📊</div>
+            <h3>Charts multi-timeframe</h3>
+            <p>Indicadores avançados, desenho vetorial e sincronização entre dispositivos em tempo real.</p>
+            <div class="feature-glow"></div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon">🤖</div>
+            <h3>Sinais com IA</h3>
+            <p>Modelos treinados em milhões de candles detectam padrões, breakouts e reversões com score de confiança.</p>
+            <div class="feature-glow"></div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon">⚡</div>
+            <h3>Execução ultrarrápida</h3>
+            <p>Infraestrutura colocated com latência sub-milissegundo e roteamento inteligente de ordens.</p>
+            <div class="feature-glow"></div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon">🛡️</div>
+            <h3>Risk management</h3>
+            <p>Stop dinâmico, position sizing automático e alertas de drawdown configuráveis por estratégia.</p>
+            <div class="feature-glow"></div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon">🔗</div>
+            <h3>API & Webhooks</h3>
+            <p>Integre bots, TradingView e sistemas externos com documentação REST e streaming WebSocket.</p>
+            <div class="feature-glow"></div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-icon">📱</div>
+            <h3>Mobile pro</h3>
+            <p>App nativo com biometria, push de sinais e execução one-tap sem comprometer segurança.</p>
+            <div class="feature-glow"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="platform" id="platform">
+      <div class="container platform-grid">
+        <div class="platform-visual reveal">
+          <div class="screen-frame">
+            <div class="screen-bar">
+              <span></span><span></span><span></span>
+              <em>vertextrade.app/terminal</em>
+            </div>
+            <div class="screen-content">
+              <div class="terminal-sidebar">
+                <div class="active"></div><div></div><div></div><div></div>
+              </div>
+              <div class="terminal-main">
+                <div class="terminal-chart">
+                  <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path class="chart-area" d="M0,80 L40,70 L80,75 L120,50 L160,55 L200,30 L240,40 L280,20 L320,35 L360,15 L400,25 L400,120 L0,120 Z" fill="url(#chartGrad)"/>
+                    <path class="chart-line" d="M0,80 L40,70 L80,75 L120,50 L160,55 L200,30 L240,40 L280,20 L320,35 L360,15 L400,25" fill="none" stroke="#22c55e" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="terminal-panels">
+                  <div class="terminal-panel scan-line"></div>
+                  <div class="terminal-panel"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="platform-copy reveal">
+          <span class="section-tag">Plataforma</span>
+          <h2>Terminal construído para decisões em milissegundos</h2>
+          <ul class="check-list">
+            <li>Order flow e heatmap de liquidez</li>
+            <li>Backtesting com dados tick-by-tick</li>
+            <li>Watchlists ilimitadas e alertas custom</li>
+            <li>Modo escuro/claro com temas personalizáveis</li>
+            <li>Journal automático com tags e screenshots</li>
+          </ul>
+          <a href="#cta" class="btn btn-primary">Explorar terminal</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <div class="container metrics-grid">
+        <div class="metric-card reveal">
+          <div class="metric-ring" style="--progress: 94">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42"/><circle cx="50" cy="50" r="42" class="ring-fill"/></svg>
+            <strong>94%</strong>
+          </div>
+          <h3>Taxa de acerto IA</h3>
+          <p>Em setups validados nos últimos 12 meses</p>
+        </div>
+        <div class="metric-card reveal">
+          <div class="metric-ring" style="--progress: 87">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42"/><circle cx="50" cy="50" r="42" class="ring-fill"/></svg>
+            <strong>87%</strong>
+          </div>
+          <h3>Traders ativos</h3>
+          <p>Retornam diariamente à plataforma</p>
+        </div>
+        <div class="metric-card reveal">
+          <div class="metric-ring" style="--progress: 99">
+            <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42"/><circle cx="50" cy="50" r="42" class="ring-fill"/></svg>
+            <strong>99%</strong>
+          </div>
+          <h3>SLA de execução</h3>
+          <p>Ordens preenchidas dentro do spread</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Planos</span>
+          <h2>Escolha o nível do seu trading</h2>
+          <p>Comece grátis. Escale quando estiver pronto.</p>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-card reveal">
+            <h3>Starter</h3>
+            <div class="price"><span>R$</span>0<small>/mês</small></div>
+            <p>Ideal para aprender e testar estratégias</p>
+            <ul>
+              <li>Conta demo ilimitada</li>
+              <li>5 alertas ativos</li>
+              <li>Charts básicos</li>
+              <li>Comunidade Discord</li>
+            </ul>
+            <a href="#cta" class="btn btn-glass btn-block">Começar grátis</a>
+          </article>
+          <article class="price-card featured reveal">
+            <div class="popular">Mais popular</div>
+            <h3>Pro</h3>
+            <div class="price"><span>R$</span>149<small>/mês</small></div>
+            <p>Para day traders e swing traders ativos</p>
+            <ul>
+              <li>Sinais IA em tempo real</li>
+              <li>Execução prioritária</li>
+              <li>API completa</li>
+              <li>Backtesting avançado</li>
+              <li>Suporte 24/7</li>
+            </ul>
+            <a href="#cta" class="btn btn-primary btn-block">Assinar Pro</a>
+          </article>
+          <article class="price-card reveal">
+            <h3>Institutional</h3>
+            <div class="price">Custom</div>
+            <p>Para mesas, fundos e alto volume</p>
+            <ul>
+              <li>Infra dedicada</li>
+              <li>FIX API & colocation</li>
+              <li>Account manager</li>
+              <li>SLA personalizado</li>
+              <li>White-label opcional</li>
+            </ul>
+            <a href="#cta" class="btn btn-glass btn-block">Falar com vendas</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-tag">Traders</span>
+          <h2>Quem opera com VertexTrade</h2>
+        </div>
+        <div class="testimonials-slider reveal">
+          <div class="testimonial-track" id="testimonial-track">
+            <blockquote class="testimonial">
+              <p>"A latência mudou meu scalping. Passei de 3 corretoras para só Vertex — execução impecável."</p>
+              <footer>
+                <div class="avatar">RC</div>
+                <div><strong>Rafael Costa</strong><span>Day trader · SP</span></div>
+              </footer>
+            </blockquote>
+            <blockquote class="testimonial">
+              <p>"Os sinais de IA não substituem análise, mas filtram ruído. Meu win rate subiu 18% em 4 meses."</p>
+              <footer>
+                <div class="avatar">ML</div>
+                <div><strong>Marina Lima</strong><span>Swing · Forex</span></div>
+              </footer>
+            </blockquote>
+            <blockquote class="testimonial">
+              <p>"Rodei nossa mesa prop inteira na API. Integração limpa, docs excelentes, uptime sólido."</p>
+              <footer>
+                <div class="avatar">FS</div>
+                <div><strong>Felipe Souza</strong><span>Head of Trading · Fund</span></div>
+              </footer>
+            </blockquote>
+          </div>
+          <div class="slider-dots" id="slider-dots"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq">
+      <div class="container faq-grid">
+        <div class="faq-head reveal">
+          <span class="section-tag">FAQ</span>
+          <h2>Perguntas frequentes</h2>
+          <p>Tudo o que você precisa saber antes de começar.</p>
+        </div>
+        <div class="faq-list reveal">
+          <details class="faq-item" open>
+            <summary>Preciso de experiência para usar?</summary>
+            <p>Não. O plano Starter inclui tutoriais, conta demo e modo guiado para iniciantes.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Quais mercados estão disponíveis?</summary>
+            <p>Cripto, forex, índices, commodities e ações US. Novos mercados são adicionados mensalmente.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Como funciona a IA de sinais?</summary>
+            <p>Modelos analisam volume, price action e correlações. Cada sinal inclui entry, stop, target e score.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Meus fundos estão seguros?</summary>
+            <p>Segregação de contas, 2FA obrigatório, criptografia AES-256 e auditorias externas trimestrais.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Posso cancelar a qualquer momento?</summary>
+            <p>Sim. Planos mensais sem fidelidade. Downgrade ou cancelamento em um clique no painel.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="cta">
+      <div class="container cta-box reveal">
+        <div class="cta-glow"></div>
+        <h2>Pronto para operar no próximo nível?</h2>
+        <p>Crie sua conta demo em 60 segundos. Sem cartão. Sem compromisso.</p>
+        <form class="cta-form" id="cta-form">
+          <input type="email" placeholder="seu@email.com" required aria-label="Email">
+          <button type="submit" class="btn btn-primary btn-lg">Criar conta demo</button>
+        </form>
+        <small>Já tem conta? <a href="#">Fazer login</a></small>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="logo">
+          <span class="logo-mark">VT</span>
+          <span class="logo-text">VertexTrade</span>
+        </a>
+        <p>Trading inteligente para a próxima geração de investidores.</p>
+      </div>
+      <div>
+        <h4>Produto</h4>
+        <a href="#features">Recursos</a>
+        <a href="#platform">Terminal</a>
+        <a href="#pricing">Planos</a>
+        <a href="#">API Docs</a>
+      </div>
+      <div>
+        <h4>Empresa</h4>
+        <a href="#">Sobre</a>
+        <a href="#">Carreiras</a>
+        <a href="#">Blog</a>
+        <a href="#">Contato</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Termos</a>
+        <a href="#">Privacidade</a>
+        <a href="#">Riscos</a>
+        <a href="#">Compliance</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>© 2026 VertexTrade. Trading envolve riscos. Resultados passados não garantem retornos futuros.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
