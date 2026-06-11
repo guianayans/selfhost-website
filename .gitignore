@@ -2,5 +2,6 @@ node_modules/
 app/node_modules/
 app/data/
 .env
+docker-compose.override.yml
 *.log
 .DS_Store

@@ -3,12 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: selfhost-website:latest
-    ports:
-      - "${PORT:-4050}:4050"
+    image: website-manager-local:latest
+    pull_policy: build
+    working_dir: /app
     volumes:
-      - ./sites:/app/sites
+      - /pendriver/website-manager/sites:/app/sites
       - website_manager_data:/app/data
+      - website_manager_node_modules:/app/node_modules
     environment:
       NODE_ENV: production
       PORT: "4050"
@@ -18,11 +19,11 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-trocar_senha}
       SESSION_SECRET: ${SESSION_SECRET:-troque-por-um-segredo-longo}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
-      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:-http://localhost:4050}
-      RSYNC_SSH_HOST: ${RSYNC_SSH_HOST:-servidor.example.com}
-      RSYNC_LOCAL_PATH: ${RSYNC_LOCAL_PATH:-/caminho/local/selfhost-website}
-      RSYNC_REMOTE_PATH: ${RSYNC_REMOTE_PATH:-/opt/selfhost-website}
-      RSYNC_REMOTE_SITES: ${RSYNC_REMOTE_SITES:-/opt/selfhost-website/sites}
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:-https://website.gvtserver.online}
+      RSYNC_SSH_HOST: yanserver.ddns.net
+      RSYNC_LOCAL_PATH: /Users/yanguimaraesviana/Desktop/website-manager
+      RSYNC_REMOTE_PATH: /pendriver/website-manager
+      RSYNC_REMOTE_SITES: /pendriver/website-manager/sites
     restart: unless-stopped
     healthcheck:
       test:
@@ -34,6 +35,32 @@ services:
       timeout: 5s
       retries: 6
       start_period: 30s
+    networks:
+      - coolify
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    labels:
+      - traefik.enable=true
+      - 'traefik.http.routers.website-manager.rule=Host(`website.gvtserver.online`) || Host(`www.website.gvtserver.online`)'
+      - traefik.http.routers.website-manager.entrypoints=https
+      - traefik.http.routers.website-manager.tls=true
+      - traefik.http.services.website-manager.loadbalancer.server.port=4050
+      - 'traefik.http.routers.website-manager.middlewares=website-manager-sec'
+      - traefik.http.middlewares.website-manager-sec.headers.forceSTSHeader=true
+      - traefik.http.middlewares.website-manager-sec.headers.stsSeconds=31536000
+      - traefik.http.middlewares.website-manager-sec.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.website-manager-sec.headers.stsPreload=true
+      - traefik.http.middlewares.website-manager-sec.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.website-manager-sec.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.website-manager-sec.headers.customResponseHeaders.X-Frame-Options=SAMEORIGIN
+      - traefik.http.middlewares.website-manager-sec.headers.customResponseHeaders.Cross-Origin-Resource-Policy=same-site
+      - 'traefik.http.middlewares.website-manager-sec.headers.customResponseHeaders.Permissions-Policy=camera=(), microphone=(), geolocation=()'
 
 volumes:
-  website_manager_data:
+  website_manager_data: null
+  website_manager_node_modules: null
+
+networks:
+  coolify:
+    external: true

@@ -104,6 +104,12 @@ O painel ficará disponível na porta **4050**. Configure seu reverse proxy para
 
 ## Deploy de sites
 
+> **Erro `Dockerfile: no such file or directory`?**  
+> O build precisa rodar na **raiz do projeto**, onde existem `Dockerfile`, `docker-compose.yml` e a pasta `app/`.  
+> Se você colou só o compose no Coolify ou fez rsync só de `sites/`, o Dockerfile não chegou no servidor.  
+> Confira no servidor: `ls -la /pendriver/website-manager/Dockerfile`  
+> Valide localmente: `sh scripts/check-deploy.sh`
+
 ### Projeto completo (app + sites)
 
 ```bash
