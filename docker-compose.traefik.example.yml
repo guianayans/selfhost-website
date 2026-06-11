@@ -1,0 +1,17 @@
+# Exemplo opcional — use com Traefik/Coolify
+# docker compose -f docker-compose.yml -f docker-compose.traefik.example.yml up -d
+
+services:
+  website-manager:
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.website-manager.rule=Host(`sites.seudominio.com`)
+      - traefik.http.routers.website-manager.entrypoints=https
+      - traefik.http.routers.website-manager.tls=true
+      - traefik.http.services.website-manager.loadbalancer.server.port=4050
+
+networks:
+  traefik:
+    external: true

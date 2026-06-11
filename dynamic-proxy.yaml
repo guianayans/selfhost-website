@@ -1,0 +1,28 @@
+http:
+  routers:
+    website-manager:
+      rule: 'Host(`sites.seudominio.com`)'
+      entryPoints:
+        - https
+      service: website-manager-svc
+      middlewares:
+        - website-manager-sec
+      tls: {}
+  middlewares:
+    website-manager-sec:
+      headers:
+        forceSTSHeader: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        contentTypeNosniff: true
+        referrerPolicy: strict-origin-when-cross-origin
+        customResponseHeaders:
+          X-Frame-Options: SAMEORIGIN
+          Cross-Origin-Resource-Policy: same-site
+          Permissions-Policy: 'camera=(), microphone=(), geolocation=()'
+  services:
+    website-manager-svc:
+      loadBalancer:
+        servers:
+          - url: 'http://website-manager:4050'
