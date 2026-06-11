@@ -24,9 +24,9 @@ const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'trocar_senha';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change-me-in-production';
 const MAX_UPLOAD_MB = Number(process.env.MAX_UPLOAD_MB || 50);
-const RSYNC_SSH_HOST = process.env.RSYNC_SSH_HOST || 'servidor.example.com';
-const RSYNC_LOCAL_PATH = process.env.RSYNC_LOCAL_PATH || '/caminho/local/selfhost-website';
-const RSYNC_REMOTE_PATH = process.env.RSYNC_REMOTE_PATH || '/opt/selfhost-website';
+const RSYNC_SSH_HOST = process.env.RSYNC_SSH_HOST || 'yanserver.ddns.net';
+const RSYNC_LOCAL_PATH = process.env.RSYNC_LOCAL_PATH || '/Users/yanguimaraesviana/Desktop/website-manager';
+const RSYNC_REMOTE_PATH = process.env.RSYNC_REMOTE_PATH || '/pendriver/website-manager';
 const RSYNC_REMOTE_SITES = process.env.RSYNC_REMOTE_SITES || `${RSYNC_REMOTE_PATH}/sites`;
 
 app.set('trust proxy', 1);
