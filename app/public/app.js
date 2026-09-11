@@ -223,22 +223,27 @@ function renderFilesPanel(site) {
           <p class="files-inline-path">${escapeHtml(state.sitesDisplayPath)}/${escapeHtml(site.slug)}</p>
         </div>
         <div class="files-inline-actions">
-          <button class="btn btn-secondary btn-sm" data-mkdir="${escapeAttr(site.slug)}" type="button">[ nova pasta ]</button>
-          <label class="btn btn-primary btn-sm upload-label">
+          <button class="btn btn-secondary btn-sm files-toolbar-btn" data-mkdir="${escapeAttr(site.slug)}" type="button">[ nova pasta ]</button>
+          <label class="btn btn-primary btn-sm upload-label files-toolbar-btn">
             [ upload ]
             <input type="file" data-upload="${escapeAttr(site.slug)}" multiple hidden>
           </label>
         </div>
       </div>
       <div class="panel-card files-panel-inner">
-        <div class="breadcrumb" id="files-breadcrumb-${escapeAttr(site.slug)}"></div>
-        <div class="files-table-head">
-          <span>Nome</span>
-          <span>Tipo</span>
-          <span>Modificado</span>
-          <span>Ações</span>
+        <div class="files-nav">
+          <button type="button" class="btn btn-secondary btn-sm files-back-btn" id="files-back-${escapeAttr(site.slug)}" disabled>[ ← voltar ]</button>
+          <div class="breadcrumb" id="files-breadcrumb-${escapeAttr(site.slug)}"></div>
         </div>
-        <div class="files-list" id="files-list-${escapeAttr(site.slug)}"></div>
+        <div class="files-table">
+          <div class="files-table-head">
+            <span>Nome</span>
+            <span>Tipo</span>
+            <span>Modificado</span>
+            <span>Ações</span>
+          </div>
+          <div class="files-list" id="files-list-${escapeAttr(site.slug)}"></div>
+        </div>
         <div class="files-empty hidden" id="files-empty-${escapeAttr(site.slug)}">
           <p>Esta pasta está vazia. Faça upload de arquivos ou crie subpastas.</p>
         </div>
@@ -442,14 +447,32 @@ function renderFiles(data, slug) {
   state.filePaths[slug] = currentPath;
 
   const breadcrumb = document.getElementById(`files-breadcrumb-${slug}`);
+  const backBtn = document.getElementById(`files-back-${slug}`);
   const filesList = document.getElementById(`files-list-${slug}`);
   const filesEmpty = document.getElementById(`files-empty-${slug}`);
   if (!breadcrumb || !filesList || !filesEmpty) return;
 
+  if (backBtn) {
+    backBtn.disabled = !currentPath;
+    backBtn.onclick = () => {
+      const parts = currentPath.split('/').filter(Boolean);
+      parts.pop();
+      state.filePaths[slug] = parts.join('/');
+      loadFiles(slug);
+    };
+  }
+
   breadcrumb.innerHTML = '';
+  const prefix = document.createElement('span');
+  prefix.className = 'breadcrumb-prefix';
+  prefix.textContent = '//';
+  breadcrumb.appendChild(prefix);
+
   const parts = currentPath ? currentPath.split('/') : [];
   const rootBtn = document.createElement('button');
-  rootBtn.textContent = '/';
+  rootBtn.type = 'button';
+  rootBtn.className = parts.length ? 'breadcrumb-link' : 'breadcrumb-link active';
+  rootBtn.textContent = 'raiz';
   rootBtn.addEventListener('click', () => {
     state.filePaths[slug] = '';
     loadFiles(slug);
@@ -457,12 +480,15 @@ function renderFiles(data, slug) {
   breadcrumb.appendChild(rootBtn);
 
   let cumulative = '';
-  parts.forEach((part) => {
+  parts.forEach((part, index) => {
     const sep = document.createElement('span');
-    sep.textContent = ' / ';
+    sep.className = 'breadcrumb-sep';
+    sep.textContent = '/';
     breadcrumb.appendChild(sep);
     cumulative = cumulative ? `${cumulative}/${part}` : part;
     const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = index === parts.length - 1 ? 'breadcrumb-link active' : 'breadcrumb-link';
     btn.textContent = part;
     btn.addEventListener('click', () => {
       state.filePaths[slug] = cumulative;
@@ -480,13 +506,13 @@ function renderFiles(data, slug) {
     row.className = 'file-row';
     row.style.animationDelay = `${index * 0.03}s`;
     row.innerHTML = `
-      <div><strong>${escapeHtml(item.name)}</strong></div>
+      <div class="file-name"><strong>${escapeHtml(item.name)}</strong></div>
       <span class="file-type">${item.type === 'directory' ? '📁 DIR' : '📄 FILE'}</span>
       <span class="file-date">${formatDate(item.modifiedAt)}</span>
-      <div class="site-actions"></div>
+      <div class="file-actions"></div>
     `;
 
-    const actions = row.querySelector('.site-actions');
+    const actions = row.querySelector('.file-actions');
     if (item.type === 'directory') {
       const openBtn = document.createElement('button');
       openBtn.className = 'btn btn-secondary btn-sm';
@@ -499,7 +525,7 @@ function renderFiles(data, slug) {
     } else {
       const downloadBtn = document.createElement('button');
       downloadBtn.className = 'btn btn-secondary btn-sm';
-      downloadBtn.textContent = '[ download ]';
+      downloadBtn.textContent = '[ baixar ]';
       downloadBtn.addEventListener('click', () => {
         const url = `/api/sites/${encodeURIComponent(slug)}/files/download?path=${encodeURIComponent(item.path)}`;
         window.open(url, '_blank');

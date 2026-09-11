@@ -50,15 +50,16 @@ website-manager/
 
 ### Pré-requisitos
 
-- [Docker](https://docs.docker.com/get-docker/) e Docker Compose
-- (Opcional) Traefik ou nginx como reverse proxy
+- Servidor com Docker e Docker Compose
+- Traefik/Coolify como reverse proxy (opcional)
 
-### 1. Clone o repositório
+### 1. Envie o projeto para o servidor (rsync)
 
 ```bash
-git clone https://github.com/guianayans/selfhost-website.git
-cd selfhost-website
+sh scripts/deploy-from-mac.sh
 ```
+
+Não use `git clone` no servidor — o deploy é por **rsync** para `/pendriver/website-manager/`.
 
 ### 2. Configure as variáveis de ambiente
 
@@ -88,10 +89,10 @@ RSYNC_REMOTE_SITES=/opt/website-manager/sites
 ### 3. Suba com Docker
 
 ```bash
-docker compose up -d --build
+sh /pendriver/website-manager/scripts/up.sh
 ```
 
-O painel ficará disponível na porta **4050**. Configure seu reverse proxy para apontar para ela.
+O painel ficará disponível na porta **4050**. Domínio: https://website.gvtserver.online
 
 ### Login padrão (altere imediatamente)
 
@@ -105,25 +106,43 @@ O painel ficará disponível na porta **4050**. Configure seu reverse proxy para
 ## Deploy de sites
 
 > **Erro `Dockerfile: no such file or directory`?**  
-> O build precisa rodar na **raiz do projeto**, onde existem `Dockerfile`, `docker-compose.yml` e a pasta `app/`.  
-> Se você colou só o compose no Coolify ou fez rsync só de `sites/`, o Dockerfile não chegou no servidor.  
+> Isso acontece quando o Coolify ou o `docker compose` roda **fora** da pasta do projeto (ex.: em `/root`).  
+> O `docker-compose.yml` já usa caminho absoluto no build: `/pendriver/website-manager`.  
+> Depois do rsync, suba com: `sh /pendriver/website-manager/scripts/up.sh`  
 > Confira no servidor: `ls -la /pendriver/website-manager/Dockerfile`  
 > Valide localmente: `sh scripts/check-deploy.sh`
 
-### Projeto completo (app + sites)
+### Projeto completo (app + sites) — Mac → servidor
+
+```bash
+sh scripts/deploy-from-mac.sh
+```
+
+Ou manualmente:
 
 ```bash
 rsync -avz --delete \
-  -e "ssh" \
-  ./ \
-  usuario@servidor:/opt/website-manager/
+  -e "ssh -o StrictHostKeyChecking=no" \
+  /Users/yanguimaraesviana/Desktop/website-manager/ \
+  root@yanserver.ddns.net:/pendriver/website-manager/
 ```
 
-Se alterou código do app:
+Rebuild no servidor (funciona de **qualquer pasta**, inclusive `/root`):
 
 ```bash
-ssh usuario@servidor "cd /opt/website-manager && docker compose up -d --build"
+sh /pendriver/website-manager/scripts/up.sh
 ```
+
+### Coolify
+
+**Não use deploy via GitHub** para este projeto. O fluxo é **rsync → servidor → docker compose**.
+
+Se o Coolify tiver repositório Git conectado, **desconecte** e use os arquivos em `/pendriver/website-manager/` (enviados por rsync).
+
+| Campo | Valor |
+|-------|-------|
+| Compose file | `/pendriver/website-manager/docker-compose.yml` |
+| Comando de deploy | `sh /pendriver/website-manager/scripts/up.sh` |
 
 ### Apenas um site
 

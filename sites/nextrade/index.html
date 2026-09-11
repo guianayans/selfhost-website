@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NexTrade — Plataforma de trading com IA, bots automáticos e rendimento 24/7.">
+  <title>NexTrade | O Futuro do Trading</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="particleCanvas"></canvas>
+  </div>
+  <div class="bg-screen" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <nav>
+        <a href="#top" class="logo">Nex<span>Trade</span></a>
+        <div class="nav-links">
+          <a href="#features">Recursos</a>
+          <a href="#pricing">Planos</a>
+          <a href="#community">Comunidade</a>
+          <a href="#cta" class="nav-cta">Entrar</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hidden" id="hero-content">
+        <h1>Comece a lucrar hoje.<br>Rendimento Automático.</h1>
+        <p>A plataforma mais avançada do mercado. Algoritmos de IA que analisam o mercado em milissegundos para gerar lucro passivo enquanto você dorme.</p>
+        <a href="#pricing" class="btn btn-primary">Começar Agora</a>
+      </div>
+    </section>
+
+    <div class="ticker-wrap" aria-label="Cotações em tempo real">
+      <div class="ticker">
+        <span class="ticker-item">BTC: $64,230 <i class="fas fa-caret-up up"></i></span>
+        <span class="ticker-item">ETH: $3,450 <i class="fas fa-caret-up up"></i></span>
+        <span class="ticker-item">SOL: $145.20 <i class="fas fa-caret-down down"></i></span>
+        <span class="ticker-item">EUR/USD: 1.09 <i class="fas fa-caret-up up"></i></span>
+        <span class="ticker-item">BTC: $64,230 <i class="fas fa-caret-up up"></i></span>
+        <span class="ticker-item">ETH: $3,450 <i class="fas fa-caret-up up"></i></span>
+        <span class="ticker-item">SOL: $145.20 <i class="fas fa-caret-down down"></i></span>
+        <span class="ticker-item">EUR/USD: 1.09 <i class="fas fa-caret-up up"></i></span>
+      </div>
+    </div>
+
+    <section id="features" class="features">
+      <div class="container">
+        <div class="section-title hidden">
+          <h2>Tecnologia de <span>Ponta</span></h2>
+          <p>Não deixe o mercado para trás. Nossa infraestrutura suporta grandes volumes.</p>
+        </div>
+        <div class="grid">
+          <article class="card hidden">
+            <i class="fas fa-robot"></i>
+            <h3>Bot Inteligente</h3>
+            <p>Nossa IA analisa 1.000 indicadores simultaneamente para encontrar a melhor entrada no mercado.</p>
+          </article>
+          <article class="card hidden">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Segurança Bancária</h3>
+            <p>Suas criptomoedas são guardadas em cold wallets e protegidas por tecnologia de ponta.</p>
+          </article>
+          <article class="card hidden">
+            <i class="fas fa-bolt"></i>
+            <h3>Estratégia 24/7</h3>
+            <p>O mercado não dorme, nem nós. Operamos 365 dias por ano para maximizar seu ROI.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="pricing">
+      <div class="container">
+        <div class="section-title hidden">
+          <h2>Planos de <span>Rendimento</span></h2>
+        </div>
+        <div class="grid">
+          <article class="price-card hidden">
+            <h3>Starter</h3>
+            <div class="price">R$ 49<span>/mês</span></div>
+            <ul class="features-list">
+              <li><i class="fas fa-check"></i> Acesso ao Bot Básico</li>
+              <li><i class="fas fa-check"></i> Suporte por Email</li>
+              <li><i class="fas fa-check"></i> ROI Alvo: 5% / mês</li>
+            </ul>
+            <a href="#cta" class="btn btn-outline">Escolher</a>
+          </article>
+          <article class="price-card featured hidden">
+            <div class="badge">MAIS POPULAR</div>
+            <h3>Premium</h3>
+            <div class="price">R$ 149<span>/mês</span></div>
+            <ul class="features-list">
+              <li><i class="fas fa-check"></i> Bot IA Avançada</li>
+              <li><i class="fas fa-check"></i> Suporte Prioritário 24h</li>
+              <li><i class="fas fa-check"></i> ROI Alvo: 15% / mês</li>
+              <li><i class="fas fa-check"></i> Acesso ao Grupo VIP</li>
+            </ul>
+            <a href="#cta" class="btn btn-primary">Começar Premium</a>
+          </article>
+          <article class="price-card hidden">
+            <h3>Elite</h3>
+            <div class="price">R$ 299<span>/mês</span></div>
+            <ul class="features-list">
+              <li><i class="fas fa-check"></i> Tudo do Premium</li>
+              <li><i class="fas fa-check"></i> Gerente de conta pessoal</li>
+              <li><i class="fas fa-check"></i> ROI Alvo: 30% / mês</li>
+            </ul>
+            <a href="#cta" class="btn btn-outline">Escolher</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="community" class="community hidden">
+      <div class="container">
+        <div class="section-title">
+          <h2>Comunidade <span>NexTrade</span></h2>
+          <p>Milhares de traders já operam com nossos bots. Junte-se ao grupo VIP.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="cta" class="cta hidden">
+      <div class="container">
+        <h2>Pronto para operar?</h2>
+        <p>Crie sua conta em menos de 2 minutos e ative o bot hoje.</p>
+        <a href="#" class="btn btn-primary">Criar conta grátis</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 NexTrade. Todos os direitos reservados.</p>
+      <div class="social">
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 services:
   website-manager:
     build:
-      context: .
+      # Caminho absoluto: funciona mesmo se o Coolify/docker compose rodar de /root
+      context: /pendriver/website-manager
       dockerfile: Dockerfile
     image: website-manager-local:latest
     pull_policy: build

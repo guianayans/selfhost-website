@@ -277,7 +277,7 @@ app.get('/api/sites/:slug/files/download', requireAuth, async (req, res) => {
 const publicDir = path.join(__dirname, 'public');
 
 app.get('/favicon.ico', (_req, res) => {
-  res.type('image/png').sendFile(path.join(publicDir, 'favicon.png'));
+  res.type('image/svg+xml').sendFile(path.join(publicDir, 'favicon.svg'));
 });
 
 app.use(express.static(publicDir, { index: false, maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0 }));
