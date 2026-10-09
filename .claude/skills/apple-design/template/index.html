@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marca — a frase que resume o produto</title>
+<meta name="description" content="Uma ou duas frases: o que é, para quem, e o que muda na vida de quem usa.">
+<meta name="theme-color" content="#05070b">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<!-- caminhos sempre relativos: o site é servido em /{slug}/ -->
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.className = "js";</script>
+<script src="script.js" defer></script>
+<script src="fx.js" defer></script>
+</head>
+<body>
+<!-- fundo de fibras: fixo atrás de tudo; cada seção escolhe a forma com data-fx-scene -->
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Marca, início">Marca</a>
+    <nav aria-label="Seções">
+      <a href="#como">Como funciona</a>
+      <a href="#recursos">Recursos</a>
+      <a href="#comecar">Começar</a>
+    </nav>
+    <a class="pill" href="#comecar">Começar</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- herói: uma frase, um apoio, uma ação -->
+  <section class="hero" data-fx-scene="0" data-fx-intensity="0.95">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow" data-reveal>Novo</p>
+        <h1 data-reveal>A promessa do produto em uma frase curta.</h1>
+        <p class="sub" data-reveal>Duas linhas que explicam o que acontece, com as palavras de quem usa. Sem jargão, sem lista de recursos.</p>
+        <div class="ctas" data-reveal>
+          <a class="pill big" href="#comecar">Começar agora</a>
+          <a class="ghost" href="#como">Como funciona</a>
+        </div>
+      </div>
+      <div class="hero-visual" data-reveal>
+        <!-- o produto de verdade: captura, vídeo curto em loop ou um mock feito em HTML -->
+        <div class="device"><div class="device-screen" data-parallax="0.06"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- cena presa: a rolagem conta a história em etapas -->
+  <section class="story" id="como" aria-label="Como funciona" data-story data-fx-scene="1" data-fx-intensity="0.55">
+    <div class="stick">
+      <div class="wrap story-grid">
+        <ol class="steps">
+          <li data-step="0"><span class="n">01</span><h2>O problema, do jeito que a pessoa sente.</h2><p>Uma situação concreta que ela reconhece na hora.</p></li>
+          <li data-step="1"><span class="n">02</span><h2>O que o produto faz a respeito.</h2><p>A primeira coisa que muda quando ela começa a usar.</p></li>
+          <li data-step="2"><span class="n">03</span><h2>O que ela passa a enxergar.</h2><p>O ganho que só aparece depois de alguns dias de uso.</p></li>
+          <li data-step="3"><span class="n">04</span><h2>Onde ela chega.</h2><p>O resultado final, dito sem exagero.</p></li>
+        </ol>
+        <div class="stage" aria-hidden="true">
+          <!-- uma cena por etapa: troque por telas do produto, mocks em HTML, vídeos -->
+          <div class="scene" data-step="0"><div class="panel">Cena 1</div></div>
+          <div class="scene" data-step="1"><div class="panel">Cena 2</div></div>
+          <div class="scene" data-step="2"><div class="panel">Cena 3</div></div>
+          <div class="scene" data-step="3"><div class="panel">Cena 4</div></div>
+        </div>
+      </div>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="progress" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <!-- números: poucos, grandes, verdadeiros -->
+  <section class="numbers" aria-label="Em números" data-fx-scene="2" data-fx-intensity="0.75">
+    <div class="wrap">
+      <h2 data-reveal>O contexto dos números, em uma linha.</h2>
+      <div class="nums">
+        <div data-reveal><b data-count="653">653</b><span>primeira medida</span></div>
+        <div data-reveal><b data-count="175">175</b><span>segunda medida</span></div>
+        <div data-reveal><b data-count="45">45</b><span>terceira medida</span></div>
+        <div data-reveal><b data-count="12">12</b><span>quarta medida</span></div>
+      </div>
+      <p class="muted small" data-reveal>De onde vêm os números e quando foram medidos.</p>
+    </div>
+  </section>
+
+  <!-- mosaico de recursos -->
+  <section class="features" id="recursos" data-fx-scene="2" data-fx-intensity="0.3">
+    <div class="wrap">
+      <h2 class="section-title" data-reveal>O benefício que une todos os recursos.</h2>
+      <div class="bento">
+        <article class="card wide" data-reveal><h3>Recurso principal</h3><p>O que ele resolve, em uma frase. Um detalhe concreto vale mais que três adjetivos.</p></article>
+        <article class="card" data-reveal><h3>Recurso</h3><p>O que ele resolve, em uma frase.</p></article>
+        <article class="card" data-reveal><h3>Recurso</h3><p>O que ele resolve, em uma frase.</p></article>
+        <article class="card" data-reveal><h3>Recurso</h3><p>O que ele resolve, em uma frase.</p></article>
+        <article class="card" data-reveal><h3>Recurso</h3><p>O que ele resolve, em uma frase.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- chamada final: tela cheia, o fundo fecha a última forma atrás do texto -->
+  <section class="final" id="comecar" data-fx-scene="3" data-fx-intensity="1">
+    <div class="wrap">
+      <h2 data-reveal>A frase que fecha a história.<br><span class="accent">E a virada.</span></h2>
+      <a class="pill big" href="#" data-reveal>Começar agora</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>Marca</span>
+    <span class="muted">© 2026</span>
+  </div>
+</footer>
+</body>
+</html>
