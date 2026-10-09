@@ -69,7 +69,7 @@ precision highp float;
 attribute float aS;       // posição ao longo da fibra (0..1)
 attribute float aSide;    // -1 / +1: lados da faixa
 attribute vec3 aLine;     // lane (0..1), semente, cor
-uniform float uT, uScene, uAspect, uIntensity, uW;
+uniform float uT, uScene, uK, uAspect, uIntensity, uW;   // uK: cena de partida, decidida no script (a mesma dos deslocamentos)
 uniform vec2 uRes, uPtr;
 uniform vec2 uOff;        // deslocamento vertical da forma atual e da próxima (acompanham a sua seção)
 uniform vec4 uBox;        // centro e escala (clip) da área onde as formas são desenhadas
@@ -81,7 +81,7 @@ float gA, gOpen;
 ${SHAPES}
 void main() {
   float lane = aLine.x, seed = aLine.y;
-  float k0 = clamp(floor(uScene), 0.0, ${SCENES - 2}.0), f = clamp(uScene - k0, 0.0, 1.0);
+  float k0 = uK, f = clamp(uScene - k0, 0.0, 1.0);
   float fi = smoothstep(0.0, 1.0, clamp(f * 1.7 - seed * 0.7, 0.0, 1.0));   // cada fibra muda no seu tempo
   float e = 1.0 / 220.0;
   float s2 = aS + (aS < 0.995 ? e : -e);
@@ -154,7 +154,7 @@ void main() {
   gl.enableVertexAttribArray(aLine); gl.vertexAttribPointer(aLine, 3, gl.FLOAT, false, 12, 0);
   inst.div(aLine, 1);
   const U = {};
-  ["uT", "uScene", "uAspect", "uIntensity", "uW", "uRes", "uPtr", "uOff", "uBox", "uC1", "uC2", "uC3"].forEach((n) => (U[n] = gl.getUniformLocation(prog, n)));
+  ["uT", "uScene", "uK", "uAspect", "uIntensity", "uW", "uRes", "uPtr", "uOff", "uBox", "uC1", "uC2", "uC3"].forEach((n) => (U[n] = gl.getUniformLocation(prog, n)));
   gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);   // soma de luz: só funciona sobre fundo escuro
   gl.clearColor(0, 0, 0, 0);
 
@@ -284,7 +284,7 @@ void main() {
     const k0 = clamp(Math.floor(scene), 0, SCENES - 2);
 
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform1f(U.uT, t); gl.uniform1f(U.uScene, clamp(scene, 0, SCENES - 1));
+    gl.uniform1f(U.uT, t); gl.uniform1f(U.uScene, clamp(scene, 0, SCENES - 1)); gl.uniform1f(U.uK, k0);
     gl.uniform1f(U.uAspect, box[4]); gl.uniform1f(U.uIntensity, inten);
     gl.uniform1f(U.uW, (small ? 4 : 5) * dpr); gl.uniform2f(U.uRes, cv.width, cv.height);
     gl.uniform2f(U.uPtr, ptr[0], ptr[1]);
