@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GymOS AI — o sistema operacional da academia</title>
+<meta name="description" content="Máquinas que reconhecem o aluno, medem cada repetição e ajustam a próxima série. Alunos, professores e equipamentos na mesma plataforma, com inteligência artificial.">
+<meta name="theme-color" content="#080c14">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.className = "js";</script>
+<script src="script.js" defer></script>
+<script src="fx.js" defer></script>
+<script src="site.js" defer></script>
+</head>
+<body>
+<!-- fundo: curva de força de uma série → arcos de amplitude → rede do ecossistema → anilha -->
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="GymOS AI, início">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="3.2"/></svg>
+      <span>GymOS <b>AI</b></span>
+    </a>
+    <nav aria-label="Seções">
+      <a href="#como">Como funciona</a>
+      <a href="#para-quem">Para quem</a>
+      <a href="#plataforma">Plataforma</a>
+      <a href="#estagio">Estágio</a>
+    </nav>
+    <a class="pill" href="#contato">Falar com a equipe</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- herói -->
+  <section class="hero" data-fx-scene="0" data-fx-intensity="0.95">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow" data-reveal><i class="led"></i> Em desenvolvimento</p>
+        <h1 data-reveal>O sistema operacional da academia.</h1>
+        <p class="sub" data-reveal>Máquinas que reconhecem o aluno, medem cada repetição e ajustam a próxima série. Alunos, professores e equipamentos na mesma plataforma, com inteligência artificial.</p>
+        <div class="ctas" data-reveal>
+          <a class="pill big" href="#contato">Falar com a equipe</a>
+          <a class="ghost" href="#como">Como funciona</a>
+        </div>
+      </div>
+      <div class="hero-visual" data-reveal>
+        <!-- o terminal da máquina, rodando uma série simulada -->
+        <div class="term" data-sim role="img" aria-label="Simulação do terminal de uma máquina inteligente: leg press, série 2 de 3, contando repetições com gráfico de força">
+          <div class="term-top">
+            <span class="who"><i class="avatar">MC</i><span>Marina C.<small>aluna fictícia</small></span></span>
+            <span class="tag live"><i class="led"></i> Simulação</span>
+          </div>
+          <div class="term-main">
+            <div class="ex">
+              <small>Exercício</small>
+              <b>Leg press 45°</b>
+              <span>Série <span data-sim-set>2</span> de 3 · 82 kg</span>
+            </div>
+            <div class="repc"><b data-sim-rep>0</b><span>/ 10</span></div>
+          </div>
+          <svg class="force" viewBox="0 0 400 110" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".35"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient></defs>
+            <path data-sim-area fill="url(#fg)"/><path data-sim-line fill="none" stroke="#22d3ee" stroke-width="2" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <div class="meters">
+            <div><small>Amplitude</small><div class="bar"><i data-sim-rom></i></div></div>
+            <div><small>Velocidade</small><b><span data-sim-vel>0,00</span> m/s</b></div>
+            <div><small>Força</small><b><span data-sim-force>0</span> N</b></div>
+          </div>
+          <p class="term-note" data-sim-note>Boa execução. Mantenha o ritmo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- cena presa: uma série, do reconhecimento ao painel do professor -->
+  <section class="story" id="como" aria-label="Como funciona" data-story data-fx-scene="1" data-fx-intensity="0.5">
+    <div class="stick">
+      <div class="wrap story-grid">
+        <ol class="steps">
+          <li data-step="0"><span class="n">01</span><h2>A máquina reconhece quem chegou.</h2><p>O aluno se identifica no terminal e o treino do dia já está lá: exercício, carga e séries prescritos pelo professor.</p></li>
+          <li data-step="1"><span class="n">02</span><h2>Cada repetição vira dado.</h2><p>Força, velocidade e amplitude medidas do começo ao fim do movimento. O aluno vê na hora; o histórico guarda tudo.</p></li>
+          <li data-step="2"><span class="n">03</span><h2>A IA sugere a próxima série. E explica.</h2><p>Quando o ritmo cai, a recomendação aparece com o motivo. Sempre dentro dos limites que o professor definiu.</p></li>
+          <li data-step="3"><span class="n">04</span><h2>O professor enxerga a sala inteira.</h2><p>Quem está treinando, em qual máquina, e quem precisa de atenção agora. Sem sair do lugar.</p></li>
+        </ol>
+
+        <div class="stage" aria-hidden="true">
+          <!-- 0: identificação e plano do dia -->
+          <div class="scene" data-step="0">
+            <div class="glass id-card">
+              <span class="tag">Dados fictícios</span>
+              <div class="id-head"><i class="avatar big">MC</i><div><b>Olá, Marina.</b><span>Treino de hoje: Inferiores A</span></div></div>
+              <ul class="plan">
+                <li class="now"><span>Leg press 45°</span><b>3 × 10 · 82 kg</b></li>
+                <li><span>Cadeira extensora</span><b>3 × 12 · 45 kg</b></li>
+                <li><span>Mesa flexora</span><b>3 × 12 · 38 kg</b></li>
+              </ul>
+              <div class="big-btn">Começar série</div>
+            </div>
+          </div>
+          <!-- 1: telemetria ao vivo -->
+          <div class="scene" data-step="1">
+            <div class="glass tele" data-sim>
+              <span class="tag live"><i class="led"></i> Simulação</span>
+              <div class="tele-top">
+                <div class="repc xl"><b data-sim-rep>0</b><span>/ 10 repetições</span></div>
+                <div class="ex"><small>Leg press 45°</small><b>82 kg</b><span>Série <span data-sim-set>2</span> de 3</span></div>
+              </div>
+              <svg class="force tall" viewBox="0 0 400 110" preserveAspectRatio="none">
+                <path data-sim-area fill="url(#fg)"/><path data-sim-line fill="none" stroke="#22d3ee" stroke-width="2" vector-effect="non-scaling-stroke"/>
+              </svg>
+              <div class="meters">
+                <div><small>Amplitude</small><div class="bar"><i data-sim-rom></i></div></div>
+                <div><small>Velocidade</small><b><span data-sim-vel>0,00</span> m/s</b></div>
+                <div><small>Força</small><b><span data-sim-force>0</span> N</b></div>
+              </div>
+            </div>
+          </div>
+          <!-- 2: recomendação explicada -->
+          <div class="scene" data-step="2">
+            <div class="glass ai-card">
+              <span class="tag">Exemplo ilustrativo</span>
+              <p class="ai-kicker"><i class="spark"></i> Sugestão da IA para a série 3</p>
+              <p class="ai-main">Reduzir para <b>78 kg</b>.</p>
+              <ul class="why">
+                <li><b>−18%</b><span>de velocidade nas três últimas repetições</span></li>
+                <li><b>88%</b><span>de amplitude, abaixo dos 90% prescritos</span></li>
+              </ul>
+              <div class="ai-actions"><div class="big-btn">Aceitar 78 kg</div><div class="big-btn quiet">Manter 82 kg</div></div>
+              <p class="fine">Limites do professor para este exercício: 60 a 90 kg.</p>
+            </div>
+          </div>
+          <!-- 3: a sala inteira -->
+          <div class="scene" data-step="3">
+            <div class="glass floor">
+              <span class="tag">Dados fictícios</span>
+              <div class="kpis">
+                <div><b>14</b><span>máquinas conectadas</span></div>
+                <div><b>9</b><span>sessões agora</span></div>
+                <div><b class="warn">1</b><span>pede atenção</span></div>
+              </div>
+              <div class="tiles">
+                <i class="busy"></i><i class="busy"></i><i></i><i class="busy"></i><i class="busy"></i><i class="alert"></i><i class="busy"></i>
+                <i></i><i class="busy"></i><i class="busy"></i><i></i><i class="busy"></i><i></i><i class="off"></i>
+              </div>
+              <p class="alert-line"><i class="led amber"></i> Leg press 03 · amplitude abaixo do prescrito em duas séries seguidas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="progress" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <!-- números de uma série -->
+  <section class="numbers" aria-label="Uma série em números" data-fx-scene="2" data-fx-intensity="0.75">
+    <div class="wrap">
+      <h2 data-reveal>Uma série, medida por inteiro.</h2>
+      <div class="nums">
+        <div data-reveal><b><i data-count="10">10</i></b><span>repetições contadas</span></div>
+        <div data-reveal><b><i data-count="82">82</i><small>kg</small></b><span>de resistência</span></div>
+        <div data-reveal><b><i data-count="62">62</i><small>cm/s</small></b><span>de velocidade média</span></div>
+        <div data-reveal><b><i data-count="94">94</i><small>%</small></b><span>de amplitude</span></div>
+      </div>
+      <p class="muted small" data-reveal>Valores de uma sessão simulada, para mostrar o que o terminal registra. Não são resultados de academias em operação.</p>
+    </div>
+  </section>
+
+  <!-- para quem -->
+  <section class="audiences" id="para-quem" data-fx-scene="2" data-fx-intensity="0.3">
+    <div class="wrap">
+      <h2 class="section-title" data-reveal>Um sistema. Três pontos de vista.</h2>
+      <div class="cols">
+        <article data-reveal>
+          <p class="kicker">Para alunos</p>
+          <h3>Saber se o treino está funcionando.</h3>
+          <ul>
+            <li>Evolução de carga, volume e frequência em um só lugar.</li>
+            <li>Recordes pessoais registrados sozinhos.</li>
+            <li>Recomendações com o motivo ao lado.</li>
+            <li>Um treinador virtual para tirar dúvidas do plano.</li>
+          </ul>
+        </article>
+        <article data-reveal>
+          <p class="kicker">Para academias</p>
+          <h3>Operar a sala com dados, não com palpite.</h3>
+          <ul>
+            <li>Uso de cada equipamento, hora a hora.</li>
+            <li>Alertas de falha e de manutenção.</li>
+            <li>Alunos que precisam de atenção, antes de desistirem.</li>
+            <li>Várias unidades na mesma conta.</li>
+          </ul>
+        </article>
+        <article data-reveal>
+          <p class="kicker">Para fabricantes</p>
+          <h3>Um terminal pronto para embarcar.</h3>
+          <ul>
+            <li>Interface de toque para telas na horizontal e na vertical.</li>
+            <li>Telemetria, firmware e estado de conexão em uma central.</li>
+            <li>Estados de segurança previstos desde o desenho.</li>
+            <li>Integração com equipamentos reais: em conversa com parceiros.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- plataforma -->
+  <section class="features" id="plataforma" data-fx-scene="2" data-fx-intensity="0.25">
+    <div class="wrap">
+      <h2 class="section-title" data-reveal>Tudo ligado ao mesmo treino.</h2>
+      <div class="bento">
+        <article class="card wide" data-reveal>
+          <h3>Portal do aluno</h3>
+          <p>Plano atual, calendário, histórico completo e a evolução de cada exercício, do jeito mais simples de ler.</p>
+          <svg class="spark-chart" viewBox="0 0 400 90" preserveAspectRatio="none" aria-label="Exemplo: evolução de carga no leg press ao longo de 12 semanas">
+            <path d="M0 78 L36 74 L72 70 L108 71 L144 62 L180 58 L216 52 L252 54 L288 42 L324 36 L360 28 L400 20 L400 90 L0 90Z" fill="url(#fg2)"/>
+            <path d="M0 78 L36 74 L72 70 L108 71 L144 62 L180 58 L216 52 L252 54 L288 42 L324 36 L360 28 L400 20" fill="none" stroke="#10b981" stroke-width="2" vector-effect="non-scaling-stroke"/>
+            <defs><linearGradient id="fg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10b981" stop-opacity=".3"/><stop offset="1" stop-color="#10b981" stop-opacity="0"/></linearGradient></defs>
+          </svg>
+          <p class="fine">Leg press · 12 semanas · exemplo com dados fictícios</p>
+        </article>
+        <article class="card" data-reveal>
+          <h3>Terminal da máquina</h3>
+          <p>Botões grandes, leitura a um metro de distância e resposta imediata. Feito para usar no meio da série.</p>
+        </article>
+        <article class="card" data-reveal>
+          <h3>Painel do professor</h3>
+          <p>Prescreve exercícios, define limites e revisa as sugestões da IA antes de valerem.</p>
+        </article>
+        <article class="card wide" data-reveal>
+          <h3>Central de inteligência artificial</h3>
+          <p>Uma pergunta em português vira resumo, comparação entre períodos ou gráfico. A resposta mostra de onde veio.</p>
+          <div class="chat">
+            <p class="q">Como foi o meu mês comparado ao anterior?</p>
+            <div class="a">
+              <div class="cmp"><span>Volume</span><i style="--v:.62"></i><i class="cur" style="--v:.78"></i><b>+26%</b></div>
+              <div class="cmp"><span>Frequência</span><i style="--v:.7"></i><i class="cur" style="--v:.75"></i><b>+7%</b></div>
+            </div>
+          </div>
+          <p class="fine">Exemplo ilustrativo de resposta</p>
+        </article>
+        <article class="card" data-reveal>
+          <h3>Gestão de equipamentos</h3>
+          <p>Inventário, conexão, versões de firmware, falhas e manutenção de cada máquina.</p>
+        </article>
+        <article class="card" data-reveal>
+          <h3>Laboratório de máquinas</h3>
+          <p>Máquinas virtuais para simular séries, falhas e reconexões antes de qualquer equipamento físico.</p>
+        </article>
+        <article class="card" data-reveal>
+          <h3>Organizações e unidades</h3>
+          <p>Permissões por papel, auditoria e relatórios para redes com mais de uma academia.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- estágio: o que existe hoje -->
+  <section class="status" id="estagio" data-fx-scene="2.45" data-fx-intensity="0.4">
+    <div class="wrap">
+      <h2 class="section-title" data-reveal>Primeiro o software. Depois o ferro.</h2>
+      <p class="lead" data-reveal>O GymOS AI está em desenvolvimento. A primeira versão controla apenas <b>máquinas virtuais</b>: tudo o que aparece nesta página é simulação, com dados fictícios.</p>
+      <ol class="how">
+        <li data-reveal><b>Agora.</b> Plataforma web, terminal de toque e simulador de máquinas.</li>
+        <li data-reveal><b>Em seguida.</b> Pilotos com academias, usando o simulador ao lado do treino real.</li>
+        <li data-reveal><b>Depois.</b> Equipamentos conectados, com fabricantes parceiros.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- convite final: a anilha fecha em volta do formulário -->
+  <section class="final" id="contato" data-fx-scene="3" data-fx-intensity="0.85">
+    <div class="wrap">
+      <h2 data-reveal>Quer acompanhar de perto?<br><span class="accent">Vamos conversar.</span></h2>
+      <form class="lead-form" id="lead" novalidate data-reveal data-endpoint="" data-email="">
+        <label><span>Nome</span><input name="nome" autocomplete="name" required></label>
+        <label><span>E-mail</span><input name="email" type="email" autocomplete="email" required></label>
+        <label class="full"><span>Eu represento</span>
+          <select name="perfil" required>
+            <option value="">Escolha</option>
+            <option>Uma academia</option>
+            <option>Um fabricante de equipamentos</option>
+            <option>Sou professor ou personal</option>
+            <option>Sou aluno</option>
+          </select>
+        </label>
+        <button class="pill big full" type="submit">Tenho interesse</button>
+        <p class="form-msg full" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>GymOS AI</span>
+    <span class="muted">Produto em desenvolvimento · telas e números desta página são simulações</span>
+  </div>
+</footer>
+</body>
+</html>
