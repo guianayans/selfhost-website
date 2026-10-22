@@ -385,40 +385,142 @@
   .papel-card b { font-family: var(--display); font-size: 15.5px; }
   .papel-card span { color: var(--texto-2); font-size: 14px; }
 
-  /* Quem faz o quê (antiga matriz RACI): um cartão por entrega, papéis em português */
-  .raci { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(310px, 100%), 1fr)); gap: 12px; }
-  .raci-card { padding: 18px; display: grid; gap: 12px; align-content: start; }
-  .raci-card h3 { margin: 0; display: flex; align-items: center; gap: 10px; font: 800 16px var(--display); }
-  .raci-card h3 .n {
-    flex-shrink: 0; width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center;
-    font: 800 13px var(--display); color: #fff; background: linear-gradient(135deg, var(--azul), var(--violeta));
+  /* Quem faz o quê: matriz interativa (entregas × participantes).
+     Linhas = entregas, colunas = quem participa. Cada célula mostra o papel com peso visual próprio:
+     Faz (cheio) > Aprova (anel) > Dá opinião (suave) > Fica sabendo (tracejado). */
+  .raci { padding: 18px; display: grid; gap: 16px; position: relative; overflow: hidden; }
+  .raci-topo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .raci-olhar { display: grid; gap: 6px; min-width: 0; }
+  .raci-olhar > span { font: 700 11px var(--corpo); letter-spacing: .1em; text-transform: uppercase; color: var(--texto-2); }
+  .raci-lentes {
+    position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 12px;
+    background: var(--fundo); border: 1px solid var(--linha); max-width: 100%; overflow-x: auto; scrollbar-width: none;
   }
-  .raci-linha { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 10px; align-items: start; }
-  .raci-papel {
-    display: inline-flex; align-items: center; gap: 6px; padding-top: 5px; white-space: nowrap;
-    font: 700 11.5px var(--corpo); letter-spacing: .06em; text-transform: uppercase; color: var(--tom);
+  .raci-lentes::-webkit-scrollbar { display: none; }
+  .raci-lentes button {
+    position: relative; z-index: 1; border: 0; background: none; height: 32px; padding: 0 11px; border-radius: 8px;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    font: 700 13px var(--corpo); color: var(--texto-2); transition: color .25s;
   }
-  .raci-papel svg { width: 15px; height: 15px; flex-shrink: 0; }
-  .raci-linha.faz { --tom: var(--azul); }
-  .raci-linha.aprova { --tom: var(--violeta); }
-  .raci-linha.opina { --tom: var(--ouro); }
-  .raci-linha.sabe { --tom: var(--texto-2); }
-  .raci-quem { display: flex; flex-wrap: wrap; gap: 6px; }
-  .raci-chip {
-    display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 999px;
-    font-size: 13px; font-weight: 600; background: color-mix(in srgb, var(--cor) 12%, var(--papel));
-    border: 1px solid color-mix(in srgb, var(--cor) 30%, var(--linha));
+  .raci-lentes button i { width: 8px; height: 8px; border-radius: 50%; background: var(--cor); flex: none; }
+  .raci-lentes button[aria-pressed="true"] { color: var(--texto); }
+  .raci-pilula {
+    position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 8px;
+    background: var(--papel); box-shadow: var(--sombra);
+    transition: transform .45s var(--mola), width .45s var(--mola);
   }
-  .raci-chip::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--cor); }
-  .raci-linha.faz .raci-chip, .raci-linha.aprova .raci-chip { font-weight: 700; }
-  .raci-linha.sabe .raci-chip { background: transparent; font-weight: 500; color: var(--texto-2); }
-  /* Ao aparecer na tela, as equipes entram uma a uma */
-  .raci-card .raci-chip { opacity: 0; }
-  .raci-card.visivel .raci-chip { animation: sobe .5s var(--mola) both; animation-delay: calc(.2s + var(--i) * 70ms); }
-  @media (max-width: 520px) {
-    .raci-card { padding: 16px; }
-    .raci-linha { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-    .raci-papel { padding-top: 0; }
+  .raci-legenda { display: flex; flex-wrap: wrap; gap: 6px; }
+  .raci-legenda button {
+    border: 1px solid var(--linha); background: var(--papel); border-radius: 999px; height: 30px; padding: 0 10px 0 6px;
+    display: inline-flex; align-items: center; gap: 6px; font: 600 12.5px var(--corpo); color: var(--texto-2);
+    transition: border-color .2s, background .2s, color .2s, transform .2s var(--mola);
+  }
+  .raci-legenda button:hover { transform: translateY(-1px); }
+  .raci-legenda button[aria-pressed="true"] { color: var(--texto); border-color: var(--tom); background: color-mix(in srgb, var(--tom) 10%, var(--papel)); }
+  .raci-legenda .raci-sel { width: 20px; height: 20px; font-size: 0; }
+
+  /* A grade */
+  .raci-grade { display: grid; grid-template-columns: minmax(200px, 1.6fr) repeat(6, minmax(0, 1fr)); gap: 4px; position: relative; }
+  .raci-cab {
+    display: grid; justify-items: center; gap: 6px; padding: 8px 4px 10px; border-radius: 12px; text-align: center;
+    font: 700 12.5px var(--corpo); line-height: 1.2; transition: background .3s, opacity .3s;
+  }
+  .raci-cab i { width: 10px; height: 10px; border-radius: 50%; background: var(--cor); box-shadow: 0 0 0 4px color-mix(in srgb, var(--cor) 18%, transparent); }
+  .raci-cab .curto { display: none; }
+  .raci-canto { display: flex; align-items: end; padding: 0 4px 10px; font: 700 11px var(--corpo); letter-spacing: .1em; text-transform: uppercase; color: var(--texto-2); }
+  .raci-linha { display: contents; }
+  .raci-entrega {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; min-width: 0;
+    font: 700 14px/1.3 var(--display); transition: background .25s;
+  }
+  .raci-entrega .n {
+    flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+    font: 800 12px var(--display); color: #fff; background: linear-gradient(135deg, var(--azul), var(--violeta));
+  }
+  .raci-celula { display: grid; place-items: center; padding: 4px 2px; border-radius: 12px; min-height: 48px; transition: background .25s, opacity .3s; }
+  .raci-linha:hover > *, .raci-linha.foco > * { background: color-mix(in srgb, var(--azul) 5%, transparent); }
+
+  /* O selo do papel */
+  .raci-sel {
+    --tom: var(--texto-2);
+    display: inline-flex; align-items: center; justify-content: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 999px;
+    font: 700 12px var(--corpo); white-space: nowrap; color: var(--tom);
+    transition: transform .35s var(--mola), opacity .3s, filter .3s, box-shadow .3s;
+  }
+  .raci-sel svg { width: 14px; height: 14px; flex: none; }
+  .raci-sel.faz { --tom: var(--azul); color: var(--papel); background: linear-gradient(135deg, var(--azul), color-mix(in srgb, var(--azul) 70%, var(--violeta))); box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--azul) 70%, transparent); position: relative; overflow: hidden; }
+  .raci-sel.aprova { --tom: var(--violeta); background: var(--violeta-suave); box-shadow: inset 0 0 0 1.5px var(--violeta); }
+  .raci-sel.opina { --tom: var(--ouro); background: var(--ouro-suave); }
+  .raci-sel.sabe { --tom: var(--texto-2); background: transparent; border: 1.5px dashed var(--linha); font-weight: 600; }
+  .raci-legenda .faz { --tom: var(--azul); } .raci-legenda .aprova { --tom: var(--violeta); }
+  .raci-legenda .opina { --tom: var(--ouro); } .raci-legenda .sabe { --tom: var(--texto-2); }
+  /* brilho que atravessa os selos "Faz" */
+  .raci-sel.faz::after {
+    content: ''; position: absolute; inset: 0; transform: translateX(-120%);
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .45) 50%, transparent 70%);
+  }
+  .raci.visivel .raci-sel.faz::after { animation: raci-brilho 1.1s var(--suave-ease) both; animation-delay: calc(.9s + var(--d) * 45ms); }
+
+  /* Destaques: por participante (coluna) e por papel */
+  .raci[data-lente]:not([data-lente="todos"]) .raci-celula:not(.na-lente),
+  .raci[data-lente]:not([data-lente="todos"]) .raci-cab:not(.na-lente) { opacity: .28; }
+  .raci-cab.na-lente, .raci-celula.na-lente { background: color-mix(in srgb, var(--cor) 9%, transparent); }
+  .raci-celula.na-lente .raci-sel { transform: scale(1.08); }
+  .raci[data-papel] .raci-sel.apaga { opacity: .15; filter: grayscale(1); transform: scale(.85); }
+  .raci[data-papel] .raci-sel.acende { transform: scale(1.1); }
+
+  /* Resumo embaixo: a frase da entrega em foco ou o placar do participante */
+  .raci-resumo {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center;
+    padding: 14px 16px; border-radius: 14px; background: var(--fundo); border: 1px solid var(--linha); min-height: 74px;
+  }
+  .raci-resumo .marca-r {
+    width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; color: #fff;
+    font: 800 15px var(--display); background: var(--cor, linear-gradient(135deg, var(--azul), var(--violeta)));
+  }
+  .raci-resumo .marca-r svg { width: 20px; height: 20px; }
+  .raci-resumo .txt { display: grid; gap: 4px; min-width: 0; font-size: 14px; color: var(--texto-2); }
+  .raci-resumo .txt b { color: var(--texto); font-family: var(--display); font-size: 15px; }
+  .raci-resumo.troca .txt, .raci-resumo.troca .marca-r { animation: desce .35s var(--suave-ease) both; }
+  .raci-placar { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .raci-placar span { display: inline-flex; align-items: baseline; gap: 5px; }
+  .raci-placar strong { font: 800 18px var(--display); color: var(--tom); font-variant-numeric: tabular-nums; }
+
+  /* Entrada: cabeçalhos descem, selos estouram em onda diagonal */
+  .raci .raci-cab, .raci .raci-entrega { opacity: 0; }
+  .raci .raci-sel { opacity: 0; transform: scale(.4); }
+  .raci.visivel .raci-cab { animation: desce .5s var(--suave-ease) both; animation-delay: calc(var(--c) * 60ms); }
+  .raci.visivel .raci-entrega { animation: raci-entra .55s var(--suave-ease) both; animation-delay: calc(.15s + var(--r) * 60ms); }
+  .raci.visivel .raci-sel { animation: raci-estoura .5s var(--mola) both; animation-delay: calc(.3s + var(--d) * 45ms); }
+  .raci.pronta .raci-cab, .raci.pronta .raci-entrega, .raci.pronta .raci-sel { animation: none; opacity: 1; }
+  .raci.pronta .raci-sel { transform: none; }
+  .raci.pronta .raci-celula.na-lente .raci-sel { transform: scale(1.08); }
+  .raci.pronta[data-papel] .raci-sel.apaga { opacity: .15; transform: scale(.85); }
+  .raci.pronta[data-papel] .raci-sel.acende { transform: scale(1.1); }
+  @keyframes raci-estoura { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+  @keyframes raci-entra { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+  @keyframes raci-brilho { to { transform: translateX(120%); } }
+
+  @media (max-width: 860px) {
+    .raci-sel .rot { display: none; }
+    .raci-sel { width: 34px; padding: 0; }
+    .raci-legenda .raci-sel { width: 20px; }
+    .raci-grade { grid-template-columns: minmax(150px, 1.4fr) repeat(6, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .raci { padding: 14px; }
+    /* No celular, o nome da entrega ocupa a linha inteira e os 6 selos ficam embaixo, alinhados às colunas */
+    .raci-grade { grid-template-columns: repeat(6, minmax(0, 1fr)); row-gap: 2px; }
+    .raci-canto { display: none; }
+    .raci-entrega { grid-column: 1 / -1; padding: 10px 6px 2px; font-size: 13.5px; }
+    .raci-cab { font-size: 11.5px; padding: 6px 2px 8px; }
+    .raci-cab .longo { display: none; }
+    .raci-cab .curto { display: inline; }
+    .raci-sel { width: 32px; height: 28px; }
+    .raci-celula { min-height: 38px; padding: 2px 0; }
+    .raci-lentes { width: 100%; }
+    .raci-resumo { grid-template-columns: minmax(0, 1fr); }
+    .raci-resumo .marca-r { display: none; }
   }
 
   /* Cronograma */
@@ -601,7 +703,7 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     .revela { opacity: 1; transform: none; }
-    .raci-card .raci-chip { opacity: 1; }
+    .raci .raci-cab, .raci .raci-entrega, .raci .raci-sel { opacity: 1; transform: none; }
   }
   /* Documentos e entregas de cada frente */
   .docs, .entregas-box { display: grid; gap: 8px; border-top: 1px dashed var(--linha); padding-top: 12px; }
@@ -854,9 +956,9 @@
     <div class="revela" style="display:grid;gap:8px">
       <span class="rotulo">Quem faz o quê</span>
       <h2>Quem faz o quê em cada entrega</h2>
-      <p class="apoio">Para cada entrega: quem <b>faz</b>, quem <b>aprova</b>, quem <b>dá opinião</b> e quem só precisa <b>ficar sabendo</b>.</p>
+      <p class="apoio">Para cada entrega: quem <b>faz</b>, quem <b>aprova</b>, quem <b>dá opinião</b> e quem só precisa <b>ficar sabendo</b>. Escolha alguém para ver só o papel dele, ou toque num papel para acender todas as vezes que ele aparece.</p>
     </div>
-    <div class="raci" id="raci"></div>
+    <div class="cartao raci revela" id="raci"></div>
   </section>
 
   <section>
@@ -1127,27 +1229,161 @@
     barrinhas.appendChild(b);
   });
 
-  // Letras da matriz RACI (R executa, A aprova, C é consultado, I é informado) viram frases.
+  // ---------- Quem faz o quê (matriz interativa) ----------
+  // Letras da matriz RACI (R faz, A aprova, C dá opinião, I fica sabendo), uma por participante, na ordem de PARTES.
   const PARTES = [
-    ['Frente A', 'var(--azul)'], ['Frente B', 'var(--violeta)'], ['Frente C', 'var(--ouro)'],
-    ['Frente D', 'var(--verde)'], ['Devs', 'var(--texto-2)'], ['Dona do hotel', 'var(--vermelho)'],
+    ['a', 'Frente A', 'A', 'var(--azul)'], ['b', 'Frente B', 'B', 'var(--violeta)'], ['c', 'Frente C', 'C', 'var(--ouro)'],
+    ['d', 'Frente D', 'D', 'var(--verde)'], ['devs', 'Devs', 'Devs', 'var(--texto-2)'], ['dona', 'Dona do hotel', 'Dona', 'var(--vermelho)'],
   ];
-  const PAPEIS = [
-    ['R', 'faz', 'Faz', '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>'],
-    ['A', 'aprova', 'Aprova', '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'],
-    ['C', 'opina', 'Dá opinião', '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>'],
-    ['I', 'sabe', 'Fica sabendo', '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'],
-  ];
-  $('#raci').innerHTML = RACI.map(([titulo, letras], n) => {
-    let i = 0;
-    const linhas = PAPEIS.map(([letra, cls, rotulo, svg]) => {
-      const quem = PARTES.filter((_, k) => letras[k] === letra);
-      if (!quem.length) return '';
-      const chips = quem.map(([nome, cor]) => `<span class="raci-chip" style="--cor:${cor};--i:${i++}">${nome}</span>`).join('');
-      return `<div class="raci-linha ${cls}"><span class="raci-papel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${svg}</svg>${rotulo}</span><div class="raci-quem">${chips}</div></div>`;
-    }).join('');
-    return `<article class="cartao raci-card revela" style="--atraso:${(n % 3) * 0.06}s"><h3><span class="n">${n + 1}</span>${titulo}</h3>${linhas}</article>`;
-  }).join('');
+  const PAPEIS = {
+    R: { cls: 'faz', rotulo: 'Faz', um: 'faz', varios: 'fazem', svg: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>' },
+    A: { cls: 'aprova', rotulo: 'Aprova', um: 'aprova', varios: 'aprovam', svg: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>' },
+    C: { cls: 'opina', rotulo: 'Dá opinião', um: 'dá opinião', varios: 'dão opinião', svg: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>' },
+    I: { cls: 'sabe', rotulo: 'Fica sabendo', um: 'fica sabendo', varios: 'ficam sabendo', svg: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' },
+  };
+  const ORDEM = ['R', 'A', 'C', 'I'];
+  const svgPapel = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PAPEIS[p].svg}</svg>`;
+  const selo = (p, extra = '') => `<span class="raci-sel ${PAPEIS[p].cls}" data-papel="${p}" ${extra}>${svgPapel(p)}<span class="rot">${PAPEIS[p].rotulo}</span></span>`;
+  const listaNomes = (nomes) => nomes.length < 2 ? nomes.join('') : nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1];
+
+  const raci = $('#raci');
+  raci.innerHTML = `
+    <div class="raci-topo">
+      <div class="raci-olhar"><span>Ver pelo olhar de</span>
+        <div class="raci-lentes" role="group" aria-label="Ver pelo olhar de">
+          <span class="raci-pilula" aria-hidden="true"></span>
+          <button type="button" data-lente="todos" aria-pressed="true">Todos</button>
+          ${PARTES.map(([id, , curto, cor]) => `<button type="button" data-lente="${id}" aria-pressed="false" style="--cor:${cor}"><i></i>${curto}</button>`).join('')}
+        </div>
+      </div>
+      <div class="raci-legenda" role="group" aria-label="Destacar um papel">
+        ${ORDEM.map((p) => `<button type="button" class="${PAPEIS[p].cls}" data-papel="${p}" aria-pressed="false">${selo(p, 'aria-hidden="true"')}${PAPEIS[p].rotulo}</button>`).join('')}
+      </div>
+    </div>
+    <div class="raci-grade" role="table" aria-label="Quem faz o quê em cada entrega">
+      <div class="raci-linha" role="row">
+        <span class="raci-canto" role="columnheader">Entrega</span>
+        ${PARTES.map(([id, nome, curto, cor], c) => `<div class="raci-cab" role="columnheader" data-parte="${id}" style="--cor:${cor};--c:${c}"><i></i><span class="longo">${nome}</span><span class="curto">${curto}</span></div>`).join('')}
+      </div>
+      ${RACI.map(([titulo, letras], r) => `
+        <div class="raci-linha" role="row" data-r="${r}">
+          <div class="raci-entrega" role="rowheader" tabindex="0" style="--r:${r}"><span class="n">${r + 1}</span>${titulo}</div>
+          ${PARTES.map(([id, nome, , cor], c) => `<div class="raci-celula" role="cell" data-parte="${id}" style="--cor:${cor}" aria-label="${nome}: ${PAPEIS[letras[c]].rotulo}">${selo(letras[c], `style="--d:${r + c}" title="${nome} · ${PAPEIS[letras[c]].rotulo}"`)}</div>`).join('')}
+        </div>`).join('')}
+    </div>
+    <div class="raci-resumo" aria-live="polite"></div>`;
+
+  const raciEstado = { lente: 'todos', papel: null, foco: null, escolhida: false };
+  const pilula = $('.raci-pilula', raci);
+  const resumo = $('.raci-resumo', raci);
+
+  function moverPilula() {
+    const b = $(`.raci-lentes [data-lente="${raciEstado.lente}"]`, raci);
+    pilula.style.width = b.offsetWidth + 'px';
+    pilula.style.transform = `translateX(${b.offsetLeft}px)`;
+  }
+
+  function contar(elNum, ate) {
+    if (reduzMov) { elNum.textContent = ate; return; }
+    const t0 = performance.now();
+    const passo = (t) => {
+      const k = Math.min(1, (t - t0) / 600);
+      elNum.textContent = Math.round(ate * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(passo);
+    };
+    requestAnimationFrame(passo);
+  }
+
+  let ultimoResumo = '';
+  function pintarResumo() {
+    const { lente, papel, foco } = raciEstado;
+    let chave, marca, html, cor = '';
+    if (foco != null) {
+      const [titulo, letras] = RACI[foco];
+      const partes = ORDEM.map((p) => {
+        const quem = PARTES.filter((_, k) => letras[k] === p).map(([, nome]) => nome);
+        if (!quem.length) return '';
+        const plural = quem.length > 1 || quem[0] === 'Devs';
+        return `${listaNomes(quem)} ${plural ? PAPEIS[p].varios : PAPEIS[p].um}`;
+      }).filter(Boolean);
+      chave = 'e' + foco;
+      marca = String(foco + 1);
+      html = `<b>${titulo}</b><span>${partes.join('; ')}.</span>`;
+    } else if (lente !== 'todos') {
+      const k = PARTES.findIndex(([id]) => id === lente);
+      const [, nome, curto, c] = PARTES[k];
+      const n = { R: [], A: [], C: [], I: [] };
+      RACI.forEach(([titulo, letras]) => n[letras[k]].push(titulo));
+      chave = 'l' + lente;
+      cor = c;
+      marca = curto.length > 2 ? curto[0] : curto;
+      const faz = n.R.length ? `Mão na massa em: ${listaNomes(n.R.map((t) => `<b style="font-size:inherit">${t}</b>`))}.` : 'Não é dono de nenhuma entrega: apoia as outras.';
+      html = `<b>${nome}</b><div class="raci-placar">${ORDEM.map((p) => `<span class="${PAPEIS[p].cls}" style="--tom:var(--${{ R: 'azul', A: 'violeta', C: 'ouro', I: 'texto-2' }[p]})"><strong data-ate="${n[p].length}">0</strong>${PAPEIS[p].rotulo.toLowerCase()}</span>`).join('')}</div><span>${faz}</span>`;
+    } else if (papel) {
+      const total = PARTES.map(([, nome], k) => [nome, RACI.filter(([, l]) => l[k] === papel).length]).filter(([, q]) => q);
+      chave = 'p' + papel;
+      marca = svgPapel(papel);
+      cor = `var(--${{ R: 'azul', A: 'violeta', C: 'ouro', I: 'texto-2' }[papel]})`;
+      html = `<b>${PAPEIS[papel].rotulo}</b><span>${total.length ? listaNomes(total.map(([nome, q]) => `${nome} (${q})`)) : 'Ninguém neste papel.'}</span>`;
+    } else {
+      chave = 'inicio';
+      marca = '?';
+      html = '<b>Toque numa entrega ou escolha alguém acima</b><span>A matriz mostra o papel de cada um em cada entrega. Ninguém fica de fora e cada entrega tem um só dono.</span>';
+    }
+    if (chave === ultimoResumo) return;
+    ultimoResumo = chave;
+    resumo.innerHTML = `<span class="marca-r" style="${cor ? `--cor:${cor}` : ''}">${marca}</span><div class="txt">${html}</div>`;
+    resumo.classList.remove('troca'); void resumo.offsetWidth; resumo.classList.add('troca');
+    resumo.querySelectorAll('[data-ate]').forEach((s) => contar(s, Number(s.dataset.ate)));
+  }
+
+  function aplicarRaci() {
+    const { lente, papel, foco } = raciEstado;
+    raci.dataset.lente = lente;
+    if (papel) raci.dataset.papel = papel; else delete raci.dataset.papel;
+    raci.querySelectorAll('.raci-lentes button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lente === lente)));
+    raci.querySelectorAll('.raci-legenda button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.papel === papel)));
+    raci.querySelectorAll('[data-parte]').forEach((e) => e.classList.toggle('na-lente', e.dataset.parte === lente));
+    raci.querySelectorAll('.raci-grade .raci-sel').forEach((s) => {
+      s.classList.toggle('acende', !!papel && s.dataset.papel === papel);
+      s.classList.toggle('apaga', !!papel && s.dataset.papel !== papel);
+    });
+    raci.querySelectorAll('.raci-linha[data-r]').forEach((l) => l.classList.toggle('foco', Number(l.dataset.r) === foco));
+    moverPilula();
+    pintarResumo();
+  }
+
+  $('.raci-lentes', raci).addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    raciEstado.lente = b.dataset.lente; raciEstado.escolhida = true; raciEstado.foco = null;
+    b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduzMov ? 'auto' : 'smooth' });
+    aplicarRaci();
+  });
+  $('.raci-legenda', raci).addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    raciEstado.papel = raciEstado.papel === b.dataset.papel ? null : b.dataset.papel;
+    raciEstado.foco = null;
+    aplicarRaci();
+  });
+  const grade = $('.raci-grade', raci);
+  const linhaDe = (e) => e.target.closest('.raci-linha[data-r]');
+  grade.addEventListener('pointerover', (e) => { const l = linhaDe(e); if (l && e.pointerType === 'mouse') { raciEstado.foco = Number(l.dataset.r); aplicarRaci(); } });
+  grade.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && raciEstado.foco != null) { raciEstado.foco = null; aplicarRaci(); } });
+  grade.addEventListener('click', (e) => { const l = linhaDe(e); if (l) { raciEstado.foco = Number(l.dataset.r); aplicarRaci(); } });
+  grade.addEventListener('focusin', (e) => { const l = linhaDe(e); if (l) { raciEstado.foco = Number(l.dataset.r); aplicarRaci(); } });
+  grade.addEventListener('focusout', () => { raciEstado.foco = null; aplicarRaci(); });
+  addEventListener('resize', moverPilula);
+  // Depois da onda de entrada, libera as transições de destaque (as animações deixam o transform preso).
+  new MutationObserver(() => { if (raci.classList.contains('visivel') && !raci.classList.contains('pronta')) setTimeout(() => raci.classList.add('pronta'), reduzMov ? 0 : 2200); })
+    .observe(raci, { attributes: true, attributeFilter: ['class'] });
+  // Quem já escolheu vaga vê a matriz pelo olhar da própria frente (até trocar à mão).
+  function raciMinha(minha) {
+    if (raciEstado.escolhida) return;
+    const alvo = !minha ? 'todos' : minha.endsWith('-dev') ? 'devs' : FRENTE_DE[minha].id;
+    if (alvo !== raciEstado.lente) { raciEstado.lente = alvo; aplicarRaci(); }
+  }
+  aplicarRaci();
+  if (document.fonts) document.fonts.ready.then(moverPilula);
 
   // ---------- Renderização ----------
   /** Uma vaga (livre ou ocupada). Usada nas frentes e no cartão do time de desenvolvimento. */
@@ -1242,6 +1478,7 @@
     }
 
     aplicarFiltro();
+    raciMinha(minha);
 
     if (estado.atualizado) {
       const d = new Date(estado.atualizado);
