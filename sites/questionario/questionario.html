@@ -1,0 +1,1167 @@
+<!doctype html>
+<html lang="pt-BR" data-tema="claro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f7fc" />
+    <title>Questionário — Estadia</title>
+    <meta
+      name="description"
+      content="15 perguntas para ajustar o Estadia ao seu hotel. Salva enquanto você responde: pode fechar e continuar de onde parou."
+    />
+    <!-- Prévia do link (WhatsApp, Telegram, redes sociais): a imagem precisa de endereço completo. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Estadia" />
+    <meta property="og:title" content="Vamos ajustar o Estadia ao seu hotel" />
+    <meta
+      property="og:description"
+      content="Questionário com 15 perguntas. Salva enquanto você responde: pode fechar e continuar de onde parou."
+    />
+    <meta property="og:url" content="https://website.gvtserver.online/questionario/" />
+    <meta property="og:image" content="https://website.gvtserver.online/questionario/capa.jpg?v=3" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Estadia — Vamos ajustar o Estadia ao seu hotel" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="estilo.css" />
+    <link rel="icon" type="image/png" href="imagens/icone.png" />
+    <link rel="apple-touch-icon" href="imagens/icone.png" />
+    <script>
+      // Tema antes do 1º desenho (mesma ideia do app): sem piscar.
+      try {
+        var t = localStorage.getItem('estadia-questionario-tema');
+        if (t) document.documentElement.dataset.tema = t;
+        if (t === 'escuro')
+          document.querySelector('meta[name="theme-color"]').content = '#060b18';
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+    <header class="barra">
+      <div class="barra-conteudo">
+        <div class="marca" aria-label="Estadia" role="img">
+          <img class="marca-logo" src="imagens/logo.webp" width="34" height="34" alt="" />
+          <div aria-hidden="true">
+            <div class="marca-nome">ESTADIA</div>
+            <div class="marca-sub">Questionário do hotel</div>
+          </div>
+        </div>
+        <span class="status-salvo" id="status" data-tipo="local" role="status"
+          >Salvo neste aparelho</span
+        >
+        <span class="contagem" id="contagem" aria-live="polite">0 de 15 respondidas</span>
+        <button
+          class="botao botao-icone"
+          id="tema"
+          type="button"
+          aria-label="Alternar tema claro/escuro"
+        >
+          <svg
+            class="icone-sol"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path
+              d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+            />
+          </svg>
+          <svg
+            class="icone-lua"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" />
+          </svg>
+        </button>
+        <button class="botao botao-primario" id="salvar" type="button" aria-label="Salvar" title="Salvar">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+          </svg>
+          <span id="rotulo-salvar">Salvar</span>
+        </button>
+      </div>
+      <div class="progresso"><div id="progresso"></div></div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-midia">
+          <img
+            class="hero-foto"
+            src="imagens/piscina.webp"
+            alt="Piscina do hotel ao entardecer"
+            width="1400"
+            height="620"
+            fetchpriority="high"
+          />
+          <div class="hero-sobre">
+            <div class="sobretitulo">Reunião com a proprietária</div>
+            <h1>
+              <span class="linha-h1">Vamos ajustar o <span class="gradiente">Estadia</span></span>
+              <span class="linha-h1">ao seu hotel</span>
+            </h1>
+            <div class="hero-chips" id="hero-chips"></div>
+          </div>
+        </div>
+        <p class="apoio">
+          Em cada pergunta, o quadro azul mostra o que o sistema já faz hoje. Se estiver bom, marque
+          <b>Pode ficar como está</b>. Comece pelas perguntas marcadas como <b>prioridade</b>. Tudo
+          é salvo <b>enquanto você responde</b> (veja o status no topo): pode fechar e abrir de novo
+          que continua de onde parou.
+        </p>
+      </section>
+
+      <div class="cartao">
+        <div class="cabecalho-campos">
+          <label class="campo"
+            >Hotel<input type="text" data-campo="cab.hotel" placeholder="Nome do hotel"
+          /></label>
+          <label class="campo">Data<input type="date" data-campo="cab.data" /></label>
+          <label class="campo largo"
+            >Participantes<input
+              type="text"
+              data-campo="cab.participantes"
+              placeholder="Quem participou da reunião"
+          /></label>
+        </div>
+      </div>
+
+      <div id="perguntas"></div>
+
+      <div class="bloco-titulo com-foto" style="--foto: url('imagens/visual.webp')">
+        <span class="pastilha" style="--cor: var(--premium)">★</span>
+        <h2>Para o visual e os recibos</h2>
+      </div>
+      <div class="cartao">
+        <div class="opcoes" data-grupo="visual">
+          <label class="opcao"
+            ><input type="checkbox" data-campo="visual.fotos" /><span
+              >Ela vai enviar fotos do hotel (fachada, recepção, quartos)</span
+            ></label
+          >
+          <label class="opcao"
+            ><input type="checkbox" data-campo="visual.logo" /><span
+              >Ela vai enviar o logo</span
+            ></label
+          >
+        </div>
+        <div class="linha-campos largos" style="margin-top: 14px">
+          <label class="campo"
+            >Nome do hotel nos recibos<input type="text" data-campo="recibo.nome"
+          /></label>
+          <label class="campo">Razão social<input type="text" data-campo="recibo.razao" /></label>
+          <label class="campo"
+            >CNPJ<input type="text" data-campo="recibo.cnpj" inputmode="numeric"
+          /></label>
+          <label class="campo"
+            >Telefone<input type="text" data-campo="recibo.telefone" inputmode="tel"
+          /></label>
+          <label class="campo"
+            >E-mail<input type="text" data-campo="recibo.email" inputmode="email"
+          /></label>
+          <label class="campo">Endereço<input type="text" data-campo="recibo.endereco" /></label>
+        </div>
+      </div>
+
+      <div class="bloco-titulo">
+        <span class="pastilha" style="--cor: var(--secundaria)">✎</span>
+        <h2>Observações</h2>
+      </div>
+      <div class="cartao">
+        <textarea
+          data-campo="observacoes"
+          rows="4"
+          placeholder="Qualquer outra coisa que ela comentar…"
+        ></textarea>
+      </div>
+
+      <div class="acoes-finais">
+        <button class="botao botao-perigo" id="limpar" type="button">Limpar tudo</button>
+        <button class="botao" id="imprimir" type="button">Imprimir</button>
+        <button class="botao" id="abrir" type="button">Abrir respostas</button>
+        <input
+          type="file"
+          id="abrir-arquivo"
+          accept=".md,.json,text/markdown,application/json"
+          hidden
+        />
+        <button class="botao" id="baixar" type="button">Baixar cópia</button>
+        <button class="botao botao-primario" id="salvar2" type="button">Salvar</button>
+      </div>
+      <p class="rodape">Estadia — gestão hoteleira</p>
+    </main>
+
+    <button class="proxima" id="proxima" type="button">
+      <span class="anel" aria-hidden="true"
+        ><svg viewBox="0 0 36 36"><circle class="anel-fundo" cx="18" cy="18" r="15" /><circle
+            class="anel-valor"
+            id="anel-valor"
+            cx="18"
+            cy="18"
+            r="15"
+            pathLength="100" /></svg
+      ></span>
+      <span id="proxima-contagem">0/15</span> Próxima pergunta
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+    </button>
+    <div class="aviso" id="aviso" role="status"></div>
+    <canvas class="confete" id="confete" aria-hidden="true"></canvas>
+
+    <script>
+      // Perguntas: tipos de campo — ok (Pode ficar como está), marcar (várias), escolher (uma),
+      // texto/numero (campo curto) e nota (texto livre).
+      const BLOCOS = [
+        {
+          titulo: 'Quartos e preços',
+          foto: 'imagens/quartos.webp',
+          cor: 'var(--primaria)',
+          perguntas: [
+            {
+              texto:
+                'Quais são as <b>categorias de quarto</b>, quantos quartos há em cada uma e quantas pessoas cabem (adultos e crianças)? Os números seguem o andar (101, 102… 201…)?',
+              prioridade: true,
+              campos: [
+                {
+                  tipo: 'nota',
+                  id: 'categorias',
+                  linhas: 4,
+                  dica: 'Ex.: Standard — 20 quartos (101 a 120) — 2 adultos + 1 criança',
+                },
+              ],
+            },
+            {
+              texto:
+                'Como funciona o <b>preço</b>? Muda por número de hóspedes, dia da semana, temporada ou feriado?',
+              hoje: 'preço por categoria e nº de hóspedes, com ajustes por dia da semana e por períodos.',
+              campos: [
+                { tipo: 'ok' },
+                {
+                  tipo: 'marcar',
+                  id: 'muda',
+                  opcoes: ['Nº de hóspedes', 'Dia da semana', 'Temporada', 'Feriados', 'Pacotes'],
+                },
+                { tipo: 'nota', id: 'obs', dica: 'Valores de referência, temporadas, pacotes…' },
+              ],
+            },
+            {
+              texto:
+                '<b>Criança</b> paga? Até que idade não paga e até que idade paga tarifa de criança?',
+              hoje: 'sugestão — 0 a 5 anos não paga; 6 a 12 paga tarifa de criança.',
+              campos: [
+                { tipo: 'ok' },
+                { tipo: 'numero', id: 'isenta', rotulo: 'Não paga até (anos)' },
+                { tipo: 'numero', id: 'tarifa', rotulo: 'Tarifa de criança até (anos)' },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+            {
+              texto: 'O <b>café da manhã</b> está incluído na diária ou é cobrado à parte?',
+              campos: [
+                {
+                  tipo: 'escolher',
+                  id: 'cafe',
+                  opcoes: ['Incluído', 'Cobrado à parte', 'Não serve'],
+                },
+                { tipo: 'texto', id: 'valor', rotulo: 'Valor (se cobrado)' },
+              ],
+            },
+          ],
+        },
+        {
+          titulo: 'Reservas e regras',
+          foto: 'imagens/reservas.webp',
+          cor: 'var(--secundaria)',
+          perguntas: [
+            {
+              texto: 'Por onde as <b>reservas</b> chegam hoje? Qual canal é o mais importante?',
+              prioridade: true,
+              campos: [
+                {
+                  tipo: 'marcar',
+                  id: 'canais',
+                  opcoes: [
+                    'Telefone',
+                    'WhatsApp',
+                    'Booking',
+                    'Site próprio',
+                    'Agências',
+                    'Empresas',
+                    'Balcão',
+                  ],
+                },
+                { tipo: 'texto', id: 'principal', rotulo: 'Canal mais importante' },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+            {
+              texto:
+                '<b>Cancelamento</b>: até quanto tempo antes pode cancelar sem multa? Qual é a multa?',
+              hoje: '48 horas antes da chegada; depois disso, multa de 1 diária.',
+              campos: [{ tipo: 'ok' }, { tipo: 'nota', id: 'obs', linhas: 2 }],
+            },
+            {
+              texto: '<b>Check-in antecipado / check-out tardio</b>: cobra? Como?',
+              hoje: 'até 3 horas, cobra 50% da diária; mais de 3 horas, diária cheia.',
+              campos: [
+                { tipo: 'ok' },
+                { tipo: 'texto', id: 'checkin', rotulo: 'Horário de check-in' },
+                { tipo: 'texto', id: 'checkout', rotulo: 'Horário de check-out' },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+            {
+              texto:
+                'Pede <b>sinal/depósito</b> para garantir a reserva? Quanto tempo a reserva fica “segurada” sem pagamento?',
+              hoje: 'pré-reserva expira em 24 horas; o 1º pagamento a torna garantida.',
+              campos: [{ tipo: 'ok' }, { tipo: 'nota', id: 'obs', linhas: 2 }],
+            },
+            {
+              texto: 'Atende <b>empresas com acordo</b> de preço que pagam depois (faturado)?',
+              hoje: 'cadastro da empresa, acordo de preço e conta encerrada como “faturado”.',
+              campos: [
+                { tipo: 'escolher', id: 'atende', opcoes: ['Sim', 'Não'] },
+                { tipo: 'numero', id: 'quantas', rotulo: 'Quantas, mais ou menos' },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+          ],
+        },
+        {
+          titulo: 'Dinheiro e consumo',
+          foto: 'imagens/dinheiro.webp',
+          cor: 'var(--sucesso)',
+          perguntas: [
+            {
+              texto:
+                'Quais <b>formas de pagamento</b> aceita? Cada recepcionista abre o próprio caixa por turno?',
+              hoje: 'um caixa por usuário, com abertura, movimentação e fechamento.',
+              prioridade: true,
+              campos: [
+                {
+                  tipo: 'marcar',
+                  id: 'formas',
+                  opcoes: ['Dinheiro', 'Pix', 'Débito', 'Crédito', 'Faturado'],
+                },
+                {
+                  tipo: 'escolher',
+                  id: 'caixa',
+                  opcoes: ['Caixa por turno, por pessoa', 'Um caixa único', 'Não sei'],
+                },
+                { tipo: 'texto', id: 'outra', rotulo: 'Outra forma' },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+            {
+              texto:
+                'O que o hóspede <b>consome e vai para a conta</b>? Quer controle de estoque do frigobar?',
+              campos: [
+                {
+                  tipo: 'marcar',
+                  id: 'consumo',
+                  opcoes: [
+                    'Frigobar',
+                    'Restaurante/bar',
+                    'Lavanderia',
+                    'Estacionamento',
+                    'Passeios/transfer',
+                  ],
+                },
+                {
+                  tipo: 'escolher',
+                  id: 'estoque',
+                  opcoes: ['Quer estoque do frigobar', 'Não precisa'],
+                },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+            {
+              texto: 'Como é emitida a <b>nota fiscal</b> hoje?',
+              campos: [
+                { tipo: 'texto', id: 'cidade', rotulo: 'Cidade do hotel' },
+                { tipo: 'texto', id: 'quem', rotulo: 'Quem emite (recepção, contador…)' },
+                {
+                  tipo: 'nota',
+                  id: 'obs',
+                  linhas: 2,
+                  dica: 'Sistema da prefeitura, emissor nacional…',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          titulo: 'Equipe, aparelhos e local',
+          foto: 'imagens/equipe.webp',
+          cor: 'var(--premium)',
+          perguntas: [
+            {
+              texto:
+                '<b>Quem vai usar</b> o sistema e quantas pessoas em cada função? A governança usaria pelo celular? O Wi-Fi pega em todos os andares?',
+              campos: [
+                { tipo: 'numero', id: 'recepcao', rotulo: 'Recepção' },
+                { tipo: 'numero', id: 'governanca', rotulo: 'Governança' },
+                { tipo: 'numero', id: 'gerencia', rotulo: 'Gerência' },
+                { tipo: 'numero', id: 'financeiro', rotulo: 'Financeiro' },
+                {
+                  tipo: 'marcar',
+                  id: 'aparelhos',
+                  opcoes: ['Governança pelo celular', 'Wi-Fi em todos os andares'],
+                },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+            {
+              texto: 'Quais <b>impressoras</b> há na recepção? Quantos <b>computadores</b>?',
+              campos: [
+                {
+                  tipo: 'marcar',
+                  id: 'impressoras',
+                  opcoes: ['Impressora A4', 'Térmica de cupom (80 mm)', 'Nenhuma'],
+                },
+                { tipo: 'numero', id: 'computadores', rotulo: 'Computadores' },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+            {
+              texto:
+                'Quais <b>relatórios</b> quer ver no dia a dia? Algum que já usa e não pode faltar?',
+              prioridade: true,
+              campos: [
+                {
+                  tipo: 'marcar',
+                  id: 'relatorios',
+                  opcoes: [
+                    'Ocupação',
+                    'Receita do dia',
+                    'Chegadas/saídas',
+                    'Caixa',
+                    'Contas em aberto',
+                    'Hóspedes na casa',
+                  ],
+                },
+                { tipo: 'nota', id: 'obs', linhas: 2 },
+              ],
+            },
+          ],
+        },
+      ];
+
+      const CHAVE = 'estadia-questionario-respostas';
+      // AAAA-MM-DD no fuso do aparelho (toISOString usaria UTC e viraria o dia depois das 21h).
+      const hojeLocal = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
+      const TOTAL = BLOCOS.reduce((n, b) => n + b.perguntas.length, 0);
+      let estado = {};
+      try {
+        estado = JSON.parse(localStorage.getItem(CHAVE) || '{}');
+      } catch (e) {
+        estado = {};
+      }
+
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"]/g,
+          (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c],
+        );
+
+      // ---------- Montagem das perguntas ----------
+      function montar() {
+        const raiz = document.getElementById('perguntas');
+        let n = 0;
+        let html = '';
+        BLOCOS.forEach((b, bi) => {
+          html += `<div class="bloco-titulo com-foto" style="--foto:url('${b.foto}')"><span class="pastilha" style="--cor:${b.cor}">${bi + 1}</span><h2>${b.titulo}</h2><span class="bloco-conta" id="conta-b${bi}"><b>0</b>/${b.perguntas.length}</span></div>`;
+          b.perguntas.forEach((p) => {
+            n++;
+            const pid = `p${n}`;
+            p.pid = pid;
+            p.n = n;
+            const curtos = p.campos.filter((c) => c.tipo === 'texto' || c.tipo === 'numero');
+            let campos = '';
+            p.campos.forEach((c) => {
+              const id = `${pid}.${c.id || c.tipo}`;
+              if (c.tipo === 'ok')
+                campos += `<div class="opcoes"><label class="opcao ok"><input type="checkbox" data-campo="${id}"><span>Pode ficar como está</span></label></div>`;
+              if (c.tipo === 'marcar' || c.tipo === 'escolher') {
+                const tipo = c.tipo === 'marcar' ? 'checkbox' : 'radio';
+                campos += `<div class="opcoes" role="group">${c.opcoes
+                  .map(
+                    (o) =>
+                      `<label class="opcao"><input type="${tipo}" name="${id}" value="${esc(o)}" data-campo="${id}"><span>${esc(o)}</span></label>`,
+                  )
+                  .join('')}</div>`;
+              }
+              if (c.tipo === 'nota')
+                campos += `<textarea rows="${c.linhas || 3}" data-campo="${id}" placeholder="${esc(c.dica || 'Resposta / observação')}"></textarea>`;
+            });
+            if (curtos.length) {
+              const linha = curtos
+                .map(
+                  (c) =>
+                    `<label class="campo">${esc(c.rotulo)}<input type="${c.tipo === 'numero' ? 'number' : 'text'}" ${c.tipo === 'numero' ? 'min="0" inputmode="numeric"' : ''} data-campo="${pid}.${c.id}" enterkeyhint="next"></label>`,
+                )
+                .join('');
+              // campos curtos logo antes da nota (texto livre)
+              const idx = campos.lastIndexOf('<textarea');
+              const bloco = `<div class="linha-campos">${linha}</div>`;
+              campos = idx >= 0 ? campos.slice(0, idx) + bloco + campos.slice(idx) : campos + bloco;
+            }
+            html += `
+              <article class="cartao" id="${pid}">
+                <div class="pergunta-cabecalho">
+                  <span class="numero">${n}</span>
+                  <p class="pergunta-texto">${p.texto}${p.prioridade ? '<span class="selo-prioridade">PRIORIDADE</span>' : ''}</p>
+                </div>
+                ${p.hoje ? `<div class="hoje"><strong>Hoje no app:</strong> ${esc(p.hoje)}</div>` : ''}
+                <div class="campos">${campos}</div>
+              </article>`;
+          });
+        });
+        raiz.innerHTML = html;
+      }
+
+      // ---------- Estado (localStorage) ----------
+      function lerCampos() {
+        const novo = {};
+        document.querySelectorAll('[data-campo]').forEach((el) => {
+          const k = el.dataset.campo;
+          if (el.type === 'checkbox' && el.value && el.value !== 'on') {
+            novo[k] = novo[k] || [];
+            if (el.checked) novo[k].push(el.value);
+          } else if (el.type === 'checkbox') {
+            if (el.checked) novo[k] = true;
+          } else if (el.type === 'radio') {
+            if (el.checked) novo[k] = el.value;
+          } else if (el.value.trim()) {
+            novo[k] = el.value;
+          }
+        });
+        for (const k of Object.keys(novo))
+          if (Array.isArray(novo[k]) && !novo[k].length) delete novo[k];
+        return novo;
+      }
+      function aplicar() {
+        document.querySelectorAll('[data-campo]').forEach((el) => {
+          const v = estado[el.dataset.campo];
+          if (el.type === 'checkbox' && el.value && el.value !== 'on')
+            el.checked = Array.isArray(v) && v.includes(el.value);
+          else if (el.type === 'checkbox') el.checked = v === true;
+          else if (el.type === 'radio') el.checked = v === el.value;
+          else el.value = v || '';
+        });
+        if (window.ajustarTextos) window.ajustarTextos();
+      }
+      function respondida(p) {
+        return Object.keys(estado).some((k) => k.startsWith(p.pid + '.'));
+      }
+      // Reinicia uma animação CSS (para repetir o efeito a cada mudança).
+      function animar(el, classe) {
+        if (!el) return;
+        el.classList.remove(classe);
+        void el.offsetWidth;
+        el.classList.add(classe);
+      }
+      let feitasAntes = null; // null = primeira contagem (sem festa ao abrir a página)
+      function atualizarProgresso() {
+        let feitas = 0;
+        BLOCOS.forEach((b, bi) => {
+          let doBloco = 0;
+          b.perguntas.forEach((p) => {
+            const r = respondida(p);
+            if (r) {
+              feitas++;
+              doBloco++;
+            }
+            const cartao = document.getElementById(p.pid);
+            if (feitasAntes !== null && r && !cartao.classList.contains('respondida'))
+              animar(cartao, 'acabou-de-responder');
+            cartao.classList.toggle('respondida', r);
+          });
+          const conta = document.getElementById(`conta-b${bi}`);
+          const antes = conta.querySelector('b').textContent;
+          conta.querySelector('b').textContent = doBloco;
+          conta.classList.toggle('completo', doBloco === b.perguntas.length);
+          if (feitasAntes !== null && String(doBloco) !== antes) animar(conta, 'pulou');
+        });
+        document.getElementById('contagem').textContent = `${feitas} de ${TOTAL} respondidas`;
+        document.getElementById('progresso').style.width = `${(100 * feitas) / TOTAL}%`;
+        document.getElementById('proxima-contagem').textContent = `${feitas}/${TOTAL}`;
+        document.getElementById('anel-valor').style.strokeDashoffset = 100 - (100 * feitas) / TOTAL;
+        document.getElementById('proxima').hidden = feitas === TOTAL;
+        if (feitasAntes !== null && feitas !== feitasAntes) {
+          animar(document.getElementById('contagem'), 'pulou');
+          animar(document.getElementById('proxima'), 'pulou');
+          if (feitas === TOTAL && feitasAntes < TOTAL) {
+            soltarConfete();
+            avisar('Todas as 15 perguntas respondidas. Obrigado!', 'festa');
+          }
+        }
+        feitasAntes = feitas;
+      }
+      function guardar() {
+        estado = lerCampos();
+        guardarLocal();
+        atualizarProgresso();
+        agendarGravacao();
+      }
+      function guardarLocal() {
+        try {
+          localStorage.setItem(CHAVE, JSON.stringify(estado));
+        } catch (e) {}
+      }
+
+      // ---------- Arquivo de respostas (Markdown legível + JSON no fim) ----------
+      function gerarArquivo() {
+        const v = (k) => estado[k];
+        const linhas = [];
+        const hoje = new Date();
+        linhas.push('# Respostas — questionário do Estadia', '');
+        linhas.push(`- **Hotel:** ${v('cab.hotel') || '—'}`);
+        linhas.push(
+          `- **Data:** ${v('cab.data') ? v('cab.data').split('-').reverse().join('/') : '—'}`,
+        );
+        linhas.push(`- **Participantes:** ${v('cab.participantes') || '—'}`);
+        linhas.push(`- **Gerado em:** ${hoje.toLocaleString('pt-BR')}`, '');
+        BLOCOS.forEach((b, bi) => {
+          linhas.push(`## ${bi + 1}. ${b.titulo}`, '');
+          b.perguntas.forEach((p) => {
+            linhas.push(`### ${p.n}. ${p.texto.replace(/<\/?b>/g, '**')}`);
+            if (p.hoje) linhas.push(`_Hoje no app: ${p.hoje}_`);
+            const itens = [];
+            p.campos.forEach((c) => {
+              const k = `${p.pid}.${c.id || c.tipo}`;
+              const r = v(k);
+              if (r === undefined) return;
+              if (c.tipo === 'ok') itens.push('- ✅ **Pode ficar como está**');
+              else if (c.tipo === 'marcar') itens.push(`- Marcado: ${r.join(', ')}`);
+              else if (c.tipo === 'escolher') itens.push(`- Escolha: ${r}`);
+              else if (c.tipo === 'nota') itens.push(`- Observação: ${r.replace(/\n/g, '\n  ')}`);
+              else itens.push(`- ${c.rotulo}: ${r}`);
+            });
+            linhas.push('', ...(itens.length ? itens : ['- _(sem resposta)_']), '');
+          });
+        });
+        linhas.push('## Visual e recibos', '');
+        linhas.push(`- Vai enviar fotos do hotel: ${v('visual.fotos') ? 'sim' : 'não marcado'}`);
+        linhas.push(`- Vai enviar o logo: ${v('visual.logo') ? 'sim' : 'não marcado'}`);
+        [
+          ['recibo.nome', 'Nome nos recibos'],
+          ['recibo.razao', 'Razão social'],
+          ['recibo.cnpj', 'CNPJ'],
+          ['recibo.telefone', 'Telefone'],
+          ['recibo.email', 'E-mail'],
+          ['recibo.endereco', 'Endereço'],
+        ].forEach(([k, r]) => linhas.push(`- ${r}: ${v(k) || '—'}`));
+        linhas.push('', '## Observações', '', v('observacoes') || '—', '');
+        linhas.push(
+          '---',
+          '',
+          '<!-- dados brutos (para importar) -->',
+          '```json',
+          JSON.stringify(estado, null, 2),
+          '```',
+          '',
+        );
+        return linhas.join('\n');
+      }
+      function baixar() {
+        estado = lerCampos();
+        const nomeHotel = (estado['cab.hotel'] || 'hotel')
+          .normalize('NFD')
+          .replace(/[̀-ͯ]/g, '')
+          .replace(/[^a-zA-Z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+          .toLowerCase();
+        const data = hojeLocal();
+        const arquivo = new Blob([gerarArquivo()], { type: 'text/markdown;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(arquivo);
+        a.download = `respostas-questionario-${nomeHotel}-${data}.md`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        avisar('Cópia das respostas baixada.');
+      }
+
+      // ---------- Onde gravar, em tempo real ----------
+      // 1) "servidor": a página veio do servidor.mjs → grava respostas.md na pasta do HTML;
+      // 2) "arquivo": Chrome/Edge no computador → grava no arquivo escolhido uma vez;
+      // 3) "aparelho": só no navegador (localStorage) + botão de baixar.
+      const API = 'api/respostas';
+      let modo = 'aparelho';
+      let arquivo = null; // FileSystemFileHandle
+      let temporizador = null;
+      const podeEscolherArquivo = 'showSaveFilePicker' in window;
+      const hora = () =>
+        new Date().toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        });
+
+      function mostrarStatus(texto, tipo) {
+        const el = document.getElementById('status');
+        el.textContent = texto;
+        el.dataset.tipo = tipo;
+        if (tipo === 'ok') animar(el, 'pisca');
+      }
+      function rotuloSalvar(texto) {
+        document.getElementById('rotulo-salvar').textContent = texto;
+        document.getElementById('salvar2').textContent = texto;
+      }
+      function agendarGravacao() {
+        if (modo === 'aparelho') return;
+        mostrarStatus('Salvando…', 'salvando');
+        clearTimeout(temporizador);
+        temporizador = setTimeout(gravarAgora, 500);
+      }
+      async function gravarAgora() {
+        temporizador = null;
+        const markdown = gerarArquivo();
+        if (modo === 'servidor') {
+          try {
+            const r = await fetch(API, {
+              method: 'PUT',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ estado, markdown }),
+            });
+            if (!r.ok) throw new Error(String(r.status));
+            mostrarStatus(`Salvo na pasta · ${hora()}`, 'ok');
+          } catch (e) {
+            mostrarStatus('Sem conexão — guardado no aparelho', 'erro');
+          }
+        } else if (modo === 'arquivo' && arquivo) {
+          try {
+            const w = await arquivo.createWritable();
+            await w.write(markdown);
+            await w.close();
+            mostrarStatus(`Salvo em ${arquivo.name} · ${hora()}`, 'ok');
+          } catch (e) {
+            modo = 'aparelho';
+            mostrarStatus('Arquivo sem permissão — toque em Salvar', 'erro');
+            rotuloSalvar(`Continuar em ${arquivo.name}`);
+          }
+        }
+      }
+
+      // Guarda a "alça" do arquivo escolhido (Chrome/Edge) para continuar nele ao reabrir.
+      function guardaArquivo(acao, valor) {
+        return new Promise((ok) => {
+          try {
+            const req = indexedDB.open('estadia-questionario', 1);
+            req.onupgradeneeded = () => req.result.createObjectStore('k');
+            req.onerror = () => ok(null);
+            req.onsuccess = () => {
+              const st = req.result
+                .transaction('k', acao === 'ler' ? 'readonly' : 'readwrite')
+                .objectStore('k');
+              const r = acao === 'ler' ? st.get('arquivo') : st.put(valor, 'arquivo');
+              r.onsuccess = () => ok(r.result ?? null);
+              r.onerror = () => ok(null);
+            };
+          } catch (e) {
+            ok(null);
+          }
+        });
+      }
+
+      async function salvar() {
+        estado = lerCampos();
+        guardarLocal();
+        if (modo === 'servidor') {
+          await gravarAgora();
+          return avisar('Respostas salvas na pasta do questionário.');
+        }
+        if (!podeEscolherArquivo) return baixar();
+        try {
+          if (arquivo && (await arquivo.requestPermission({ mode: 'readwrite' })) === 'granted') {
+            // reabriu a página: continua no mesmo arquivo
+          } else {
+            arquivo = await window.showSaveFilePicker({
+              suggestedName: 'respostas-questionario.md',
+              types: [
+                { description: 'Respostas (Markdown)', accept: { 'text/markdown': ['.md'] } },
+              ],
+            });
+            await guardaArquivo('gravar', arquivo);
+          }
+          modo = 'arquivo';
+          rotuloSalvar('Salvando automaticamente');
+          await gravarAgora();
+          avisar(`Pronto: cada resposta agora é salva em ${arquivo.name}.`);
+        } catch (e) {
+          if (e && e.name !== 'AbortError') baixar();
+        }
+      }
+
+      async function iniciarGravacao() {
+        if (location.protocol.startsWith('http')) {
+          try {
+            const r = await fetch(API, { cache: 'no-store' });
+            if (r.ok && (r.headers.get('content-type') || '').includes('json')) {
+              const doServidor = await r.json();
+              modo = 'servidor';
+              rotuloSalvar('Salvar agora');
+              if (Object.keys(doServidor).length) {
+                // A pasta é a fonte da verdade: continua de onde parou, em qualquer aparelho.
+                estado = doServidor;
+                guardarLocal();
+                aplicar();
+                atualizarProgresso();
+                mostrarStatus('Respostas carregadas da pasta', 'ok');
+              } else if (Object.keys(estado).length) {
+                await gravarAgora();
+              } else {
+                mostrarStatus('Salvando na pasta do questionário', 'ok');
+              }
+              // Voltou para a aba: busca o que outro aparelho possa ter salvo.
+              document.addEventListener('visibilitychange', async () => {
+                if (document.visibilityState !== 'visible' || temporizador) return;
+                try {
+                  const novo = await (await fetch(API, { cache: 'no-store' })).json();
+                  if (JSON.stringify(novo) !== JSON.stringify(estado)) {
+                    estado = novo;
+                    guardarLocal();
+                    aplicar();
+                    atualizarProgresso();
+                  }
+                } catch (e) {}
+              });
+              return;
+            }
+          } catch (e) {}
+        }
+        if (podeEscolherArquivo) {
+          arquivo = await guardaArquivo('ler');
+          rotuloSalvar(arquivo ? `Continuar em ${arquivo.name}` : 'Salvar em arquivo…');
+          mostrarStatus(
+            arquivo
+              ? 'Toque em “Continuar” para voltar a salvar no arquivo'
+              : 'Guardado neste aparelho',
+            'local',
+          );
+        } else {
+          rotuloSalvar('Baixar respostas');
+          mostrarStatus('Guardado neste aparelho', 'local');
+        }
+      }
+
+      // Abrir um respostas.md/.json (de outro aparelho) e continuar dele.
+      async function abrirArquivo(f) {
+        const texto = await f.text();
+        const m = /```json\s*([\s\S]*?)```/.exec(texto);
+        try {
+          estado = JSON.parse(m ? m[1] : texto);
+        } catch (e) {
+          return avisar('Não reconheci esse arquivo de respostas.');
+        }
+        guardarLocal();
+        aplicar();
+        atualizarProgresso();
+        agendarGravacao();
+        avisar('Respostas carregadas.');
+      }
+      function avisar(texto, tipo) {
+        const el = document.getElementById('aviso');
+        const icone = tipo === 'festa' ? '★' : '✓';
+        el.innerHTML = `<span class="aviso-icone" aria-hidden="true">${icone}</span><span></span>`;
+        el.lastChild.textContent = texto;
+        el.dataset.tipo = tipo || '';
+        el.classList.remove('visivel');
+        void el.offsetWidth;
+        el.classList.add('visivel');
+        clearTimeout(avisar.t);
+        avisar.t = setTimeout(() => el.classList.remove('visivel'), tipo === 'festa' ? 5000 : 3500);
+      }
+
+      // ---------- Efeitos visuais ----------
+      const movimentoReduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Chips da abertura (contados a partir das perguntas).
+      function montarChipsHero() {
+        const prioridades = BLOCOS.reduce(
+          (n, b) => n + b.perguntas.filter((p) => p.prioridade).length,
+          0,
+        );
+        document.getElementById('hero-chips').innerHTML = [
+          `<span><b>${TOTAL}</b> perguntas</span>`,
+          `<span><b>${prioridades}</b> prioridades</span>`,
+          `<span><i class="ponto-vivo"></i>Salva sozinho</span>`,
+        ].join('');
+      }
+
+      // Cartões e títulos surgem conforme entram na tela, em cascata.
+      function iniciarRevelacao() {
+        const itens = document.querySelectorAll('main .cartao, main .bloco-titulo, .acoes-finais');
+        if (movimentoReduzido || !('IntersectionObserver' in window)) return;
+        document.documentElement.classList.add('com-revelacao');
+        const obs = new IntersectionObserver(
+          (entradas) => {
+            let i = 0;
+            entradas.forEach((en) => {
+              if (!en.isIntersecting) return;
+              en.target.style.setProperty('--atraso', `${Math.min(i++, 5) * 70}ms`);
+              en.target.classList.add('visto');
+              obs.unobserve(en.target);
+            });
+          },
+          { rootMargin: '0px 0px -6% 0px', threshold: 0.06 },
+        );
+        itens.forEach((el) => obs.observe(el));
+      }
+
+      // Cartão no centro da tela fica em evidência.
+      function iniciarCartaoAtivo() {
+        if (!('IntersectionObserver' in window)) return;
+        const obs = new IntersectionObserver(
+          (entradas) =>
+            entradas.forEach((en) => en.target.classList.toggle('ativo', en.isIntersecting)),
+          { rootMargin: '-42% 0px -42% 0px' },
+        );
+        document.querySelectorAll('#perguntas .cartao').forEach((c) => obs.observe(c));
+      }
+
+      // Parallax suave na foto da abertura e nas fotos dos blocos; sombra na barra ao rolar.
+      function iniciarRolagem() {
+        const barra = document.querySelector('.barra');
+        const heroFoto = document.querySelector('.hero-foto');
+        const fotos = [...document.querySelectorAll('.bloco-titulo.com-foto')];
+        let pendente = false;
+        const quadro = () => {
+          pendente = false;
+          const y = scrollY;
+          barra.classList.toggle('rolou', y > 8);
+          if (movimentoReduzido) return;
+          if (y < innerHeight) heroFoto.style.setProperty('--py', `${y * 0.18}px`);
+          fotos.forEach((f) => {
+            const r = f.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > innerHeight) return;
+            const p = (r.top + r.height / 2 - innerHeight / 2) / innerHeight; // -1..1
+            f.style.setProperty('--fy', `${50 + p * 22}%`);
+          });
+        };
+        addEventListener(
+          'scroll',
+          () => {
+            if (!pendente) {
+              pendente = true;
+              requestAnimationFrame(quadro);
+            }
+          },
+          { passive: true },
+        );
+        quadro();
+      }
+
+      // Onda ao tocar num chip.
+      document.addEventListener('pointerdown', (e) => {
+        const chip = e.target.closest && e.target.closest('.opcao span, .botao, .proxima');
+        if (!chip || movimentoReduzido) return;
+        const r = chip.getBoundingClientRect();
+        const onda = document.createElement('i');
+        onda.className = 'onda';
+        const lado = Math.max(r.width, r.height) * 2.2;
+        onda.style.cssText = `width:${lado}px;height:${lado}px;left:${e.clientX - r.left - lado / 2}px;top:${e.clientY - r.top - lado / 2}px`;
+        chip.appendChild(onda);
+        onda.addEventListener('animationend', () => onda.remove());
+      });
+
+      // Textarea cresce com o texto também onde "field-sizing" não existe (Safari/Firefox).
+      if (!CSS.supports('field-sizing', 'content')) {
+        const ajustar = (t) => {
+          t.style.height = 'auto';
+          t.style.height = `${Math.min(t.scrollHeight + 2, innerHeight * 0.6)}px`;
+        };
+        document.addEventListener('input', (e) => {
+          if (e.target.tagName === 'TEXTAREA') ajustar(e.target);
+        });
+        window.ajustarTextos = () => document.querySelectorAll('textarea').forEach(ajustar);
+      }
+
+      // Confete ao terminar tudo (canvas leve, some sozinho).
+      function soltarConfete() {
+        if (movimentoReduzido) return;
+        const cv = document.getElementById('confete');
+        const ctx = cv.getContext('2d');
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        cv.width = innerWidth * dpr;
+        cv.height = innerHeight * dpr;
+        ctx.scale(dpr, dpr);
+        cv.classList.add('ativo');
+        const cores = ['#2563eb', '#8b5cf6', '#d5a65c', '#10b981', '#f3d9a4', '#60a5fa'];
+        const pecas = Array.from({ length: 160 }, (_, i) => {
+          const daEsquerda = i % 2 === 0;
+          return {
+            x: daEsquerda ? -10 : innerWidth + 10,
+            y: innerHeight * (0.55 + Math.random() * 0.3),
+            vx: (daEsquerda ? 1 : -1) * (4 + Math.random() * 9),
+            vy: -(10 + Math.random() * 11),
+            g: 0.28 + Math.random() * 0.12,
+            w: 6 + Math.random() * 6,
+            h: 8 + Math.random() * 8,
+            a: Math.random() * Math.PI,
+            va: (Math.random() - 0.5) * 0.3,
+            cor: cores[i % cores.length],
+          };
+        });
+        const inicio = performance.now();
+        const passo = (t) => {
+          const dt = t - inicio;
+          ctx.clearRect(0, 0, innerWidth, innerHeight);
+          ctx.globalAlpha = dt > 2600 ? Math.max(0, 1 - (dt - 2600) / 900) : 1;
+          pecas.forEach((p) => {
+            p.vx *= 0.985;
+            p.vy += p.g;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.a += p.va;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.a);
+            ctx.scale(1, Math.cos(p.a * 2));
+            ctx.fillStyle = p.cor;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+          });
+          if (dt < 3500) requestAnimationFrame(passo);
+          else {
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            cv.classList.remove('ativo');
+          }
+        };
+        requestAnimationFrame(passo);
+      }
+
+      // ---------- Início ----------
+      montar();
+      montarChipsHero();
+      iniciarRevelacao();
+      iniciarCartaoAtivo();
+      iniciarRolagem();
+      aplicar();
+      atualizarProgresso();
+      document.addEventListener('input', guardar);
+      // Leva à primeira pergunta ainda sem resposta (depois da que está na tela, se houver).
+      document.getElementById('proxima').addEventListener('click', () => {
+        const faltam = [...document.querySelectorAll('#perguntas .cartao:not(.respondida)')];
+        const topo = document.querySelector('.barra').offsetHeight + 8;
+        const alvo = faltam.find((c) => c.getBoundingClientRect().top > topo + 4) || faltam[0];
+        if (!alvo) return;
+        alvo.scrollIntoView({ behavior: movimentoReduzido ? 'auto' : 'smooth', block: 'start' });
+        setTimeout(() => {
+          animar(alvo, 'destaque');
+          const primeiro = alvo.querySelector('textarea, input[type=text], input[type=number]');
+          if (primeiro && matchMedia('(pointer: fine)').matches) primeiro.focus({ preventScroll: true });
+        }, movimentoReduzido ? 0 : 450);
+      });
+      // Enter num campo curto pula para o próximo campo (teclado do celular: "próximo").
+      document.addEventListener('keydown', (e) => {
+        const el = e.target;
+        if (e.key !== 'Enter' || el.tagName !== 'INPUT' || !['text', 'number'].includes(el.type))
+          return;
+        e.preventDefault();
+        const todos = [...document.querySelectorAll('input[type=text], input[type=number], textarea')];
+        const prox = todos[todos.indexOf(el) + 1];
+        if (prox) prox.focus();
+      });
+      document.addEventListener('change', guardar);
+      document.getElementById('salvar').addEventListener('click', salvar);
+      document.getElementById('salvar2').addEventListener('click', salvar);
+      document.getElementById('baixar').addEventListener('click', baixar);
+      document
+        .getElementById('abrir')
+        .addEventListener('click', () => document.getElementById('abrir-arquivo').click());
+      document.getElementById('abrir-arquivo').addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (f) abrirArquivo(f);
+        e.target.value = '';
+      });
+      document.getElementById('imprimir').addEventListener('click', () => window.print());
+      document.getElementById('limpar').addEventListener('click', () => {
+        if (!confirm('Apagar todas as respostas? (também do arquivo salvo)')) return;
+        estado = {};
+        try {
+          localStorage.removeItem(CHAVE);
+        } catch (e) {}
+        aplicar();
+        atualizarProgresso();
+        agendarGravacao();
+      });
+      document.getElementById('tema').addEventListener('click', (e) => {
+        const novo = document.documentElement.dataset.tema === 'claro' ? 'escuro' : 'claro';
+        const trocar = () => {
+          document.documentElement.dataset.tema = novo;
+          document.querySelector('meta[name="theme-color"]').content =
+            novo === 'claro' ? '#f5f7fc' : '#060b18';
+        };
+        try {
+          localStorage.setItem('estadia-questionario-tema', novo);
+        } catch (err) {}
+        // Troca de tema com um círculo que se abre a partir do botão (onde o navegador suporta).
+        if (!document.startViewTransition || movimentoReduzido) return trocar();
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const y = r.top + r.height / 2;
+        const raio = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+        document.startViewTransition(trocar).ready.then(() => {
+          document.documentElement.animate(
+            { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${raio}px at ${x}px ${y}px)`] },
+            {
+              duration: 650,
+              easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+              pseudoElement: '::view-transition-new(root)',
+            },
+          );
+        });
+      });
+      // Luz que acompanha o mouse nos cartões (como no app).
+      if (matchMedia('(hover: hover) and (pointer: fine)').matches)
+        document.addEventListener(
+          'pointermove',
+          (e) => {
+            const c = e.target.closest && e.target.closest('.cartao');
+            if (!c) return;
+            const r = c.getBoundingClientRect();
+            c.style.setProperty('--mx', `${e.clientX - r.left}px`);
+            c.style.setProperty('--my', `${e.clientY - r.top}px`);
+          },
+          { passive: true },
+        );
+      iniciarGravacao().then(() => {
+        if (!estado['cab.data']) {
+          const d = document.querySelector('[data-campo="cab.data"]');
+          d.value = hojeLocal();
+          estado = lerCampos();
+          guardarLocal();
+        }
+      });
+    </script>
+  </body>
+</html>
