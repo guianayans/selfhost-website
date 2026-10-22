@@ -1,0 +1,63 @@
+ESTADIA · SITE DE DEMONSTRAÇÃO PARA A EQUIPE
+É o app de verdade (mesma API, banco e tempo real), com dados SIMULADOS de uma pousada de
+1 andar (12 quartos, 101 a 112) e uma semana de movimento: hóspedes, reservas, caixa,
+fechamentos de dia e relatórios. Serve para todo o grupo ver como está o MVP.
+
+ACESSO
+  https://website.gvtserver.online/estadia/
+  Abre direto como administrador, sem tela de login e sem senha.
+
+FUNCIONÁRIOS (um por tipo de função; troque em "Trocar funcionário", no cabeçalho ou no aviso)
+  login        nome               perfil                 PIN    menus (além do Início)
+  admin        Ana Administradora Administrador          7391   todos, inclusive Usuários
+  gerente      Gustavo Gerente    Gerência               4826   todos, menos Usuários
+  recepcao     Rita Recepção      Recepção               2580   Mapa, Reservas, Caixa, Rack, Relatórios, Fechamento, Governança
+  financeiro   Fábio Financeiro   Financeiro             8264   Mapa, Reservas, Caixa, Rack, Relatórios, Empresas
+  governanca   Gabi Governanta    Governanta             1593   Mapa, Relatórios, Governança (abre na Governança)
+  limpeza      Lia Limpeza        Camareira / Limpeza    6047   Mapa, Governança (abre na Governança)
+  manutencao   Mário Manutenção   Manutenção             3918   Mapa (bloquear e liberar quartos)
+  Senha de todos (o roteador usa sozinho; ninguém precisa digitar): Estadia demo 2026
+  Os PINs só aparecem se alguém bloquear a tela de propósito.
+  Perfis e contas novos (Limpeza, Manutenção; Governança vira Governanta com bloquear quarto e
+  estoque) são criados pelo roteador no modelo e em toda cópia, sem desfazer o que já existe.
+  No simulador, a limpeza é feita pela "limpeza" e os bloqueios pela "manutencao" (auditoria).
+
+CAMADA DA DEMONSTRAÇÃO (demo-camada.js/.css, por cima do app, sem mudar o pacote)
+  - Painel "Funcionários do hotel": cartões com perfil, resumo e menus que cada um vê, e a
+    aba "Comparar menus" (matriz menus × funcionários, com ✓/—).
+  - Menu lateral recolhível no computador: botão no topo do menu ou a tecla [ ; a escolha fica
+    salva no navegador.
+  - Rack só para quem vê reservas; a camareira abre direto na Governança.
+  - Os mapas de código-fonte (.map) não são servidos: o código do app é privado.
+
+NINGUÉM ALTERA O BANCO DE DEMONSTRAÇÃO
+  Tudo funciona e é clicável, mas o que cada pessoa faz fica só para ela:
+  - O banco de demonstração vira um MODELO (estadia_modelo) em que nenhum usuário se conecta.
+  - Cada navegador ganha um cookie (estadia_visita) e, no primeiro uso, uma cópia só dele
+    do modelo. As mudanças vão para essa cópia; os colegas não veem.
+  - Apagou os cookies (ou tocou em "Recomeçar do zero", no aviso do canto da tela): volta tudo
+    como era antes.
+  - Cópias sem uso há 7 dias são apagadas. Até 12 cópias ficam abertas ao mesmo tempo; as
+    paradas há 15 minutos são desligadas e voltam, com os dados, quando a pessoa volta.
+  - O modelo é refeito todo dia (seed + uma semana de movimento até hoje).
+  Quem faz isso é o roteador: sites/estadia/demo-roteador.mjs (entra como admin sozinho e
+  entra de novo se a sessão cair ou bloquear).
+
+COMO RODAR NO SERVIDOR
+  docker compose -f /pendriver/website-manager/docker-compose.estadia.yml up -d
+  Na 1ª vez o modelo é montado (1 a 2 minutos). Estado: https://website.gvtserver.online/estadia/__demo/saude
+
+PARA ATUALIZAR COM UMA VERSÃO NOVA DO APP
+  1) No projeto do app, monte o pacote:  demo/montar.sh
+  2) Copie SÓ a pasta do app:  demo/pacote/sites/estadia/app/ → /pendriver/website-manager/sites/estadia/app/
+     (não copie o docker-compose.estadia.yml nem o LEIA-ME do pacote: os daqui já usam o roteador)
+  3) docker restart estadia   (o modelo novo é montado no dia seguinte; para já, veja abaixo)
+
+RECOMEÇAR TUDO DO ZERO (modelo novo e apaga as cópias de todos)
+  docker compose -f /pendriver/website-manager/docker-compose.estadia.yml down
+  rm -rf /pendriver/estadia-dados
+  docker compose -f /pendriver/website-manager/docker-compose.estadia.yml up -d
+
+ATENÇÃO
+  Senhas fixas e dados fictícios: é só para demonstração. O hotel de verdade usa o
+  docker-compose.yml do projeto, nunca este arquivo.

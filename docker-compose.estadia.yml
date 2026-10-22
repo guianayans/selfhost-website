@@ -1,0 +1,97 @@
+# Estadia — site de DEMONSTRAÇÃO para a equipe (dados simulados de uma pousada de 1 andar).
+# Mesmo modelo do docker-compose.equipe.yml: o Traefik manda website.gvtserver.online/estadia/
+# para cá. É o app de verdade, aberto direto como admin (sem login).
+#
+# Ninguém altera o banco de demonstração: o roteador (sites/estadia/demo-roteador.mjs) dá a cada
+# navegador uma cópia só dele, presa a um cookie. Apagou os cookies, volta tudo como era antes.
+# O modelo é refeito todo dia (seed + uma semana de movimento até hoje).
+#
+# Subir:     docker compose -f /pendriver/website-manager/docker-compose.estadia.yml up -d
+# Recomeçar: docker compose -f ... down && rm -rf /pendriver/estadia-dados && docker compose -f ... up -d
+# Dados:     /pendriver/estadia-dados/ (fora de sites/, então o rsync --delete não apaga).
+#
+# Tudo aqui é FICTÍCIO (senhas fixas de propósito): nunca use para um hotel de verdade.
+
+services:
+  estadia-db:
+    image: postgres:18.6
+    container_name: estadia-db
+    restart: unless-stopped
+    # cada cópia aberta tem o seu processo da API (com pool, tempo real e fila de tarefas)
+    command: ['postgres', '-c', 'max_connections=500']
+    environment:
+      POSTGRES_DB: hotelaria
+      POSTGRES_USER: hotel_owner
+      POSTGRES_PASSWORD: estadia-demo-banco-2026
+      TZ: America/Sao_Paulo
+      PGTZ: America/Sao_Paulo
+    volumes:
+      - /pendriver/estadia-dados/postgres:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U hotel_owner -d hotelaria']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [estadia]
+
+  # Roteador: serve o site, cria a cópia de cada visitante e entra como admin sozinho.
+  estadia:
+    image: node:24.22.0-slim
+    container_name: estadia
+    restart: unless-stopped
+    init: true
+    working_dir: /app
+    command: ['node', '/site/demo-roteador.mjs']
+    volumes:
+      - /pendriver/website-manager/sites/estadia/app:/app:ro
+      - /pendriver/website-manager/sites/estadia:/site:ro
+      - /pendriver/estadia-dados/roteador:/dados
+    depends_on:
+      estadia-db:
+        condition: service_healthy
+    environment:
+      TZ: America/Sao_Paulo
+      PORTA: '8080'
+      BANCO_HOST: estadia-db:5432
+      BANCO_DONO: hotel_owner
+      BANCO_DONO_SENHA: estadia-demo-banco-2026
+      DB_APP_USER: hotel_app
+      DB_APP_PASSWORD: estadia-demo-app-2026
+      SEED_DEMO_SENHA: Estadia demo 2026
+      SEED_DEMO_MODELO: um_andar
+      DEMO_LOGIN: admin
+      HOTEL_NOME: Pousada Estadia
+      MAX_PROCESSOS: '12'
+      OCIOSO_MIN: '15'
+      GUARDAR_DIAS: '7'
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:8080/__demo/saude').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 240s
+    networks: [estadia, coolify]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+      - 'traefik.http.routers.estadia.rule=Host(`website.gvtserver.online`) && PathPrefix(`/estadia`)'
+      - traefik.http.routers.estadia.priority=100
+      - traefik.http.routers.estadia.entrypoints=https
+      - traefik.http.routers.estadia.tls=true
+      - traefik.http.routers.estadia.middlewares=estadia-barra,estadia-prefixo,estadia-sec
+      - traefik.http.services.estadia.loadbalancer.server.port=8080
+      # /estadia → /estadia/ (o site usa o prefixo /estadia/). Sem cifrão de propósito (o Coolify não lida bem).
+      - 'traefik.http.middlewares.estadia-barra.redirectregex.regex=^https?://[^/]+/estadia\z'
+      - 'traefik.http.middlewares.estadia-barra.redirectregex.replacement=https://website.gvtserver.online/estadia/'
+      - traefik.http.middlewares.estadia-barra.redirectregex.permanent=false
+      - traefik.http.middlewares.estadia-prefixo.stripprefix.prefixes=/estadia
+      - traefik.http.middlewares.estadia-sec.headers.forceSTSHeader=true
+      - traefik.http.middlewares.estadia-sec.headers.stsSeconds=31536000
+      - traefik.http.middlewares.estadia-sec.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.estadia-sec.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.estadia-sec.headers.customResponseHeaders.X-Frame-Options=SAMEORIGIN
+
+networks:
+  estadia:
+  coolify:
+    external: true
