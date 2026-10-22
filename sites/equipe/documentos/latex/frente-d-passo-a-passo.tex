@@ -1,0 +1,461 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage[default,type1,semibold]{inter}
+\usepackage[a4paper,top=18mm,bottom=24mm,left=18mm,right=18mm,footskip=12mm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{amssymb,textcomp,array,longtable,enumitem,fancyhdr,lastpage,needspace,fontawesome5}
+\usepackage[skins,breakable,raster]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{positioning,calc,babel}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+
+\definecolor{cor}{HTML}{047857}
+\definecolor{suave}{HTML}{E3F5EE}
+\definecolor{texto}{HTML}{0F172A}
+\definecolor{cinza}{HTML}{5B6B84}
+\definecolor{linha}{HTML}{D3DAE6}
+\color{texto}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\linespread{1.1}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{10pt}
+\renewcommand{\arraystretch}{1.45}
+\arrayrulecolor{linha}
+\setlist{itemsep=4pt,topsep=4pt,parsep=0pt}
+\setlist[itemize]{label={\color{cor}\small\faCaretRight},leftmargin=1.4em}
+% Passos numerados: número dentro de um círculo da cor da equipe.
+\DeclareRobustCommand{\bolinha}[1]{\tikz[baseline=(n.base)]\node[circle,fill=cor,text=white,inner sep=1.6pt,minimum size=17pt,font=\footnotesize\bfseries](n){#1};}
+\setlist[enumerate]{label=\bolinha{\arabic*},leftmargin=2.3em,labelsep=0.6em,itemsep=6pt}
+% Checklist: quadrado grande para marcar à mão.
+\DeclareRobustCommand{\caixinha}{\tikz[baseline=-0.6ex]\draw[cor,line width=1.2pt,rounded corners=2pt](0,-0.16)rectangle(0.42,0.26);}
+\newlist{checklist}{itemize}{1}
+\setlist[checklist]{label=\caixinha,leftmargin=2em,labelsep=0.6em,itemsep=7pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{cor}\textbf{\faUsers\ \ Frente D}\color{cinza}\ \ ·\ \ Pessoas e Treinamento · Passo a passo}
+\fancyfoot[R]{\footnotesize\color{cinza}\textbf{\thepage}\,/\,\pageref{LastPage}}
+% Fita da cor da equipe na margem esquerda de todas as páginas.
+\fancyhead[L]{\begin{tikzpicture}[remember picture,overlay]\fill[cor](current page.north west)rectangle([xshift=5pt]current page.south west);\end{tikzpicture}}
+
+% Título de seção com ícone: nunca sozinho no pé da página.
+\newcommand{\secao}[2]{\Needspace{10\baselineskip}\vspace{12pt}%
+  \noindent\tikz[baseline=(i.base)]\node[circle,fill=cor,text=white,minimum size=26pt,inner sep=0pt](i){\small #1};%
+  \hspace{8pt}{\Large\bfseries #2}\par\vspace{-4pt}{\color{cor!35}\rule{\linewidth}{1.2pt}}\par\vspace{2pt}}
+\newcommand{\subsecao}[1]{\Needspace{8\baselineskip}\vspace{8pt}{\large\bfseries\color{cor}#1}\par}
+\newcommand{\rotulo}[2]{\Needspace{6\baselineskip}\vspace{10pt}%
+  \noindent{\color{cor}\normalsize #1}\hspace{6pt}{\footnotesize\bfseries\color{cor}\MakeUppercase{#2}}\par\vspace{2pt}}
+\newtcolorbox{destaque}[1][]{enhanced,breakable,colback=suave,colframe=suave,borderline west={4pt}{0pt}{cor},arc=4pt,boxrule=0pt,left=12pt,right=12pt,top=8pt,bottom=8pt,before skip=8pt,after skip=10pt,#1}
+\newtcolorbox{apostila}{enhanced,breakable,colback=white,colframe=cor,boxrule=1pt,arc=6pt,left=12pt,right=12pt,top=8pt,bottom=8pt,before skip=8pt,after skip=8pt,
+  overlay={\node[fill=cor,text=white,rounded corners=3pt,font=\scriptsize\bfseries,inner sep=4pt,anchor=west] at ([xshift=10pt]frame.north west) {\faBookOpen\ DA APOSTILA};}}
+\newtcolorbox{selo}{enhanced,left=8pt,right=8pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt,
+  frame code={\draw[cor,dashed,line width=1.4pt,rounded corners=8pt](frame.south west)rectangle(frame.north east);},
+  interior code={\fill[suave,rounded corners=8pt](interior.south west)rectangle(interior.north east);}}
+% Anotações: ocupa o resto da página da etapa (só se sobrar espaço útil).
+\newcommand{\anotacoes}{\par\ifdim\dimexpr\pagegoal-\pagetotal\relax>3.5cm\ifdim\pagegoal<\maxdimen
+\begin{tcolorbox}[enhanced,height fill,colback=white,colframe=cor!35,boxrule=0.8pt,arc=8pt,before skip=10pt,left=10pt,top=6pt,
+  borderline={0.8pt}{0pt}{cor!35,dashed},frame hidden,
+  underlay={\begin{scope}\clip(interior.south west)rectangle(interior.north east);
+    \foreach \y in {1,...,40}{\draw[cor!18,line width=0.6pt]([yshift=-\y*0.75cm-0.5cm]interior.north west)--([yshift=-\y*0.75cm-0.5cm]interior.north east);}\end{scope}}]
+{\footnotesize\bfseries\color{cor}\faStickyNote\ \ ANOTAÇÕES}
+\end{tcolorbox}\fi\fi}
+% Fim da etapa: se o bloco final não cabe, a sobra vira Anotações e o bloco vai para a próxima página.
+\newif\ifjaanotou
+\newsavebox{\blocofinal}
+% Mede o bloco final já montado; se não couber no resto da página, a sobra vira Anotações.
+\newcommand{\usarblocofinal}{\par\global\jaanotoufalse
+  \ifdim\pagegoal<\maxdimen\ifdim\dimexpr\pagegoal-\pagetotal\relax<\dimexpr\ht\blocofinal+\dp\blocofinal+18pt\relax
+    \anotacoes\global\jaanotoutrue\clearpage\fi\fi
+  \vspace{10pt}\noindent\usebox{\blocofinal}\par}
+\newtcolorbox{faixa}[1][]{enhanced,colback=cor,colframe=cor,coltext=white,arc=8pt,boxrule=0pt,left=14pt,right=14pt,top=10pt,bottom=10pt,#1}
+\newtcbox{\chip}[1][]{enhanced,on line,colback=suave,colframe=suave,coltext=cor,arc=7pt,boxrule=0pt,left=5pt,right=5pt,top=2pt,bottom=2pt,fontupper=\footnotesize\bfseries,#1}
+\newtcbox{\chipbranco}{enhanced,on line,colback=white,colframe=white,coltext=cor,arc=7pt,boxrule=0pt,left=6pt,right=6pt,top=2pt,bottom=2pt,fontupper=\footnotesize\bfseries}
+\begin{document}
+\thispagestyle{fancy}
+\begin{tikzpicture}[remember picture,overlay]
+\fill[cor,opacity=0.10] ([xshift=-1.5cm,yshift=-1cm]current page.north east) circle (5.2cm);
+\fill[cor,opacity=0.07] ([xshift=-5.5cm,yshift=-4.5cm]current page.north east) circle (2.4cm);
+\fill[cor,opacity=0.06] ([xshift=2cm,yshift=3cm]current page.south west) circle (4cm);
+\end{tikzpicture}
+\vspace*{2mm}
+\noindent\begin{tikzpicture}
+\node[circle,fill=cor,text=white,minimum size=78pt,font=\fontsize{40}{40}\selectfont\bfseries] (L) {D};
+\node[right=14pt of L.east,anchor=west,align=left,text width=12.2cm] {
+  {\footnotesize\bfseries\color{cor}PROJETO ESTADIA\ \ ·\ \ EQUIPE VERDE\ \ ·\ \ FRENTE D}\\[4pt]
+  {\fontsize{23}{27}\selectfont\bfseries Pessoas e Treinamento}\\[6pt]
+  \chip{\faShoePrints\ \ Passo a passo}\ \chip{\faUsers\ \ Aulas 13 a 16 da apostila}
+};
+\end{tikzpicture}
+\vspace{10pt}
+
+\begin{faixa}
+{\large\faRocket}\hspace{8pt}{\large\bfseries Nossa missão}\par\vspace{2pt}
+{\normalsize Cuidar das pessoas: conversar com a dona do hotel, preparar os funcionários para usar o sistema e definir quem decide o quê.}
+\end{faixa}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!40,boxrule=1pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=10pt,
+  title={\faUserFriends\ \ Nossa equipe},fonttitle=\bfseries\small,coltitle=cor,colbacktitle=suave,attach boxed title to top left={xshift=10pt,yshift=-8pt},boxed title style={arc=4pt,boxrule=0pt}]
+\vspace{6pt}
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faHandshake};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Relação com a cliente}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faChalkboardTeacher};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Treinamento}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faLaptopCode};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Dev de apoio}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}
+\end{tcolorbox}
+\secao{\faMapSigns}{Mapa da jornada}
+{\color{cinza}4 tarefas curtas, uma por página. Marquem a bolinha quando terminarem cada uma.}\par\vspace{4pt}
+\begin{tcolorbox}[enhanced,colback=suave!60,colframe=cor!25,boxrule=0.6pt,arc=6pt,left=6pt,right=8pt,top=4pt,bottom=4pt,before skip=0pt,after skip=4pt]
+\begin{tabular}{@{}m{24pt}m{20pt}>{\raggedright\arraybackslash}m{0.52\linewidth}>{\raggedleft\arraybackslash}m{0.27\linewidth}@{}}
+\tikz\node[circle,fill=cor,text=white,minimum size=20pt,inner sep=0pt,font=\footnotesize\bfseries]{1}; &
+{\color{cor}\large \faHandshake} &
+\textbf{Conversa com a dona do hotel}\par{\scriptsize\color{cinza}\faUser\ Relação com a cliente} &
+\chip{\faCalendarCheck\ Semana 1}\par\vspace{2pt}\chip{\faClock\ cerca de 1h30}
+\end{tabular}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.6pt,arc=6pt,left=6pt,right=8pt,top=4pt,bottom=4pt,before skip=0pt,after skip=4pt]
+\begin{tabular}{@{}m{24pt}m{20pt}>{\raggedright\arraybackslash}m{0.52\linewidth}>{\raggedleft\arraybackslash}m{0.27\linewidth}@{}}
+\tikz\node[circle,fill=cor,text=white,minimum size=20pt,inner sep=0pt,font=\footnotesize\bfseries]{2}; &
+{\color{cor}\large \faBookOpen} &
+\textbf{Manual rápido do sistema}\par{\scriptsize\color{cinza}\faUser\ Treinamento} &
+\chip{\faCalendarCheck\ Semana 2}\par\vspace{2pt}\chip{\faClock\ cerca de 2h}
+\end{tabular}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=suave!60,colframe=cor!25,boxrule=0.6pt,arc=6pt,left=6pt,right=8pt,top=4pt,bottom=4pt,before skip=0pt,after skip=4pt]
+\begin{tabular}{@{}m{24pt}m{20pt}>{\raggedright\arraybackslash}m{0.52\linewidth}>{\raggedleft\arraybackslash}m{0.27\linewidth}@{}}
+\tikz\node[circle,fill=cor,text=white,minimum size=20pt,inner sep=0pt,font=\footnotesize\bfseries]{3}; &
+{\color{cor}\large \faChalkboardTeacher} &
+\textbf{Plano de treinamento}\par{\scriptsize\color{cinza}\faUser\ Treinamento} &
+\chip{\faCalendarCheck\ Semana 3}\par\vspace{2pt}\chip{\faClock\ cerca de 1h}
+\end{tabular}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.6pt,arc=6pt,left=6pt,right=8pt,top=4pt,bottom=4pt,before skip=0pt,after skip=4pt]
+\begin{tabular}{@{}m{24pt}m{20pt}>{\raggedright\arraybackslash}m{0.52\linewidth}>{\raggedleft\arraybackslash}m{0.27\linewidth}@{}}
+\tikz\node[circle,fill=cor,text=white,minimum size=20pt,inner sep=0pt,font=\footnotesize\bfseries]{4}; &
+{\color{cor}\large \faBalanceScale} &
+\textbf{Quem decide o quê e privacidade}\par{\scriptsize\color{cinza}\faUser\ Relação com a cliente} &
+\chip{\faCalendarCheck\ Semana 4}\par\vspace{2pt}\chip{\faClock\ cerca de 1h}
+\end{tabular}
+\end{tcolorbox}
+\secao{\faInfoCircle}{Como usar este documento}
+\begin{enumerate}
+  \item Sigam as etapas na ordem. Cada uma diz \textbf{em que semana} fazer, \textbf{quanto tempo} leva e qual \textbf{aula da apostila} explica o assunto.
+  \item Nas tabelas, a \textbf{1ª linha é um exemplo}: usem como modelo para preencher as outras.
+  \item O \textbf{Desafio extra} é opcional: só para quem quiser ir além.
+  \item Preencham no computador pela versão \textbf{Word}; este PDF é para ler e imprimir (há espaço para escrever à mão).
+  \item Só considerem a etapa concluída quando todos os quadradinhos do \textbf{Pronto quando} estiverem marcados.
+  \item Ao terminar, enviem o arquivo pelo site da divisão de funções, em \textbf{Entregas da Frente D}, com o nome do selo \textbf{Entregar no site}.
+\end{enumerate}
+\clearpage
+\noindent\begin{tikzpicture}
+\draw[cor!25,line width=2.2pt](0.00,0)--(1.50,0);
+\draw[cor!25,line width=2.2pt](1.50,0)--(3.00,0);
+\draw[cor!25,line width=2.2pt](3.00,0)--(4.50,0);
+\node[circle,fill=cor,text=white,draw=suave,line width=3pt,minimum size=24pt,inner sep=0pt,font=\small\bfseries] at (0.00,0){1};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (1.50,0){2};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (3.00,0){3};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (4.50,0){4};
+\end{tikzpicture}
+\par\vspace{8pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{40pt}>{\raggedright\arraybackslash}m{0.78\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=36pt,inner sep=0pt]{\Large \faHandshake}; &
+{\footnotesize\bfseries ETAPA 1 DE 4}\ \ \chipbranco{\faCalendarCheck\ Semana 1}\ \chipbranco{\faClock\ cerca de 1h30}\par\vspace{2pt}
+{\fontsize{17}{21}\selectfont\bfseries Conversa com a dona do hotel}\par\vspace{3pt}
+{\footnotesize\faUser\ \ Quem faz: \textbf{Relação com a cliente}\ \ ·\ \ \faCompass\ \ Ajuda: Guia da Frente D, manual da sua função}
+\end{tabular}
+\end{faixa}
+\begin{apostila}\vspace{4pt}Aula 16 · O Business Partner é a ponte entre o cliente e a equipe: entende o que o cliente precisa, leva as perguntas e traz as decisões. Ele recomenda; quem decide é o cliente.\end{apostila}
+\rotulo{\faBullseye}{Objetivo}
+{\large Ouvir a dona do hotel e levar as respostas para o grupo.}\par
+\rotulo{\faShoePrints}{Passo a passo}
+\begin{enumerate}
+  \item Usem o questionário pronto do projeto (peçam o link ao dev de apoio).
+  \item Na conversa, comecem pelas perguntas sobre quartos, reservas, pagamentos e relatórios.
+  \item Anotem as 5 decisões mais importantes na tabela abaixo.
+  \item Mandem as decisões para a Frente B (produto) e a Frente C (indicadores).
+\end{enumerate}
+\rotulo{\faPen}{Para preencher}
+{\footnotesize\color{cinza}\faHandPointDown\ A 1ª linha é um exemplo. Preencham as outras.}\par\vspace{2pt}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.297\linewidth}>{\raggedright\arraybackslash}p{0.297\linewidth}>{\raggedright\arraybackslash}p{0.297\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Assunto} & \color{white}\textbf{\footnotesize O que a dona decidiu} & \color{white}\textbf{\footnotesize Mandar para} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Assunto} & \color{white}\textbf{\footnotesize O que a dona decidiu} & \color{white}\textbf{\footnotesize Mandar para} \\
+\endhead
+\rowcolor{white}\textbf{Cancelamento} & Sem multa até 2 dias antes & Frente B \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt} &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt} &  &  \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt} &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt} &  &  \\ \hline
+\end{longtable}
+\endgroup
+\begin{lrbox}{\blocofinal}\begin{minipage}{\linewidth}
+\begin{tcolorbox}[enhanced,colback=suave!45,colframe=cor!35,boxrule=0.8pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt]
+\begin{minipage}[t]{0.56\linewidth}\vspace{0pt}
+{\footnotesize\bfseries\color{cor}\faCheckDouble\ \ PRONTO QUANDO}\par\vspace{2pt}
+\begin{checklist}
+  \item Questionário respondido.
+  \item 5 decisões anotadas e repassadas.
+\end{checklist}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}
+\begin{selo}\centering
+{\LARGE\color{cor}\faUpload}\par\vspace{3pt}
+{\scriptsize\bfseries\color{cor}ENTREGAR NO SITE COMO}\par\vspace{2pt}
+{\bfseries D1-conversa-com-a-dona}
+\end{selo}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}\end{lrbox}
+\usarblocofinal
+\ifjaanotou\else\anotacoes\fi
+\clearpage
+\noindent\begin{tikzpicture}
+\draw[cor,line width=2.2pt](0.00,0)--(1.50,0);
+\draw[cor!25,line width=2.2pt](1.50,0)--(3.00,0);
+\draw[cor!25,line width=2.2pt](3.00,0)--(4.50,0);
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (0.00,0){\faCheck};
+\node[circle,fill=cor,text=white,draw=suave,line width=3pt,minimum size=24pt,inner sep=0pt,font=\small\bfseries] at (1.50,0){2};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (3.00,0){3};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (4.50,0){4};
+\end{tikzpicture}
+\par\vspace{8pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{40pt}>{\raggedright\arraybackslash}m{0.78\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=36pt,inner sep=0pt]{\Large \faBookOpen}; &
+{\footnotesize\bfseries ETAPA 2 DE 4}\ \ \chipbranco{\faCalendarCheck\ Semana 2}\ \chipbranco{\faClock\ cerca de 2h}\par\vspace{2pt}
+{\fontsize{17}{21}\selectfont\bfseries Manual rápido do sistema}\par\vspace{3pt}
+{\footnotesize\faUser\ \ Quem faz: \textbf{Treinamento}\ \ ·\ \ \faCompass\ \ Ajuda: Guia da Frente D, manual da sua função}
+\end{tabular}
+\end{faixa}
+\begin{apostila}\vspace{4pt}Aula 13 · Transformação digital não é só ter um sistema novo: as pessoas precisam saber usar. Sem isso, temos ``tecnologia nova com problema antigo''.\end{apostila}
+\rotulo{\faBullseye}{Objetivo}
+{\large Fazer 2 manuais de uma página, com prints: um para a recepção e um para a governança.}\par
+\rotulo{\faShoePrints}{Passo a passo}
+\begin{enumerate}
+  \item Peçam ao dev de apoio um usuário de recepção e um de governança na versão de demonstração.
+  \item Recepção: mostrem como fazer um check-in, do começo ao fim, em no máximo 6 passos com prints.
+  \item Governança: mostrem como marcar um quarto como limpo pelo celular.
+  \item Use frases curtas e números grandes nos passos. Nada de termos técnicos.
+\end{enumerate}
+\rotulo{\faPen}{Para preencher}
+{\footnotesize\color{cinza}\faHandPointDown\ A 1ª linha é um exemplo. Preencham as outras.}\par\vspace{2pt}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.058\linewidth}>{\raggedright\arraybackslash}p{0.417\linewidth}>{\raggedright\arraybackslash}p{0.417\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Passo} & \color{white}\textbf{\footnotesize O que fazer} & \color{white}\textbf{\footnotesize Print} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Passo} & \color{white}\textbf{\footnotesize O que fazer} & \color{white}\textbf{\footnotesize Print} \\
+\endhead
+\rowcolor{white}\textbf{1} & Abra o Mapa do dia e clique no quarto do hóspede & (colar print) \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{2} &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt}\textbf{3} &  &  \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{4} &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt}\textbf{5} &  &  \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{6} &  &  \\ \hline
+\end{longtable}
+\endgroup
+\begin{lrbox}{\blocofinal}\begin{minipage}{\linewidth}
+\begin{tcolorbox}[enhanced,colback=suave!45,colframe=cor!35,boxrule=0.8pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt]
+\begin{minipage}[t]{0.56\linewidth}\vspace{0pt}
+{\footnotesize\bfseries\color{cor}\faCheckDouble\ \ PRONTO QUANDO}\par\vspace{2pt}
+\begin{checklist}
+  \item Manual da recepção (1 página).
+  \item Manual da governança (1 página).
+  \item Nenhum dado real de hóspede nos prints.
+\end{checklist}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}
+\begin{selo}\centering
+{\LARGE\color{cor}\faUpload}\par\vspace{3pt}
+{\scriptsize\bfseries\color{cor}ENTREGAR NO SITE COMO}\par\vspace{2pt}
+{\bfseries D2-manuais}
+\end{selo}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}\end{lrbox}
+\usarblocofinal
+\ifjaanotou\else\anotacoes\fi
+\clearpage
+\noindent\begin{tikzpicture}
+\draw[cor,line width=2.2pt](0.00,0)--(1.50,0);
+\draw[cor,line width=2.2pt](1.50,0)--(3.00,0);
+\draw[cor!25,line width=2.2pt](3.00,0)--(4.50,0);
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (0.00,0){\faCheck};
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (1.50,0){\faCheck};
+\node[circle,fill=cor,text=white,draw=suave,line width=3pt,minimum size=24pt,inner sep=0pt,font=\small\bfseries] at (3.00,0){3};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (4.50,0){4};
+\end{tikzpicture}
+\par\vspace{8pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{40pt}>{\raggedright\arraybackslash}m{0.78\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=36pt,inner sep=0pt]{\Large \faChalkboardTeacher}; &
+{\footnotesize\bfseries ETAPA 3 DE 4}\ \ \chipbranco{\faCalendarCheck\ Semana 3}\ \chipbranco{\faClock\ cerca de 1h}\par\vspace{2pt}
+{\fontsize{17}{21}\selectfont\bfseries Plano de treinamento}\par\vspace{3pt}
+{\footnotesize\faUser\ \ Quem faz: \textbf{Treinamento}\ \ ·\ \ \faCompass\ \ Ajuda: Guia da Frente D, manual da sua função}
+\end{tabular}
+\end{faixa}
+\begin{apostila}\vspace{4pt}Aula 14 · Muitas empresas compram tecnologia mas não preparam as pessoas. Aí o projeto parece pronto, mas ninguém usa: é o ``Projeto Melancia'' (verde por fora, vermelho por dentro).\end{apostila}
+\rotulo{\faBullseye}{Objetivo}
+{\large Planejar como os funcionários vão aprender a usar o sistema e o que pode atrapalhar.}\par
+\rotulo{\faShoePrints}{Passo a passo}
+\begin{enumerate}
+  \item Preencham a tabela de treinamento por função (exemplo na primeira linha).
+  \item Pensem em 3 dificuldades que os funcionários podem ter (ex.: medo de errar no caixa).
+  \item Para cada dificuldade, escrevam uma forma de ajudar.
+\end{enumerate}
+\rotulo{\faPen}{Para preencher}
+{\footnotesize\color{cinza}\faHandPointDown\ A 1ª linha é um exemplo. Preencham as outras.}\par\vspace{2pt}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.081\linewidth}>{\raggedright\arraybackslash}p{0.405\linewidth}>{\raggedright\arraybackslash}p{0.405\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Função} & \color{white}\textbf{\footnotesize O que precisa aprender} & \color{white}\textbf{\footnotesize Duração} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Função} & \color{white}\textbf{\footnotesize O que precisa aprender} & \color{white}\textbf{\footnotesize Duração} \\
+\endhead
+\rowcolor{white}\textbf{Recepção} & Reserva, check-in, check-out e caixa & 2 h \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{Governança} &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt}\textbf{Gerência} &  &  \\ \hline
+\end{longtable}
+\endgroup
+\subsecao{\faEdit\ Dificuldades e como ajudar}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.464\linewidth}>{\raggedright\arraybackslash}p{0.464\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Dificuldade} & \color{white}\textbf{\footnotesize Como ajudar} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Dificuldade} & \color{white}\textbf{\footnotesize Como ajudar} \\
+\endhead
+\rowcolor{white}\rule{0pt}{24pt} &  \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt} &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt} &  \\ \hline
+\end{longtable}
+\endgroup
+\begin{lrbox}{\blocofinal}\begin{minipage}{\linewidth}
+\begin{tcolorbox}[enhanced,colback=suave!45,colframe=cor!35,boxrule=0.8pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt]
+\begin{minipage}[t]{0.56\linewidth}\vspace{0pt}
+{\footnotesize\bfseries\color{cor}\faCheckDouble\ \ PRONTO QUANDO}\par\vspace{2pt}
+\begin{checklist}
+  \item Treinamento para 3 funções.
+  \item 3 dificuldades com solução.
+\end{checklist}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}
+\begin{selo}\centering
+{\LARGE\color{cor}\faUpload}\par\vspace{3pt}
+{\scriptsize\bfseries\color{cor}ENTREGAR NO SITE COMO}\par\vspace{2pt}
+{\bfseries D3-treinamento}
+\end{selo}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}\end{lrbox}
+\usarblocofinal
+\ifjaanotou\else\anotacoes\fi
+\clearpage
+\noindent\begin{tikzpicture}
+\draw[cor,line width=2.2pt](0.00,0)--(1.50,0);
+\draw[cor,line width=2.2pt](1.50,0)--(3.00,0);
+\draw[cor,line width=2.2pt](3.00,0)--(4.50,0);
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (0.00,0){\faCheck};
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (1.50,0){\faCheck};
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (3.00,0){\faCheck};
+\node[circle,fill=cor,text=white,draw=suave,line width=3pt,minimum size=24pt,inner sep=0pt,font=\small\bfseries] at (4.50,0){4};
+\end{tikzpicture}
+\par\vspace{8pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{40pt}>{\raggedright\arraybackslash}m{0.78\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=36pt,inner sep=0pt]{\Large \faBalanceScale}; &
+{\footnotesize\bfseries ETAPA 4 DE 4}\ \ \chipbranco{\faCalendarCheck\ Semana 4}\ \chipbranco{\faClock\ cerca de 1h}\par\vspace{2pt}
+{\fontsize{17}{21}\selectfont\bfseries Quem decide o quê e privacidade}\par\vspace{3pt}
+{\footnotesize\faUser\ \ Quem faz: \textbf{Relação com a cliente}\ \ ·\ \ \faCompass\ \ Ajuda: Guia da Frente D, manual da sua função}
+\end{tabular}
+\end{faixa}
+\begin{apostila}\vspace{4pt}Aula 15 · Governança é deixar claro quem decide cada assunto. Ex.: ``Monarquia de Negócio'' = a dona decide; ``Monarquia de TI'' = a equipe técnica decide; ``Duopólio'' = as duas partes decidem juntas.\end{apostila}
+\rotulo{\faBullseye}{Objetivo}
+{\large Mostrar quem decide cada assunto do sistema e escrever um aviso simples de privacidade para os hóspedes.}\par
+\rotulo{\faShoePrints}{Passo a passo}
+\begin{enumerate}
+  \item Para cada assunto da tabela, digam quem decide: a dona, o time técnico ou os dois juntos.
+  \item Escrevam o nome do modelo da aula (Monarquia de Negócio, Monarquia de TI ou Duopólio).
+  \item Escrevam um aviso de privacidade de até 5 linhas para colocar no balcão (o guia tem as regras).
+\end{enumerate}
+\rotulo{\faPen}{Para preencher}
+{\footnotesize\color{cinza}\faHandPointDown\ A 1ª linha é um exemplo. Preencham as outras.}\par\vspace{2pt}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.173\linewidth}>{\raggedright\arraybackslash}p{0.360\linewidth}>{\raggedright\arraybackslash}p{0.360\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Assunto} & \color{white}\textbf{\footnotesize Quem decide} & \color{white}\textbf{\footnotesize Modelo da aula} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Assunto} & \color{white}\textbf{\footnotesize Quem decide} & \color{white}\textbf{\footnotesize Modelo da aula} \\
+\endhead
+\rowcolor{white}\textbf{Preço das diárias} & A dona & Monarquia de Negócio \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{Backup e segurança} &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt}\textbf{Criar usuários} &  &  \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{Novas funções no sistema} &  &  \\ \hline
+\end{longtable}
+\endgroup
+\Needspace{6\baselineskip}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!30,boxrule=0.8pt,arc=5pt,left=8pt,right=8pt,top=4pt,bottom=6pt,before skip=0pt,after skip=5pt]
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Aviso de privacidade (até 5 linhas)}}\par\vspace{16pt}\noindent\tikz\draw[cor!45,dotted,line width=1.3pt](0,0)--(\linewidth,0);\par
+\end{tcolorbox}
+\vspace{4pt}
+\begin{lrbox}{\blocofinal}\begin{minipage}{\linewidth}
+\begin{tcolorbox}[enhanced,colback=suave!45,colframe=cor!35,boxrule=0.8pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt]
+\begin{minipage}[t]{0.56\linewidth}\vspace{0pt}
+{\footnotesize\bfseries\color{cor}\faCheckDouble\ \ PRONTO QUANDO}\par\vspace{2pt}
+\begin{checklist}
+  \item 4 assuntos com quem decide e o modelo.
+  \item Aviso de privacidade escrito.
+\end{checklist}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}
+\begin{selo}\centering
+{\LARGE\color{cor}\faUpload}\par\vspace{3pt}
+{\scriptsize\bfseries\color{cor}ENTREGAR NO SITE COMO}\par\vspace{2pt}
+{\bfseries D4-governanca-e-privacidade}
+\end{selo}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}\end{lrbox}
+\usarblocofinal
+\Needspace{6\baselineskip}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor,boxrule=1pt,arc=8pt,left=12pt,right=12pt,top=12pt,bottom=8pt,before skip=20pt,
+  overlay={\node[fill=cor,text=white,rounded corners=3pt,font=\scriptsize\bfseries,inner sep=4pt,anchor=west] at ([xshift=10pt]frame.north west) {\faMedal\ DESAFIO EXTRA · OPCIONAL};}]
+Montem a matriz RACI de uma decisão (ex.: restaurar um backup): quem executa, aprova, é consultado e informado.
+\end{tcolorbox}
+\ifjaanotou\else\anotacoes\fi
+\clearpage
+\secao{\faLaptopCode}{O papel do dev de apoio}
+\begin{itemize}
+  \item Mostrar o sistema funcionando e criar usuários de teste.
+  \item Conferir o que a frente escreveu sobre o sistema.
+  \item Passar números e prints da versão de demonstração.
+  \item Explicar o que for técnico em palavras simples.
+\end{itemize}
+\secao{\faUpload}{Como entregar no site}
+\begin{enumerate}
+  \item Abram o link da divisão de funções que o grupo usa.
+  \item Na Frente D, toquem em \textbf{Enviar entrega} (ou arrastem o arquivo): Word, PDF, Excel, PowerPoint, imagem ou ZIP, até 25 MB.
+  \item O arquivo aparece na hora para todo o grupo, com o nome de quem enviou e a data. Versões novas podem ser enviadas: a mais recente fica no topo.
+  \item Sem o servidor ligado (página aberta como arquivo), o envio não funciona: mandem o arquivo para a Frente A.
+\end{enumerate}
+\vspace{16pt}
+\begin{faixa}
+\centering{\Large\faTrophy}\par\vspace{4pt}{\large\bfseries Terminaram tudo? Avisem a Frente A e comemorem!}
+\end{faixa}
+\end{document}

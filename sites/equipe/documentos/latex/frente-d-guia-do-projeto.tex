@@ -1,0 +1,425 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage[default,type1,semibold]{inter}
+\usepackage[a4paper,top=18mm,bottom=24mm,left=18mm,right=18mm,footskip=12mm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{amssymb,textcomp,array,longtable,enumitem,fancyhdr,lastpage,needspace,fontawesome5}
+\usepackage[skins,breakable,raster]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{positioning,calc,babel}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+
+\definecolor{cor}{HTML}{047857}
+\definecolor{suave}{HTML}{E3F5EE}
+\definecolor{texto}{HTML}{0F172A}
+\definecolor{cinza}{HTML}{5B6B84}
+\definecolor{linha}{HTML}{D3DAE6}
+\color{texto}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\linespread{1.1}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{10pt}
+\renewcommand{\arraystretch}{1.45}
+\arrayrulecolor{linha}
+\setlist{itemsep=4pt,topsep=4pt,parsep=0pt}
+\setlist[itemize]{label={\color{cor}\small\faCaretRight},leftmargin=1.4em}
+% Passos numerados: número dentro de um círculo da cor da equipe.
+\DeclareRobustCommand{\bolinha}[1]{\tikz[baseline=(n.base)]\node[circle,fill=cor,text=white,inner sep=1.6pt,minimum size=17pt,font=\footnotesize\bfseries](n){#1};}
+\setlist[enumerate]{label=\bolinha{\arabic*},leftmargin=2.3em,labelsep=0.6em,itemsep=6pt}
+% Checklist: quadrado grande para marcar à mão.
+\DeclareRobustCommand{\caixinha}{\tikz[baseline=-0.6ex]\draw[cor,line width=1.2pt,rounded corners=2pt](0,-0.16)rectangle(0.42,0.26);}
+\newlist{checklist}{itemize}{1}
+\setlist[checklist]{label=\caixinha,leftmargin=2em,labelsep=0.6em,itemsep=7pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{cor}\textbf{\faUsers\ \ Frente D}\color{cinza}\ \ ·\ \ Pessoas e Treinamento · Guia do projeto}
+\fancyfoot[R]{\footnotesize\color{cinza}\textbf{\thepage}\,/\,\pageref{LastPage}}
+% Fita da cor da equipe na margem esquerda de todas as páginas.
+\fancyhead[L]{\begin{tikzpicture}[remember picture,overlay]\fill[cor](current page.north west)rectangle([xshift=5pt]current page.south west);\end{tikzpicture}}
+
+% Título de seção com ícone: nunca sozinho no pé da página.
+\newcommand{\secao}[2]{\Needspace{10\baselineskip}\vspace{12pt}%
+  \noindent\tikz[baseline=(i.base)]\node[circle,fill=cor,text=white,minimum size=26pt,inner sep=0pt](i){\small #1};%
+  \hspace{8pt}{\Large\bfseries #2}\par\vspace{-4pt}{\color{cor!35}\rule{\linewidth}{1.2pt}}\par\vspace{2pt}}
+\newcommand{\subsecao}[1]{\Needspace{8\baselineskip}\vspace{8pt}{\large\bfseries\color{cor}#1}\par}
+\newcommand{\rotulo}[2]{\Needspace{6\baselineskip}\vspace{10pt}%
+  \noindent{\color{cor}\normalsize #1}\hspace{6pt}{\footnotesize\bfseries\color{cor}\MakeUppercase{#2}}\par\vspace{2pt}}
+\newtcolorbox{destaque}[1][]{enhanced,breakable,colback=suave,colframe=suave,borderline west={4pt}{0pt}{cor},arc=4pt,boxrule=0pt,left=12pt,right=12pt,top=8pt,bottom=8pt,before skip=8pt,after skip=10pt,#1}
+\newtcolorbox{apostila}{enhanced,breakable,colback=white,colframe=cor,boxrule=1pt,arc=6pt,left=12pt,right=12pt,top=8pt,bottom=8pt,before skip=8pt,after skip=8pt,
+  overlay={\node[fill=cor,text=white,rounded corners=3pt,font=\scriptsize\bfseries,inner sep=4pt,anchor=west] at ([xshift=10pt]frame.north west) {\faBookOpen\ DA APOSTILA};}}
+\newtcolorbox{selo}{enhanced,left=8pt,right=8pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt,
+  frame code={\draw[cor,dashed,line width=1.4pt,rounded corners=8pt](frame.south west)rectangle(frame.north east);},
+  interior code={\fill[suave,rounded corners=8pt](interior.south west)rectangle(interior.north east);}}
+% Anotações: ocupa o resto da página da etapa (só se sobrar espaço útil).
+\newcommand{\anotacoes}{\par\ifdim\dimexpr\pagegoal-\pagetotal\relax>3.5cm\ifdim\pagegoal<\maxdimen
+\begin{tcolorbox}[enhanced,height fill,colback=white,colframe=cor!35,boxrule=0.8pt,arc=8pt,before skip=10pt,left=10pt,top=6pt,
+  borderline={0.8pt}{0pt}{cor!35,dashed},frame hidden,
+  underlay={\begin{scope}\clip(interior.south west)rectangle(interior.north east);
+    \foreach \y in {1,...,40}{\draw[cor!18,line width=0.6pt]([yshift=-\y*0.75cm-0.5cm]interior.north west)--([yshift=-\y*0.75cm-0.5cm]interior.north east);}\end{scope}}]
+{\footnotesize\bfseries\color{cor}\faStickyNote\ \ ANOTAÇÕES}
+\end{tcolorbox}\fi\fi}
+% Fim da etapa: se o bloco final não cabe, a sobra vira Anotações e o bloco vai para a próxima página.
+\newif\ifjaanotou
+\newsavebox{\blocofinal}
+% Mede o bloco final já montado; se não couber no resto da página, a sobra vira Anotações.
+\newcommand{\usarblocofinal}{\par\global\jaanotoufalse
+  \ifdim\pagegoal<\maxdimen\ifdim\dimexpr\pagegoal-\pagetotal\relax<\dimexpr\ht\blocofinal+\dp\blocofinal+18pt\relax
+    \anotacoes\global\jaanotoutrue\clearpage\fi\fi
+  \vspace{10pt}\noindent\usebox{\blocofinal}\par}
+\newtcolorbox{faixa}[1][]{enhanced,colback=cor,colframe=cor,coltext=white,arc=8pt,boxrule=0pt,left=14pt,right=14pt,top=10pt,bottom=10pt,#1}
+\newtcbox{\chip}[1][]{enhanced,on line,colback=suave,colframe=suave,coltext=cor,arc=7pt,boxrule=0pt,left=5pt,right=5pt,top=2pt,bottom=2pt,fontupper=\footnotesize\bfseries,#1}
+\newtcbox{\chipbranco}{enhanced,on line,colback=white,colframe=white,coltext=cor,arc=7pt,boxrule=0pt,left=6pt,right=6pt,top=2pt,bottom=2pt,fontupper=\footnotesize\bfseries}
+\begin{document}
+\thispagestyle{fancy}
+\begin{tikzpicture}[remember picture,overlay]
+\fill[cor,opacity=0.10] ([xshift=-1.5cm,yshift=-1cm]current page.north east) circle (5.2cm);
+\fill[cor,opacity=0.07] ([xshift=-5.5cm,yshift=-4.5cm]current page.north east) circle (2.4cm);
+\fill[cor,opacity=0.06] ([xshift=2cm,yshift=3cm]current page.south west) circle (4cm);
+\end{tikzpicture}
+\vspace*{2mm}
+\noindent\begin{tikzpicture}
+\node[circle,fill=cor,text=white,minimum size=78pt,font=\fontsize{40}{40}\selectfont\bfseries] (L) {D};
+\node[right=14pt of L.east,anchor=west,align=left,text width=12.2cm] {
+  {\footnotesize\bfseries\color{cor}PROJETO ESTADIA\ \ ·\ \ EQUIPE VERDE\ \ ·\ \ FRENTE D}\\[4pt]
+  {\fontsize{23}{27}\selectfont\bfseries Pessoas e Treinamento}\\[6pt]
+  \chip{\faCompass\ \ Guia do projeto}\ \chip{\faUsers\ \ Aulas 13 a 16 da apostila}
+};
+\end{tikzpicture}
+\vspace{10pt}
+
+\begin{faixa}
+{\large\faRocket}\hspace{8pt}{\large\bfseries Nossa missão}\par\vspace{2pt}
+{\normalsize Cuidar das pessoas: conversar com a dona do hotel, preparar os funcionários para usar o sistema e definir quem decide o quê.}
+\end{faixa}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!40,boxrule=1pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=10pt,
+  title={\faUserFriends\ \ Nossa equipe},fonttitle=\bfseries\small,coltitle=cor,colbacktitle=suave,attach boxed title to top left={xshift=10pt,yshift=-8pt},boxed title style={arc=4pt,boxrule=0pt}]
+\vspace{6pt}
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faHandshake};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Relação com a cliente}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faChalkboardTeacher};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Treinamento}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faLaptopCode};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Dev de apoio}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}
+\end{tcolorbox}
+\begin{destaque}[before skip=4pt]
+{\color{cor}\Large\faCrosshairs}\hspace{8pt}{\large\bfseries O seu foco}\par\vspace{3pt}
+O sistema só ajuda o hotel se as pessoas usarem. Vocês cuidam da conversa com a dona e da preparação dos funcionários.
+\end{destaque}
+\secao{\faSitemap}{Como usar este guia}
+{\large Este guia tem uma parte geral e um \textbf{manual para cada função}. Leia a parte geral e depois vá direto ao manual da sua função: ele tem tudo de que você precisa para fazer as suas tarefas do Passo a passo.}\par\vspace{6pt}
+\Needspace{7\baselineskip}
+\begin{tcbraster}[raster columns=3,raster equal height=rows,raster column skip=6pt,raster row skip=6pt,raster before skip=4pt,raster after skip=8pt]
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!40]
+\centering{\color{cor}\LARGE \faHandshake}\par\vspace{3pt}{\bfseries Relação com a cliente}\par\vspace{2pt}{\footnotesize\color{cinza}Conversa com a dona do hotel e cuida de quem decide o quê.}\par\vspace{4pt}\chip{D1}\ \chip{D4}\par\vspace{4pt}{\footnotesize\bfseries\color{cor}\faArrowRight\ manual na página \pageref{manual-d1}}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!40]
+\centering{\color{cor}\LARGE \faChalkboardTeacher}\par\vspace{3pt}{\bfseries Treinamento}\par\vspace{2pt}{\footnotesize\color{cinza}Faz os manuais e o plano para os funcionários aprenderem o sistema.}\par\vspace{4pt}\chip{D2}\ \chip{D3}\par\vspace{4pt}{\footnotesize\bfseries\color{cor}\faArrowRight\ manual na página \pageref{manual-d2}}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!40]
+\centering{\color{cor}\LARGE \faLaptopCode}\par\vspace{3pt}{\bfseries Dev de apoio}\par\vspace{2pt}{\footnotesize\color{cinza}Cria os usuários de teste e ajuda nos prints.}\par\vspace{4pt}\chip{apoio às tarefas}\par\vspace{4pt}{\footnotesize\bfseries\color{cor}\faArrowRight\ manual na página \pageref{manual-d-dev}}
+\end{tcolorbox}
+\end{tcbraster}
+\secao{\faHotel}{O projeto em 1 minuto}
+{\large O Estadia é um sistema para administrar um hotel de 50 quartos. Pelo computador ou pelo celular, a equipe do hotel faz reservas, registra a entrada (check-in) e a saída (check-out) dos hóspedes, cobra o que eles consumiram, fecha o caixa do dia e vê relatórios.}\par
+\Needspace{7\baselineskip}
+\begin{tcbraster}[raster columns=2,raster equal height=rows,raster column skip=6pt,raster row skip=6pt,raster before skip=4pt,raster after skip=8pt]
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\color{cor}\Large \faExclamationTriangle}\hspace{6pt}{\bfseries O problema}\par\vspace{3pt}{\small Muitos hotéis pequenos ainda controlam tudo em caderno, planilha e WhatsApp. Aí acontecem erros: vender o mesmo quarto para duas pessoas, cobrar errado, o caixa não bater e a dona não saber quanto o hotel realmente ganhou no mês.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\color{cor}\Large \faLightbulb}\hspace{6pt}{\bfseries A solução}\par\vspace{3pt}{\small Um sistema único que vários funcionários usam ao mesmo tempo. Ele não deixa vender o mesmo quarto duas vezes, guarda quem fez cada ação e mostra relatórios prontos para a dona decidir preços e equipe.}
+\end{tcolorbox}
+\end{tcbraster}
+\subsecao{\faAngleDoubleRight\ Privacidade dos hóspedes (LGPD), em palavras simples}
+\begin{destaque}\begin{itemize}
+  \item O hotel guarda dados dos hóspedes porque a lei exige (ficha de registro) e para cumprir a reserva.
+  \item Esses dados ficam guardados por 5 anos depois da última hospedagem e depois são apagados ou anonimizados.
+  \item Cada funcionário só vê o que precisa para o seu trabalho.
+  \item Tudo o que alguém faz no sistema fica registrado (quem, quando e o quê).
+  \item O hóspede pode pedir para ver ou apagar seus dados (quando a lei permitir).
+\end{itemize}
+\end{destaque}
+\subsecao{\faAngleDoubleRight\ Proteções que o sistema já tem}
+\begin{destaque}\begin{itemize}
+  \item Cada pessoa tem seu próprio login e um PIN de 4 números.
+  \item A tela bloqueia sozinha quando ninguém usa por alguns minutos.
+  \item Backup automático várias vezes por dia.
+\end{itemize}
+\end{destaque}
+\clearpage
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{46pt}>{\raggedright\arraybackslash}m{0.76\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=42pt,inner sep=0pt]{\LARGE \faHandshake}; &
+{\footnotesize\bfseries MANUAL DA FUNÇÃO · FRENTE D}\label{manual-d1}\par\vspace{2pt}
+{\fontsize{20}{24}\selectfont\bfseries Relação com a cliente}\par\vspace{3pt}
+{\small Conversa com a dona do hotel e cuida de quem decide o quê.}
+\end{tabular}
+\end{faixa}
+\rotulo{\faTasks}{Suas tarefas}
+\chip{D1}\ Conversa com a dona do hotel\hspace{10pt}\chip{D4}\ Quem decide o quê e privacidade\par
+{\footnotesize\color{cinza}Você também ajuda nas outras tarefas da frente. Quem faz cada uma está no Passo a passo.}\par
+\Needspace{12\baselineskip}\vspace{10pt}
+\begin{tcolorbox}[enhanced,colback=cor,colframe=cor,coltext=white,arc=6pt,boxrule=0pt,left=10pt,right=10pt,top=6pt,bottom=6pt,after skip=6pt]
+{\Large \faHandshake}\hspace{10pt}{\footnotesize\bfseries TAREFA D1}\hspace{8pt}{\large\bfseries Conversa com a dona do hotel}\hfill{\footnotesize\faClock\ cerca de 1h30}
+\end{tcolorbox}
+\rotulo{\faBrain}{O que você precisa saber}
+\begin{itemize}
+  \item Business Partner = ponte. Vocês levam perguntas e trazem decisões; quem decide é a dona.
+\end{itemize}
+\Needspace{7\baselineskip}
+\begin{tcbraster}[raster columns=2,raster equal height=rows,raster column skip=6pt,raster row skip=6pt,raster before skip=4pt,raster after skip=8pt]
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Dicas}}\par\vspace{3pt}{\small {\color{cor}\faLightbulb}\ \ Peçam licença para anotar. Repitam a resposta em voz alta para confirmar.\par\vspace{3pt}{\color{cor}\faLightbulb}\ \ O questionário salva as respostas sozinho e gera um arquivo para baixar.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Cuidado com}}\par\vspace{3pt}{\small {\color{cor}\faExclamationTriangle}\ \ Prometer coisas para a dona. Vocês recomendam; o grupo e a dona decidem juntos.}
+\end{tcolorbox}
+\end{tcbraster}
+\subsecao{\faBoxOpen\ As 6 perguntas mais importantes do questionário}
+\begin{destaque}\begin{itemize}
+  \item Quais são os tipos de quarto e quantos há de cada?
+  \item O preço muda em fim de semana, temporada ou feriado?
+  \item Até quando o hóspede pode cancelar sem multa?
+  \item Quais formas de pagamento o hotel aceita?
+  \item Quantos funcionários vão usar o sistema, e em que funções?
+  \item Quais números a dona quer ver todo dia?
+\end{itemize}
+\end{destaque}
+\subsecao{\faBoxOpen\ Mensagem para a Frente B depois da conversa}
+\begin{destaque}{\color{cor}\faQuoteLeft}\ \ Oi, Frente B! A dona decidiu: [decisão 1], [decisão 2]. Isso muda o item [nº] do backlog?\end{destaque}
+\Needspace{12\baselineskip}\vspace{10pt}
+\begin{tcolorbox}[enhanced,colback=cor,colframe=cor,coltext=white,arc=6pt,boxrule=0pt,left=10pt,right=10pt,top=6pt,bottom=6pt,after skip=6pt]
+{\Large \faBalanceScale}\hspace{10pt}{\footnotesize\bfseries TAREFA D4}\hspace{8pt}{\large\bfseries Quem decide o quê e privacidade}\hfill{\footnotesize\faClock\ cerca de 1h}
+\end{tcolorbox}
+\rotulo{\faBrain}{O que você precisa saber}
+\begin{itemize}
+  \item Governança = deixar claro quem decide cada assunto.
+  \item Privacidade: o hóspede tem direito de saber o que o hotel guarda dele.
+\end{itemize}
+\Needspace{7\baselineskip}
+\begin{tcbraster}[raster columns=2,raster equal height=rows,raster column skip=6pt,raster row skip=6pt,raster before skip=4pt,raster after skip=8pt]
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Dicas}}\par\vspace{3pt}{\small {\color{cor}\faLightbulb}\ \ Criar usuários é decisão de quem administra o hotel (a dona ou a gerência), com apoio técnico.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Cuidado com}}\par\vspace{3pt}{\small {\color{cor}\faExclamationTriangle}\ \ Dizer que ``cada um decide'' algum assunto: isso é Anarquia, o modelo que a aula manda evitar.}
+\end{tcolorbox}
+\end{tcbraster}
+\subsecao{\faBoxOpen\ Os 3 modelos de decisão da aula}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.255\linewidth}>{\raggedright\arraybackslash}p{0.331\linewidth}>{\raggedright\arraybackslash}p{0.306\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Modelo} & \color{white}\textbf{\footnotesize Quem decide} & \color{white}\textbf{\footnotesize Exemplo} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Modelo} & \color{white}\textbf{\footnotesize Quem decide} & \color{white}\textbf{\footnotesize Exemplo} \\
+\endhead
+\rowcolor{white}\textbf{Monarquia de Negócio} & A dona do hotel & Preço das diárias \\ \hline
+\rowcolor{suave!55}\textbf{Monarquia de TI} & O time técnico (devs) & Backup e segurança \\ \hline
+\rowcolor{white}\textbf{Duopólio} & Dona + time técnico juntos & Novas funções no sistema \\ \hline
+\end{longtable}
+\endgroup
+\subsecao{\faBoxOpen\ Fatos para o aviso de privacidade}
+\begin{destaque}\begin{itemize}
+  \item O hotel guarda os dados da ficha porque a lei exige e para cumprir a reserva.
+  \item Os dados ficam guardados por 5 anos depois da última hospedagem.
+  \item Só os funcionários que precisam conseguem ver os dados.
+  \item O hóspede pode pedir informações sobre os seus dados na recepção.
+\end{itemize}
+\end{destaque}
+\subsecao{\faBoxOpen\ Modelo de aviso (completem)}
+\begin{destaque}{\color{cor}\faQuoteLeft}\ \ Seus dados estão seguros. O [nome do hotel] guarda as informações da sua ficha porque a lei exige e para cuidar da sua reserva. Elas ficam guardadas por 5 anos e só a nossa equipe autorizada tem acesso. Dúvidas? Fale com a recepção.\end{destaque}
+\clearpage
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{46pt}>{\raggedright\arraybackslash}m{0.76\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=42pt,inner sep=0pt]{\LARGE \faChalkboardTeacher}; &
+{\footnotesize\bfseries MANUAL DA FUNÇÃO · FRENTE D}\label{manual-d2}\par\vspace{2pt}
+{\fontsize{20}{24}\selectfont\bfseries Treinamento}\par\vspace{3pt}
+{\small Faz os manuais e o plano para os funcionários aprenderem o sistema.}
+\end{tabular}
+\end{faixa}
+\rotulo{\faTasks}{Suas tarefas}
+\chip{D2}\ Manual rápido do sistema\hspace{10pt}\chip{D3}\ Plano de treinamento\par
+{\footnotesize\color{cinza}Você também ajuda nas outras tarefas da frente. Quem faz cada uma está no Passo a passo.}\par
+\Needspace{12\baselineskip}\vspace{10pt}
+\begin{tcolorbox}[enhanced,colback=cor,colframe=cor,coltext=white,arc=6pt,boxrule=0pt,left=10pt,right=10pt,top=6pt,bottom=6pt,after skip=6pt]
+{\Large \faBookOpen}\hspace{10pt}{\footnotesize\bfseries TAREFA D2}\hspace{8pt}{\large\bfseries Manual rápido do sistema}\hfill{\footnotesize\faClock\ cerca de 2h}
+\end{tcolorbox}
+\rotulo{\faBrain}{O que você precisa saber}
+\begin{itemize}
+  \item Manual bom cabe em uma página: passos numerados, frases curtas e um print por passo.
+\end{itemize}
+\Needspace{7\baselineskip}
+\begin{tcbraster}[raster columns=2,raster equal height=rows,raster column skip=6pt,raster row skip=6pt,raster before skip=4pt,raster after skip=8pt]
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Dicas}}\par\vspace{3pt}{\small {\color{cor}\faLightbulb}\ \ Para print no celular, usem o usuário de Governança que o dev de apoio criar.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Cuidado com}}\par\vspace{3pt}{\small {\color{cor}\faExclamationTriangle}\ \ Print com nome de hóspede real. Usem só a versão de demonstração (dados inventados).}
+\end{tcolorbox}
+\end{tcbraster}
+\subsecao{\faBoxOpen\ Recepção: fazer o check-in (passos reais do sistema)}
+\begin{destaque}\begin{enumerate}
+  \item Menu Reservas → aba ``Chegadas hoje''.
+  \item Clique na reserva do hóspede.
+  \item Clique no botão verde ``Check-in''.
+  \item Complete ou revise a ficha do hóspede.
+  \item Confira o quarto escolhido.
+  \item Clique em confirmar o check-in.
+\end{enumerate}
+\end{destaque}
+\subsecao{\faBoxOpen\ Governança: marcar o quarto como limpo (pelo celular)}
+\begin{destaque}\begin{enumerate}
+  \item Entre no sistema pelo celular.
+  \item Toque em ``Governança'' no menu de baixo.
+  \item Cada toque no cartão do quarto avança o status: Sujo → Em limpeza → Limpo → Inspecionado.
+\end{enumerate}
+\end{destaque}
+\subsecao{\faBoxOpen\ Modelo de cada página}
+\begin{destaque}\begin{itemize}
+  \item Título: ``Como fazer o check-in''.
+  \item Para quem: Recepção.
+  \item Passos numerados com print.
+  \item Se der errado: chame a gerência.
+\end{itemize}
+\end{destaque}
+\Needspace{12\baselineskip}\vspace{10pt}
+\begin{tcolorbox}[enhanced,colback=cor,colframe=cor,coltext=white,arc=6pt,boxrule=0pt,left=10pt,right=10pt,top=6pt,bottom=6pt,after skip=6pt]
+{\Large \faChalkboardTeacher}\hspace{10pt}{\footnotesize\bfseries TAREFA D3}\hspace{8pt}{\large\bfseries Plano de treinamento}\hfill{\footnotesize\faClock\ cerca de 1h}
+\end{tcolorbox}
+\rotulo{\faBrain}{O que você precisa saber}
+\begin{itemize}
+  \item ``Projeto Melancia'': verde por fora (sistema entregue), vermelho por dentro (ninguém usa). O treinamento evita isso.
+\end{itemize}
+\Needspace{7\baselineskip}
+\begin{tcbraster}[raster columns=2,raster equal height=rows,raster column skip=6pt,raster row skip=6pt,raster before skip=4pt,raster after skip=8pt]
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Dicas}}\par\vspace{3pt}{\small {\color{cor}\faLightbulb}\ \ Treinem uma função por vez, com o manual da D2 na mão.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt,colback=suave!50]
+{\footnotesize\bfseries\color{cor}\MakeUppercase{Cuidado com}}\par\vspace{3pt}{\small {\color{cor}\faExclamationTriangle}\ \ Treinar tudo para todos: cada função aprende só o que usa.}
+\end{tcolorbox}
+\end{tcbraster}
+\subsecao{\faBoxOpen\ O que cada função precisa aprender}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.124\linewidth}>{\raggedright\arraybackslash}p{0.681\linewidth}>{\raggedright\arraybackslash}p{0.087\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Função} & \color{white}\textbf{\footnotesize Conteúdo} & \color{white}\textbf{\footnotesize Duração} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Função} & \color{white}\textbf{\footnotesize Conteúdo} & \color{white}\textbf{\footnotesize Duração} \\
+\endhead
+\rowcolor{white}\textbf{Recepção} & Login e PIN, mapa do dia, reserva, check-in, check-out, caixa & 2 h \\ \hline
+\rowcolor{suave!55}\textbf{Governança} & Login pelo celular, lista de quartos, mudar status & 30 min \\ \hline
+\rowcolor{white}\textbf{Gerência} & Relatórios, preços e fechamento do dia & 1 h \\ \hline
+\end{longtable}
+\endgroup
+\subsecao{\faBoxOpen\ Dificuldades comuns e como ajudar}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.371\linewidth}>{\raggedright\arraybackslash}p{0.557\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Dificuldade} & \color{white}\textbf{\footnotesize Como ajudar} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Dificuldade} & \color{white}\textbf{\footnotesize Como ajudar} \\
+\endhead
+\rowcolor{white}\textbf{Medo de errar no caixa} & Treinar com a versão de demonstração antes \\ \hline
+\rowcolor{suave!55}\textbf{Pouca prática com computador} & Manual de uma página do lado do computador \\ \hline
+\rowcolor{white}\textbf{Turno da noite sem ajuda} & Telefone de quem chamar escrito no manual \\ \hline
+\rowcolor{suave!55}\textbf{Esquecer a senha} & Usar o PIN de 4 números para desbloquear \\ \hline
+\end{longtable}
+\endgroup
+\Needspace{22\baselineskip}\vspace{14pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{46pt}>{\raggedright\arraybackslash}m{0.76\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=42pt,inner sep=0pt]{\LARGE \faLaptopCode}; &
+{\footnotesize\bfseries MANUAL DA FUNÇÃO · FRENTE D}\label{manual-d-dev}\par\vspace{2pt}
+{\fontsize{20}{24}\selectfont\bfseries Dev de apoio}\par\vspace{3pt}
+{\small Cria os usuários de teste e ajuda nos prints.}
+\end{tabular}
+\end{faixa}
+\secao{\faTools}{O que você entrega em cada tarefa}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.105\linewidth}>{\raggedright\arraybackslash}p{0.823\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Tarefa} & \color{white}\textbf{\footnotesize O que fazer} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Tarefa} & \color{white}\textbf{\footnotesize O que fazer} \\
+\endhead
+\rowcolor{white}\textbf{D1} & Passar o link do questionário e ajudar a abrir o arquivo de respostas. \\ \hline
+\rowcolor{suave!55}\textbf{D2} & Criar um usuário de Recepção e um de Governança na demonstração e ajudar nos prints. \\ \hline
+\rowcolor{white}\textbf{D3} & Dizer quanto tempo leva para aprender cada tela. \\ \hline
+\rowcolor{suave!55}\textbf{D4} & Confirmar quem cuida de backup e de criar usuários. \\ \hline
+\end{longtable}
+\endgroup
+\rotulo{\faHandsHelping}{Sempre}
+\begin{itemize}
+  \item Mostrar o sistema funcionando e criar usuários de teste.
+  \item Conferir o que a frente escreveu sobre o sistema.
+  \item Passar números e prints da versão de demonstração.
+  \item Explicar o que for técnico em palavras simples.
+\end{itemize}
+\begin{destaque}{\color{cor}\faDesktop}\ \ Peça ao seu dev de apoio o endereço da versão de demonstração e um usuário de teste. Ela tem dados inventados: nunca use dados reais de hóspedes nos trabalhos ou prints.\end{destaque}
+\clearpage
+\secao{\faQuestionCircle}{Onde tirar dúvidas}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.342\linewidth}>{\raggedright\arraybackslash}p{0.586\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Preciso de…} & \color{white}\textbf{\footnotesize Onde encontrar} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Preciso de…} & \color{white}\textbf{\footnotesize Onde encontrar} \\
+\endhead
+\rowcolor{white}\textbf{Ver o sistema funcionando} & Peça ao dev de apoio o link da versão de demonstração \\ \hline
+\rowcolor{suave!55}\textbf{Tirar dúvida sobre o sistema} & Dev de apoio da sua frente \\ \hline
+\rowcolor{white}\textbf{Conceitos da disciplina} & Apostila ``Gestão Estratégica Guiada a Dados'' \\ \hline
+\rowcolor{suave!55}\textbf{O que a dona do hotel respondeu} & Frente D (questionário da reunião) \\ \hline
+\rowcolor{white}\textbf{Entregar seu trabalho} & Site da divisão de funções → Entregas da sua frente \\ \hline
+\end{longtable}
+\endgroup
+\secao{\faBook}{Glossário}
+\Needspace{27\baselineskip}
+\begin{tcbraster}[raster columns=2,raster equal height=rows,raster column skip=6pt,raster row skip=6pt,raster before skip=4pt,raster after skip=8pt]
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}Diária}\par\vspace{1pt}{\footnotesize O preço de uma noite no hotel.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}Check-in / Check-out}\par\vspace{1pt}{\footnotesize Registro da entrada e da saída do hóspede.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}Taxa de ocupação}\par\vspace{1pt}{\footnotesize Quantos \% dos quartos foram ocupados. Ex.: 35 de 50 = 70\%.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}Diária média (ADR)}\par\vspace{1pt}{\footnotesize Quanto o hotel recebeu, em média, por quarto vendido.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}RevPAR}\par\vspace{1pt}{\footnotesize Receita das diárias dividida por todos os quartos (vendidos ou não).}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}No-show}\par\vspace{1pt}{\footnotesize Quem reservou e não apareceu.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}Governança}\par\vspace{1pt}{\footnotesize Equipe de limpeza e arrumação dos quartos.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}Backlog}\par\vspace{1pt}{\footnotesize Lista de tudo que o sistema precisa ter, em ordem de importância.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}Sprint}\par\vspace{1pt}{\footnotesize Um ciclo curto de trabalho (aqui, 1 semana) com um objetivo.}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.8pt,arc=6pt,left=8pt,right=8pt,top=6pt,bottom=6pt]
+{\bfseries\color{cor}KPI}\par\vspace{1pt}{\footnotesize Indicador importante, que ajuda a tomar uma decisão.}
+\end{tcolorbox}
+\end{tcbraster}
+\end{document}

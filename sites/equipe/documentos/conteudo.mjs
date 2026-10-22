@@ -1,0 +1,588 @@
+// Conteúdo dos documentos de cada frente (Passo a passo + Guia do projeto).
+// Versão simplificada para alunos do 2º período (a versão completa anterior está na tag equipe-v1).
+// Gerar:  node docs/equipe/documentos/gerar.mjs  (Word)  ·  gerar-latex.mjs + compilar-pdf.sh  (PDF)
+// Base: apostila "Gestão Estratégica Guiada a Dados" (docs/Gestao_Estrategica.pdf).
+
+// ---------- O projeto, em palavras simples (comum a todos os guias) ----------
+export const PROJETO = {
+  resumo:
+    'O Estadia é um sistema para administrar um hotel de 50 quartos. Pelo computador ou pelo celular, a equipe do hotel faz reservas, registra a entrada (check-in) e a saída (check-out) dos hóspedes, cobra o que eles consumiram, fecha o caixa do dia e vê relatórios.',
+  problema:
+    'Muitos hotéis pequenos ainda controlam tudo em caderno, planilha e WhatsApp. Aí acontecem erros: vender o mesmo quarto para duas pessoas, cobrar errado, o caixa não bater e a dona não saber quanto o hotel realmente ganhou no mês.',
+  solucao:
+    'Um sistema único que vários funcionários usam ao mesmo tempo. Ele não deixa vender o mesmo quarto duas vezes, guarda quem fez cada ação e mostra relatórios prontos para a dona decidir preços e equipe.',
+  restricoes: [
+    'Funciona sem internet: roda dentro da rede do próprio hotel.',
+    'Fica instalado num computador (servidor) do próprio hotel.',
+    'Protege os dados pessoais dos hóspedes, como manda a LGPD.',
+    'Faz cópia de segurança (backup) sozinho, várias vezes por dia.',
+  ],
+  modulos: [
+    ['M1', 'Quartos e mapa', 'Quais quartos estão livres, ocupados, sujos ou em manutenção'],
+    ['M2', 'Tarifas', 'Preço das diárias'],
+    ['M3', 'Reservas', 'Reservar, alterar e cancelar'],
+    ['M4', 'Check-in / Check-out', 'Entrada e saída do hóspede'],
+    ['M5', 'Hóspedes', 'Cadastro de quem se hospeda'],
+    ['M6', 'Conta do hóspede', 'Diárias e consumo (frigobar, restaurante…)'],
+    ['M7', 'Caixa', 'Pagamentos e fechamento do caixa de cada turno'],
+    ['M8', 'Empresas', 'Clientes empresa que pagam depois'],
+    ['M9', 'Fechamento do dia', 'Encerra o dia do hotel'],
+    ['M10', 'Relatórios', 'Ocupação, receita, chegadas e saídas'],
+    ['M11', 'Fiscal', 'Resumo para o contador'],
+  ],
+  foraDoEscopo: 'Nota fiscal eletrônica, integração com Booking e site de reservas ficam para versões futuras.',
+  perfis: [
+    ['Recepção', 'Reservas, check-in, check-out e caixa'],
+    ['Governança', 'Limpeza dos quartos, pelo celular'],
+    ['Gerência', 'Relatórios, preços e fechamento do dia'],
+    ['Financeiro', 'Caixa, contas e empresas'],
+    ['Administrador', 'Usuários e configurações'],
+    ['Suporte técnico', 'Backup e saúde do sistema (equipe técnica)'],
+  ],
+  linhaDoTempo: [
+    ['15/10/2026', 'Planejamento do sistema concluído'],
+    ['16/10/2026', 'Base do sistema, login e cadastro de quartos prontos'],
+    ['19/10/2026', 'Reservas, check-in/out, caixa e relatórios prontos · versão 1.0'],
+    ['19–21/10/2026', 'Visual novo (tema claro e escuro) e imagens'],
+  ],
+  numeros: [
+    ['50', 'quartos no hotel'],
+    ['11', 'módulos no sistema'],
+    ['6', 'tipos de usuário'],
+    ['0', 'internet necessária para funcionar'],
+    ['~300', 'testes automáticos'],
+    ['4', 'pessoas programando'],
+  ],
+  ondeVer: [
+    ['Ver o sistema funcionando', 'Peça ao dev de apoio o link da versão de demonstração'],
+    ['Tirar dúvida sobre o sistema', 'Dev de apoio da sua frente'],
+    ['Conceitos da disciplina', 'Apostila "Gestão Estratégica Guiada a Dados"'],
+    ['O que a dona do hotel respondeu', 'Frente D (questionário da reunião)'],
+    ['Entregar seu trabalho', 'Site da divisão de funções → Entregas da sua frente'],
+  ],
+  demo: 'Peça ao seu dev de apoio o endereço da versão de demonstração e um usuário de teste. Ela tem dados inventados: nunca use dados reais de hóspedes nos trabalhos ou prints.',
+};
+
+export const GLOSSARIO_HOTEL = [
+  ['Diária', 'O preço de uma noite no hotel.'],
+  ['Check-in / Check-out', 'Registro da entrada e da saída do hóspede.'],
+  ['Taxa de ocupação', 'Quantos % dos quartos foram ocupados. Ex.: 35 de 50 = 70%.'],
+  ['Diária média (ADR)', 'Quanto o hotel recebeu, em média, por quarto vendido.'],
+  ['RevPAR', 'Receita das diárias dividida por todos os quartos (vendidos ou não).'],
+  ['No-show', 'Quem reservou e não apareceu.'],
+  ['Governança', 'Equipe de limpeza e arrumação dos quartos.'],
+  ['Backlog', 'Lista de tudo que o sistema precisa ter, em ordem de importância.'],
+  ['Sprint', 'Um ciclo curto de trabalho (aqui, 1 semana) com um objetivo.'],
+  ['KPI', 'Indicador importante, que ajuda a tomar uma decisão.'],
+];
+
+// ---------- Frentes ----------
+// Etapa: titulo, semana, tempo, aula (o conceito em palavras simples), objetivo, passos[],
+// modelo ({ colunas, linhas } com a 1ª linha de exemplo, ou { campos }), pronto[], entregar,
+// desafio (opcional: atividade extra para quem quiser ir além).
+export const FRENTES = [
+  {
+    id: 'a',
+    letra: 'A',
+    titulo: 'Organização do Projeto',
+    papeis: '2 integrantes + 1 dev de apoio',
+    missao: 'Organizar o trabalho do grupo: o que vamos fazer, quem faz, até quando, e juntar tudo no final.',
+    modulo: 'Aulas 03, 06 e 08 da apostila',
+    etapas: [
+      {
+        titulo: 'Canvas do projeto',
+        semana: 'Semana 1',
+        tempo: 'cerca de 1h30',
+        aula: 'Aula 03 · O Project Model Canvas resume um projeto inteiro em uma página, respondendo perguntas simples: por quê, quem, o quê, quando e como saberemos que deu certo.',
+        objetivo: 'Explicar o projeto Estadia em uma página que qualquer pessoa entenda.',
+        passos: [
+          'Leiam a parte "O projeto em palavras simples" do Guia da Frente A.',
+          'Respondam cada bloco da tabela com UMA frase curta. A primeira linha já está preenchida como exemplo.',
+          'Se não souberem algum bloco, perguntem ao dev de apoio.',
+          'Passem a tabela para um quadro visual no Canva, PowerPoint ou Miro (pode usar um modelo pronto de Project Model Canvas).',
+        ],
+        modelo: {
+          colunas: ['Bloco', 'Pergunta', 'Resposta (1 frase)'],
+          linhas: [
+            ['Justificativa', 'Por que o projeto existe?', 'O hotel controla tudo em caderno e planilha e erra muito.'],
+            ['Objetivo', 'O que queremos alcançar?', ''],
+            ['Benefícios', 'O que o hotel ganha?', ''],
+            ['Interessados', 'Quem participa ou é afetado?', ''],
+            ['Entregas', 'O que vamos entregar?', ''],
+            ['Riscos', 'O que pode dar errado?', ''],
+            ['Prazo', 'Quando termina?', ''],
+            ['Equipe', 'Quem trabalha nele?', ''],
+            ['Como medir', 'Como saberemos que deu certo?', ''],
+          ],
+        },
+        pronto: ['Todos os blocos com uma frase.', 'Quadro visual pronto (imagem ou PDF).'],
+        entregar: 'A1-canvas',
+        desafio: 'O Canvas completo tem 13 blocos (premissas, restrições, requisitos, custos, recursos…). Tentem preencher os 13.',
+      },
+      {
+        titulo: 'Reunião de início (kick-off)',
+        semana: 'Semana 1',
+        tempo: 'cerca de 1h (30 min de reunião)',
+        aula: 'Aula 08 · O kick-off é a primeira reunião do projeto: todo mundo entende o objetivo, sabe o que vai fazer e sai com tarefas e prazos combinados.',
+        objetivo: 'Fazer uma reunião rápida com o grupo todo e registrar o que foi combinado.',
+        passos: [
+          'Marquem 30 minutos com as 12 pessoas (pode ser online).',
+          'Uma pessoa da dupla apresenta: objetivo do projeto, as 4 frentes e o cronograma do site.',
+          'A outra pessoa anota as decisões na tabela abaixo.',
+          'No fim, leiam em voz alta o que ficou combinado e mandem a ata no grupo.',
+        ],
+        modelo: {
+          colunas: ['O que foi combinado', 'Quem faz', 'Até quando'],
+          linhas: [
+            ['Cada frente envia a 1ª entrega no site', 'Todas as frentes', 'Sexta da semana 1'],
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', ''],
+          ],
+        },
+        pronto: ['Ata com pelo menos 5 combinados, cada um com responsável e data.', 'Ata enviada ao grupo.'],
+        entregar: 'A2-ata-kickoff',
+        desafio: 'Montem a matriz RACI do projeto (quem executa, quem aprova, quem é consultado, quem é informado).',
+      },
+      {
+        titulo: 'Cronograma e acompanhamento',
+        semana: 'Semanas 2 e 3',
+        tempo: 'cerca de 1h + 15 min por semana',
+        aula: 'Aulas 06 e 08 · Cronograma é a lista de tarefas com datas. A "linha de base" é o cronograma combinado no início, guardado para comparar depois. O SPI mostra se estamos no ritmo: tarefas feitas ÷ tarefas que deveriam estar feitas.',
+        objetivo: 'Saber se o grupo está no prazo e avisar cedo quando algo atrasar.',
+        passos: [
+          'Listem as entregas das 4 frentes (estão no site) na tabela abaixo, com a data prevista.',
+          'Guardem uma cópia dessa versão: ela é a linha de base.',
+          'Toda semana, preencham a data em que cada entrega ficou pronta de verdade.',
+          'Calculem o SPI uma vez por semana. Exemplo: deveriam estar prontas 8 entregas e estão 6 → SPI = 6 ÷ 8 = 0,75 (atrasado).',
+          'Se o SPI ficar abaixo de 1, conversem com a frente atrasada e anotem o que vão fazer.',
+        ],
+        modelo: {
+          colunas: ['Entrega', 'Frente', 'Data prevista', 'Data real', 'No prazo?'],
+          linhas: [
+            ['Canvas do projeto', 'A', '24/10', '23/10', 'Sim'],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+          ],
+        },
+        modeloExtra: {
+          titulo: 'SPI da semana',
+          colunas: ['Semana', 'Deveriam estar prontas', 'Estão prontas', 'SPI', 'O que vamos fazer'],
+          linhas: [['1', '4', '4', '1,00', 'Seguir assim'], ['2', '', '', '', ''], ['3', '', '', '', '']],
+        },
+        pronto: ['Cronograma com todas as entregas.', 'SPI calculado em pelo menos 2 semanas.'],
+        entregar: 'A3-cronograma',
+        desafio: 'Usem o PERT para estimar uma tarefa incerta: tempo = (otimista + 4 × provável + pessimista) ÷ 6.',
+      },
+      {
+        titulo: 'Fechamento e apresentação',
+        semana: 'Semana 4',
+        tempo: 'cerca de 2h',
+        aula: 'Aula 06 · Encerrar um projeto é juntar tudo o que foi entregue, confirmar que está aceito e registrar as lições aprendidas para os próximos projetos.',
+        objetivo: 'Montar o trabalho final com a parte de todas as frentes e preparar a apresentação.',
+        passos: [
+          'Baixem no site a última entrega de cada frente.',
+          'Juntem tudo num documento só, nesta ordem: Frente A, B, C e D.',
+          'Façam 15 minutos de conversa com o grupo e preencham as lições aprendidas.',
+          'Montem os slides: 1 a 2 slides por frente + abertura e conclusão.',
+        ],
+        modelo: {
+          colunas: ['Pergunta', 'Resposta do grupo'],
+          linhas: [
+            ['O que funcionou bem?', ''],
+            ['O que não funcionou?', ''],
+            ['O que faríamos diferente?', ''],
+          ],
+        },
+        pronto: ['Documento final com as 4 frentes.', 'Lições aprendidas preenchidas.', 'Slides prontos.'],
+        entregar: 'A4-trabalho-final',
+      },
+    ],
+    guia: {
+      foco: 'Vocês organizam o grupo: o que precisa ser feito, quem faz e até quando. Não precisam entender de programação.',
+      secoes: [
+        {
+          titulo: 'O que vocês precisam saber',
+          lista: [
+            'O sistema já está pronto (versão 1.0). O trabalho de vocês é organizar a parte de gestão do projeto.',
+            'São 4 frentes: A (vocês), B (produto e tarefas), C (metas e indicadores) e D (pessoas e treinamento).',
+            'Cada frente entrega seus arquivos no site da divisão de funções. É de lá que vocês juntam tudo no final.',
+            'Se uma frente atrasar, avisem cedo: o SPI serve exatamente para isso.',
+          ],
+        },
+        {
+          titulo: 'Riscos que vale citar no Canvas',
+          lista: [
+            'Faltar tempo de alguém do grupo (provas, trabalho).',
+            'A dona do hotel demorar para responder perguntas.',
+            'Os funcionários do hotel terem dificuldade de usar o sistema.',
+            'A internet do hotel cair (o sistema continua funcionando, porque roda na rede local).',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: 'b',
+    letra: 'B',
+    titulo: 'Produto e Tarefas (PO + Scrum Master)',
+    papeis: 'Product Owner (1) + Scrum Master (1) + 1 dev de apoio',
+    missao: 'Organizar a lista do que o sistema precisa ter e conduzir as tarefas do grupo do jeito ágil (Scrum e Kanban).',
+    modulo: 'Aulas 01, 02, 04 e 07 da apostila',
+    etapas: [
+      {
+        titulo: 'Lista de funcionalidades (backlog)',
+        semana: 'Semana 1',
+        tempo: 'cerca de 1h30',
+        aula: 'Aulas 01 e 02 · O Product Backlog é a lista de tudo que o produto precisa, em ordem de importância. Quem cuida dela é o Product Owner (PO). Cada item é escrito do ponto de vista de quem usa.',
+        objetivo: 'Listar 10 coisas que o Estadia faz, escritas como histórias de usuário e em ordem de importância.',
+        passos: [
+          'Peçam ao dev de apoio para mostrar o sistema de demonstração (15 minutos bastam).',
+          'Escrevam 10 itens no formato: "Como ___, quero ___, para ___". Veja o exemplo na tabela.',
+          'Deem prioridade: Alta (sem isso o hotel não funciona), Média ou Baixa.',
+          'Para cada item, escrevam como saber que está pronto (uma frase).',
+        ],
+        modelo: {
+          colunas: ['#', 'Como ___, quero ___, para ___', 'Prioridade', 'Está pronto quando…'],
+          linhas: [
+            ['1', 'Como recepcionista, quero ver os quartos livres, para não vender um quarto ocupado', 'Alta', 'O sistema mostra só os quartos livres na data escolhida'],
+            ['2', '', '', ''],
+            ['3', '', '', ''],
+            ['4', '', '', ''],
+            ['5', '', '', ''],
+            ['6', '', '', ''],
+            ['7', '', '', ''],
+            ['8', '', '', ''],
+            ['9', '', '', ''],
+            ['10', '', '', ''],
+          ],
+        },
+        pronto: ['10 itens escritos no formato certo.', 'Todos com prioridade e "está pronto quando".'],
+        entregar: 'B1-backlog',
+        desafio: 'Escrevam os critérios no formato da aula: "Dado ___, quando ___, então ___".',
+      },
+      {
+        titulo: 'Quadro Kanban',
+        semana: 'Semana 1',
+        tempo: 'cerca de 45 min',
+        aula: 'Aula 04 · Kanban é um quadro com colunas (A fazer → Fazendo → Feito) e cartões que andam pelas colunas. Ajuda todo mundo a ver o que está sendo feito e evita começar coisas demais ao mesmo tempo.',
+        objetivo: 'Criar um quadro onde o grupo inteiro vê o andamento das tarefas.',
+        passos: [
+          'Criem um quadro gratuito no Trello com 3 colunas: A fazer, Fazendo, Feito.',
+          'Criem um cartão para cada entrega das 4 frentes (estão no site), com uma etiqueta de cor por frente.',
+          'Convidem o grupo e combinem: cada um move o próprio cartão.',
+          'Combinem um limite: no máximo 2 cartões em "Fazendo" por pessoa.',
+          'Tirem um print agora e outro na última semana.',
+        ],
+        modelo: { campos: ['Link do quadro', 'Cores usadas para cada frente', 'Limite de cartões em "Fazendo"'] },
+        pronto: ['Quadro com as entregas das 4 frentes.', 'Prints do começo e do fim.'],
+        entregar: 'B2-kanban (prints)',
+      },
+      {
+        titulo: 'Planejamento de uma sprint',
+        semana: 'Semana 2',
+        tempo: 'cerca de 1h',
+        aula: 'Aulas 01 e 02 · Sprint é um ciclo curto de trabalho com um objetivo claro. No começo, o time escolhe o que cabe no tempo que tem. Capacidade = pessoas × horas por dia × dias.',
+        objetivo: 'Planejar uma semana de trabalho do grupo do jeito Scrum.',
+        passos: [
+          'Escrevam o objetivo da sprint em uma frase. Ex.: "Terminar a primeira versão de todas as entregas".',
+          'Calculem a capacidade: quantas pessoas × horas por dia × dias. Ex.: 8 pessoas × 1 h × 5 dias = 40 horas.',
+          'Escolham do quadro Kanban as tarefas que cabem nessas horas e estimem cada uma.',
+          'Se passar da capacidade, tirem tarefas da sprint.',
+        ],
+        modelo: {
+          colunas: ['Tarefa', 'Quem faz', 'Horas estimadas'],
+          linhas: [['Canvas do projeto', 'Frente A', '3'], ['', '', ''], ['', '', ''], ['', '', ''], ['', '', ''], ['', '', '']],
+        },
+        modeloExtra: { titulo: 'Resumo da sprint', campos: ['Objetivo da sprint', 'Capacidade (conta)', 'Total de horas planejadas'] },
+        pronto: ['Objetivo em uma frase.', 'Total planejado menor ou igual à capacidade.'],
+        entregar: 'B3-sprint',
+        desafio: 'Escrevam a "Definição de Pronto" (DoD) do grupo: o que toda entrega precisa ter para ser considerada pronta.',
+      },
+      {
+        titulo: 'Reuniões rápidas e retrospectiva',
+        semana: 'Semanas 2 e 3',
+        tempo: '15 min por reunião',
+        aula: 'Aulas 01 e 02 · A daily é uma reunião de 15 minutos com 3 perguntas: o que fiz, o que vou fazer, tem algo me atrapalhando? A retrospectiva, no fim da sprint, pergunta o que melhorar.',
+        objetivo: 'Conduzir as reuniões rápidas do grupo e registrar as melhorias.',
+        passos: [
+          'O Scrum Master puxa 2 dailies de 15 minutos (pode ser por mensagem no grupo).',
+          'Anotem as respostas e qualquer impedimento.',
+          'No fim da semana, façam a retrospectiva: o que foi bem, o que melhorar e 3 ações.',
+        ],
+        modelo: {
+          colunas: ['Reunião', 'Data', 'Principais pontos', 'Impedimentos'],
+          linhas: [['Daily', '28/10', 'Frente C terminou os OKRs', 'Ninguém tem acesso ao Trello'], ['Daily', '', '', ''], ['Daily', '', '', '']],
+        },
+        modeloExtra: {
+          titulo: 'Retrospectiva',
+          colunas: ['O que foi bem', 'O que melhorar', 'Ação (com responsável)'],
+          linhas: [['', '', ''], ['', '', ''], ['', '', '']],
+        },
+        pronto: ['2 dailies registradas.', 'Retrospectiva com 3 ações.'],
+        entregar: 'B4-reunioes',
+      },
+    ],
+    guia: {
+      foco: 'O PO decide o que é mais importante; o Scrum Master ajuda o grupo a trabalhar no ritmo e tira obstáculos do caminho.',
+      secoes: [
+        {
+          titulo: 'O que o sistema faz (ideias para o backlog)',
+          lista: [
+            'Mostrar quais quartos estão livres, ocupados, sujos ou em manutenção.',
+            'Reservar por tipo de quarto, sem deixar vender o mesmo quarto duas vezes.',
+            'Fazer check-in e check-out, com a ficha do hóspede.',
+            'Lançar consumo na conta do hóspede (frigobar, restaurante).',
+            'Abrir e fechar o caixa de cada turno.',
+            'Avisar a governança quais quartos precisam de limpeza.',
+            'Gerar relatórios de ocupação e receita.',
+            'Bloquear a tela com um PIN quando o funcionário sai do computador.',
+          ],
+        },
+        {
+          titulo: 'Scrum e Kanban em uma frase',
+          lista: [
+            'Scrum: trabalho em ciclos curtos (sprints) com reuniões rápidas e papéis definidos (PO, Scrum Master, time).',
+            'Kanban: quadro com colunas para ver o fluxo do trabalho e não acumular tarefas pela metade.',
+            'Os dois se completam: dá para planejar em sprints e acompanhar no quadro Kanban.',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: 'c',
+    letra: 'C',
+    titulo: 'Metas e Indicadores',
+    papeis: '2 integrantes + 1 dev de apoio',
+    missao: 'Mostrar com números como o Estadia ajuda o hotel: definir metas e os indicadores que a dona vai acompanhar.',
+    modulo: 'Aulas 10, 11 e 12 da apostila',
+    etapas: [
+      {
+        titulo: 'Metas do hotel (OKR)',
+        semana: 'Semana 1',
+        tempo: 'cerca de 1h',
+        aula: 'Aula 10 · OKR tem duas partes: o Objetivo (onde queremos chegar, sem números) e os Resultados-chave (números que mostram se estamos chegando lá).',
+        objetivo: 'Escrever uma meta para o hotel usando o sistema, com 3 resultados que dá para medir.',
+        passos: [
+          'Escrevam um objetivo sem números. Ex.: "Deixar a recepção rápida e sem erros".',
+          'Escrevam 3 resultados-chave com número de antes e meta (veja o exemplo).',
+          'Os números de "antes" podem ser estimados: digam de onde tiraram (palpite da dona, pesquisa…).',
+          'Confiram: resultado-chave não é tarefa. "Instalar o sistema" é tarefa; "check-in em 3 minutos" é resultado.',
+        ],
+        modelo: {
+          colunas: ['Resultado-chave', 'Antes', 'Meta'],
+          linhas: [['Tempo médio de check-in', '8 min', '3 min'], ['', '', ''], ['', '', '']],
+        },
+        modeloExtra: { campos: ['Objetivo (sem números)'] },
+        pronto: ['Objetivo sem números.', '3 resultados-chave com antes e meta.'],
+        entregar: 'C1-okr',
+        desafio: 'Liguem a meta à estratégia do hotel: estratégia → portfólio de projetos → projeto Estadia → OKR (Aula 10).',
+      },
+      {
+        titulo: 'Fichas de indicadores (KPIs)',
+        semana: 'Semana 2',
+        tempo: 'cerca de 1h30',
+        aula: 'Aulas 11 e 12 · Um bom indicador mede algo importante e ajuda a tomar uma decisão. Se ninguém decide nada com ele, não precisa existir.',
+        objetivo: 'Explicar 4 indicadores que o Estadia já calcula, com fórmula e meta.',
+        passos: [
+          'Usem estes 4: taxa de ocupação, diária média, RevPAR e no-show (explicados no Guia da Frente C).',
+          'Preencham uma linha por indicador. A primeira já está como exemplo.',
+          'Na última coluna, digam qual decisão a dona pode tomar olhando aquele número.',
+          'Confiram as contas com o exemplo resolvido do guia.',
+        ],
+        modelo: {
+          colunas: ['Indicador', 'Fórmula', 'Meta', 'Que decisão ajuda a tomar?'],
+          linhas: [
+            ['Taxa de ocupação', 'quartos ocupados ÷ quartos do hotel', '70%', 'Se estiver baixa, fazer promoção'],
+            ['Diária média', '', '', ''],
+            ['RevPAR', '', '', ''],
+            ['No-show', '', '', ''],
+          ],
+        },
+        pronto: ['4 indicadores com fórmula, meta e decisão.'],
+        entregar: 'C2-indicadores',
+      },
+      {
+        titulo: 'Painel de indicadores',
+        semana: 'Semana 3',
+        tempo: 'cerca de 2h',
+        aula: 'Aula 11 · Um painel (dashboard) mostra os indicadores de um jeito rápido de entender, com cores: verde = dentro da meta, amarelo = atenção, vermelho = problema.',
+        objetivo: 'Montar um painel simples no Google Sheets ou Excel com os 4 indicadores.',
+        passos: [
+          'Peçam ao dev de apoio os números de um mês na versão de demonstração (ou usem o exemplo do guia).',
+          'Façam uma tabela com os 4 indicadores: valor, meta e cor (verde, amarelo ou vermelho).',
+          'Façam 1 gráfico (ex.: ocupação por semana).',
+          'Escrevam 3 frases: o que o painel mostra e o que vocês recomendam à dona.',
+        ],
+        modelo: {
+          colunas: ['Indicador', 'Valor do mês', 'Meta', 'Cor'],
+          linhas: [['Taxa de ocupação', '70%', '70%', 'Verde'], ['Diária média', '', '', ''], ['RevPAR', '', '', ''], ['No-show', '', '', '']],
+        },
+        modeloExtra: { campos: ['O que o painel mostra (3 frases)'] },
+        pronto: ['Painel com os 4 indicadores coloridos.', '1 gráfico.', '3 frases de análise.'],
+        entregar: 'C3-painel (planilha ou print)',
+        desafio: 'Calculem também o % de atingimento dos resultados-chave: (atual − antes) ÷ (meta − antes) × 100.',
+      },
+    ],
+    guia: {
+      foco: 'Vocês transformam o sistema em números que ajudam a dona do hotel a decidir: subir ou baixar preço, fazer promoção, contratar.',
+      secoes: [
+        {
+          titulo: 'Os 4 indicadores, com um exemplo resolvido',
+          texto: 'Um hotel de 50 quartos, num mês de 30 dias, tem 1.500 "noites de quarto" para vender. Imagine que ele vendeu 1.050 noites e recebeu R$ 252.000 de diárias:',
+          tabela: {
+            colunas: ['Indicador', 'Conta', 'Resultado'],
+            linhas: [
+              ['Taxa de ocupação', '1.050 ÷ 1.500', '70%'],
+              ['Diária média', 'R$ 252.000 ÷ 1.050', 'R$ 240,00'],
+              ['RevPAR', 'R$ 252.000 ÷ 1.500', 'R$ 168,00'],
+              ['No-show', 'reservas que não vieram ÷ reservas do mês', 'ex.: 6 ÷ 120 = 5%'],
+            ],
+          },
+        },
+        {
+          titulo: 'Onde esses números aparecem no sistema',
+          lista: [
+            'Tela Relatórios → "Ocupação, diária média e RevPAR".',
+            'Relatório de no-shows (quem reservou e não veio).',
+            'Todos os relatórios podem ser baixados em planilha (CSV).',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: 'd',
+    letra: 'D',
+    titulo: 'Pessoas e Treinamento',
+    papeis: '2 integrantes + 1 dev de apoio',
+    missao: 'Cuidar das pessoas: conversar com a dona do hotel, preparar os funcionários para usar o sistema e definir quem decide o quê.',
+    modulo: 'Aulas 13 a 16 da apostila',
+    etapas: [
+      {
+        titulo: 'Conversa com a dona do hotel',
+        semana: 'Semana 1',
+        tempo: 'cerca de 1h30',
+        aula: 'Aula 16 · O Business Partner é a ponte entre o cliente e a equipe: entende o que o cliente precisa, leva as perguntas e traz as decisões. Ele recomenda; quem decide é o cliente.',
+        objetivo: 'Ouvir a dona do hotel e levar as respostas para o grupo.',
+        passos: [
+          'Usem o questionário pronto do projeto (peçam o link ao dev de apoio).',
+          'Na conversa, comecem pelas perguntas sobre quartos, reservas, pagamentos e relatórios.',
+          'Anotem as 5 decisões mais importantes na tabela abaixo.',
+          'Mandem as decisões para a Frente B (produto) e a Frente C (indicadores).',
+        ],
+        modelo: {
+          colunas: ['Assunto', 'O que a dona decidiu', 'Mandar para'],
+          linhas: [['Cancelamento', 'Sem multa até 2 dias antes', 'Frente B'], ['', '', ''], ['', '', ''], ['', '', ''], ['', '', '']],
+        },
+        pronto: ['Questionário respondido.', '5 decisões anotadas e repassadas.'],
+        entregar: 'D1-conversa-com-a-dona',
+      },
+      {
+        titulo: 'Manual rápido do sistema',
+        semana: 'Semana 2',
+        tempo: 'cerca de 2h',
+        aula: 'Aula 13 · Transformação digital não é só ter um sistema novo: as pessoas precisam saber usar. Sem isso, temos "tecnologia nova com problema antigo".',
+        objetivo: 'Fazer 2 manuais de uma página, com prints: um para a recepção e um para a governança.',
+        passos: [
+          'Peçam ao dev de apoio um usuário de recepção e um de governança na versão de demonstração.',
+          'Recepção: mostrem como fazer um check-in, do começo ao fim, em no máximo 6 passos com prints.',
+          'Governança: mostrem como marcar um quarto como limpo pelo celular.',
+          'Use frases curtas e números grandes nos passos. Nada de termos técnicos.',
+        ],
+        modelo: {
+          colunas: ['Passo', 'O que fazer', 'Print'],
+          linhas: [['1', 'Abra o Mapa do dia e clique no quarto do hóspede', '(colar print)'], ['2', '', ''], ['3', '', ''], ['4', '', ''], ['5', '', ''], ['6', '', '']],
+        },
+        pronto: ['Manual da recepção (1 página).', 'Manual da governança (1 página).', 'Nenhum dado real de hóspede nos prints.'],
+        entregar: 'D2-manuais',
+      },
+      {
+        titulo: 'Plano de treinamento',
+        semana: 'Semana 3',
+        tempo: 'cerca de 1h',
+        aula: 'Aula 14 · Muitas empresas compram tecnologia mas não preparam as pessoas. Aí o projeto parece pronto, mas ninguém usa: é o "Projeto Melancia" (verde por fora, vermelho por dentro).',
+        objetivo: 'Planejar como os funcionários vão aprender a usar o sistema e o que pode atrapalhar.',
+        passos: [
+          'Preencham a tabela de treinamento por função (exemplo na primeira linha).',
+          'Pensem em 3 dificuldades que os funcionários podem ter (ex.: medo de errar no caixa).',
+          'Para cada dificuldade, escrevam uma forma de ajudar.',
+        ],
+        modelo: {
+          colunas: ['Função', 'O que precisa aprender', 'Duração'],
+          linhas: [['Recepção', 'Reserva, check-in, check-out e caixa', '2 h'], ['Governança', '', ''], ['Gerência', '', '']],
+        },
+        modeloExtra: {
+          titulo: 'Dificuldades e como ajudar',
+          colunas: ['Dificuldade', 'Como ajudar'],
+          linhas: [['', ''], ['', ''], ['', '']],
+        },
+        pronto: ['Treinamento para 3 funções.', '3 dificuldades com solução.'],
+        entregar: 'D3-treinamento',
+      },
+      {
+        titulo: 'Quem decide o quê e privacidade',
+        semana: 'Semana 4',
+        tempo: 'cerca de 1h',
+        aula: 'Aula 15 · Governança é deixar claro quem decide cada assunto. Ex.: "Monarquia de Negócio" = a dona decide; "Monarquia de TI" = a equipe técnica decide; "Duopólio" = as duas partes decidem juntas.',
+        objetivo: 'Mostrar quem decide cada assunto do sistema e escrever um aviso simples de privacidade para os hóspedes.',
+        passos: [
+          'Para cada assunto da tabela, digam quem decide: a dona, o time técnico ou os dois juntos.',
+          'Escrevam o nome do modelo da aula (Monarquia de Negócio, Monarquia de TI ou Duopólio).',
+          'Escrevam um aviso de privacidade de até 5 linhas para colocar no balcão (o guia tem as regras).',
+        ],
+        modelo: {
+          colunas: ['Assunto', 'Quem decide', 'Modelo da aula'],
+          linhas: [
+            ['Preço das diárias', 'A dona', 'Monarquia de Negócio'],
+            ['Backup e segurança', '', ''],
+            ['Criar usuários', '', ''],
+            ['Novas funções no sistema', '', ''],
+          ],
+        },
+        modeloExtra: { campos: ['Aviso de privacidade (até 5 linhas)'] },
+        pronto: ['4 assuntos com quem decide e o modelo.', 'Aviso de privacidade escrito.'],
+        entregar: 'D4-governanca-e-privacidade',
+        desafio: 'Montem a matriz RACI de uma decisão (ex.: restaurar um backup): quem executa, aprova, é consultado e informado.',
+      },
+    ],
+    guia: {
+      foco: 'O sistema só ajuda o hotel se as pessoas usarem. Vocês cuidam da conversa com a dona e da preparação dos funcionários.',
+      secoes: [
+        {
+          titulo: 'Privacidade dos hóspedes (LGPD), em palavras simples',
+          lista: [
+            'O hotel guarda dados dos hóspedes porque a lei exige (ficha de registro) e para cumprir a reserva.',
+            'Esses dados ficam guardados por 5 anos depois da última hospedagem e depois são apagados ou anonimizados.',
+            'Cada funcionário só vê o que precisa para o seu trabalho.',
+            'Tudo o que alguém faz no sistema fica registrado (quem, quando e o quê).',
+            'O hóspede pode pedir para ver ou apagar seus dados (quando a lei permitir).',
+          ],
+        },
+        {
+          titulo: 'Proteções que o sistema já tem',
+          lista: [
+            'Cada pessoa tem seu próprio login e um PIN de 4 números.',
+            'A tela bloqueia sozinha quando ninguém usa por alguns minutos.',
+            'Backup automático várias vezes por dia.',
+          ],
+        },
+      ],
+    },
+  },
+];
+
+// O que o dev de apoio faz (vai no fim de cada Passo a passo).
+export const DEV_DE_APOIO = [
+  'Mostrar o sistema funcionando e criar usuários de teste.',
+  'Conferir o que a frente escreveu sobre o sistema.',
+  'Passar números e prints da versão de demonstração.',
+  'Explicar o que for técnico em palavras simples.',
+];

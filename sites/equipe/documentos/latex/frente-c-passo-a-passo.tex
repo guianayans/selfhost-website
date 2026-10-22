@@ -1,0 +1,380 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage[default,type1,semibold]{inter}
+\usepackage[a4paper,top=18mm,bottom=24mm,left=18mm,right=18mm,footskip=12mm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{amssymb,textcomp,array,longtable,enumitem,fancyhdr,lastpage,needspace,fontawesome5}
+\usepackage[skins,breakable,raster]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{positioning,calc,babel}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+
+\definecolor{cor}{HTML}{B07D24}
+\definecolor{suave}{HTML}{FAF1DF}
+\definecolor{texto}{HTML}{0F172A}
+\definecolor{cinza}{HTML}{5B6B84}
+\definecolor{linha}{HTML}{D3DAE6}
+\color{texto}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\linespread{1.1}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{10pt}
+\renewcommand{\arraystretch}{1.45}
+\arrayrulecolor{linha}
+\setlist{itemsep=4pt,topsep=4pt,parsep=0pt}
+\setlist[itemize]{label={\color{cor}\small\faCaretRight},leftmargin=1.4em}
+% Passos numerados: número dentro de um círculo da cor da equipe.
+\DeclareRobustCommand{\bolinha}[1]{\tikz[baseline=(n.base)]\node[circle,fill=cor,text=white,inner sep=1.6pt,minimum size=17pt,font=\footnotesize\bfseries](n){#1};}
+\setlist[enumerate]{label=\bolinha{\arabic*},leftmargin=2.3em,labelsep=0.6em,itemsep=6pt}
+% Checklist: quadrado grande para marcar à mão.
+\DeclareRobustCommand{\caixinha}{\tikz[baseline=-0.6ex]\draw[cor,line width=1.2pt,rounded corners=2pt](0,-0.16)rectangle(0.42,0.26);}
+\newlist{checklist}{itemize}{1}
+\setlist[checklist]{label=\caixinha,leftmargin=2em,labelsep=0.6em,itemsep=7pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{cor}\textbf{\faChartLine\ \ Frente C}\color{cinza}\ \ ·\ \ Metas e Indicadores · Passo a passo}
+\fancyfoot[R]{\footnotesize\color{cinza}\textbf{\thepage}\,/\,\pageref{LastPage}}
+% Fita da cor da equipe na margem esquerda de todas as páginas.
+\fancyhead[L]{\begin{tikzpicture}[remember picture,overlay]\fill[cor](current page.north west)rectangle([xshift=5pt]current page.south west);\end{tikzpicture}}
+
+% Título de seção com ícone: nunca sozinho no pé da página.
+\newcommand{\secao}[2]{\Needspace{10\baselineskip}\vspace{12pt}%
+  \noindent\tikz[baseline=(i.base)]\node[circle,fill=cor,text=white,minimum size=26pt,inner sep=0pt](i){\small #1};%
+  \hspace{8pt}{\Large\bfseries #2}\par\vspace{-4pt}{\color{cor!35}\rule{\linewidth}{1.2pt}}\par\vspace{2pt}}
+\newcommand{\subsecao}[1]{\Needspace{8\baselineskip}\vspace{8pt}{\large\bfseries\color{cor}#1}\par}
+\newcommand{\rotulo}[2]{\Needspace{6\baselineskip}\vspace{10pt}%
+  \noindent{\color{cor}\normalsize #1}\hspace{6pt}{\footnotesize\bfseries\color{cor}\MakeUppercase{#2}}\par\vspace{2pt}}
+\newtcolorbox{destaque}[1][]{enhanced,breakable,colback=suave,colframe=suave,borderline west={4pt}{0pt}{cor},arc=4pt,boxrule=0pt,left=12pt,right=12pt,top=8pt,bottom=8pt,before skip=8pt,after skip=10pt,#1}
+\newtcolorbox{apostila}{enhanced,breakable,colback=white,colframe=cor,boxrule=1pt,arc=6pt,left=12pt,right=12pt,top=8pt,bottom=8pt,before skip=8pt,after skip=8pt,
+  overlay={\node[fill=cor,text=white,rounded corners=3pt,font=\scriptsize\bfseries,inner sep=4pt,anchor=west] at ([xshift=10pt]frame.north west) {\faBookOpen\ DA APOSTILA};}}
+\newtcolorbox{selo}{enhanced,left=8pt,right=8pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt,
+  frame code={\draw[cor,dashed,line width=1.4pt,rounded corners=8pt](frame.south west)rectangle(frame.north east);},
+  interior code={\fill[suave,rounded corners=8pt](interior.south west)rectangle(interior.north east);}}
+% Anotações: ocupa o resto da página da etapa (só se sobrar espaço útil).
+\newcommand{\anotacoes}{\par\ifdim\dimexpr\pagegoal-\pagetotal\relax>3.5cm\ifdim\pagegoal<\maxdimen
+\begin{tcolorbox}[enhanced,height fill,colback=white,colframe=cor!35,boxrule=0.8pt,arc=8pt,before skip=10pt,left=10pt,top=6pt,
+  borderline={0.8pt}{0pt}{cor!35,dashed},frame hidden,
+  underlay={\begin{scope}\clip(interior.south west)rectangle(interior.north east);
+    \foreach \y in {1,...,40}{\draw[cor!18,line width=0.6pt]([yshift=-\y*0.75cm-0.5cm]interior.north west)--([yshift=-\y*0.75cm-0.5cm]interior.north east);}\end{scope}}]
+{\footnotesize\bfseries\color{cor}\faStickyNote\ \ ANOTAÇÕES}
+\end{tcolorbox}\fi\fi}
+% Fim da etapa: se o bloco final não cabe, a sobra vira Anotações e o bloco vai para a próxima página.
+\newif\ifjaanotou
+\newsavebox{\blocofinal}
+% Mede o bloco final já montado; se não couber no resto da página, a sobra vira Anotações.
+\newcommand{\usarblocofinal}{\par\global\jaanotoufalse
+  \ifdim\pagegoal<\maxdimen\ifdim\dimexpr\pagegoal-\pagetotal\relax<\dimexpr\ht\blocofinal+\dp\blocofinal+18pt\relax
+    \anotacoes\global\jaanotoutrue\clearpage\fi\fi
+  \vspace{10pt}\noindent\usebox{\blocofinal}\par}
+\newtcolorbox{faixa}[1][]{enhanced,colback=cor,colframe=cor,coltext=white,arc=8pt,boxrule=0pt,left=14pt,right=14pt,top=10pt,bottom=10pt,#1}
+\newtcbox{\chip}[1][]{enhanced,on line,colback=suave,colframe=suave,coltext=cor,arc=7pt,boxrule=0pt,left=5pt,right=5pt,top=2pt,bottom=2pt,fontupper=\footnotesize\bfseries,#1}
+\newtcbox{\chipbranco}{enhanced,on line,colback=white,colframe=white,coltext=cor,arc=7pt,boxrule=0pt,left=6pt,right=6pt,top=2pt,bottom=2pt,fontupper=\footnotesize\bfseries}
+\begin{document}
+\thispagestyle{fancy}
+\begin{tikzpicture}[remember picture,overlay]
+\fill[cor,opacity=0.10] ([xshift=-1.5cm,yshift=-1cm]current page.north east) circle (5.2cm);
+\fill[cor,opacity=0.07] ([xshift=-5.5cm,yshift=-4.5cm]current page.north east) circle (2.4cm);
+\fill[cor,opacity=0.06] ([xshift=2cm,yshift=3cm]current page.south west) circle (4cm);
+\end{tikzpicture}
+\vspace*{2mm}
+\noindent\begin{tikzpicture}
+\node[circle,fill=cor,text=white,minimum size=78pt,font=\fontsize{40}{40}\selectfont\bfseries] (L) {C};
+\node[right=14pt of L.east,anchor=west,align=left,text width=12.2cm] {
+  {\footnotesize\bfseries\color{cor}PROJETO ESTADIA\ \ ·\ \ EQUIPE DOURADO\ \ ·\ \ FRENTE C}\\[4pt]
+  {\fontsize{23}{27}\selectfont\bfseries Metas e Indicadores}\\[6pt]
+  \chip{\faShoePrints\ \ Passo a passo}\ \chip{\faChartLine\ \ Aulas 10, 11 e 12 da apostila}
+};
+\end{tikzpicture}
+\vspace{10pt}
+
+\begin{faixa}
+{\large\faRocket}\hspace{8pt}{\large\bfseries Nossa missão}\par\vspace{2pt}
+{\normalsize Mostrar com números como o Estadia ajuda o hotel: definir metas e os indicadores que a dona vai acompanhar.}
+\end{faixa}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!40,boxrule=1pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=10pt,
+  title={\faUserFriends\ \ Nossa equipe},fonttitle=\bfseries\small,coltitle=cor,colbacktitle=suave,attach boxed title to top left={xshift=10pt,yshift=-8pt},boxed title style={arc=4pt,boxrule=0pt}]
+\vspace{6pt}
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faBullseye};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Metas}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faChartBar};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Painel}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.31\linewidth}\centering
+\tikz\node[circle,draw=cor,line width=1.4pt,fill=white,minimum size=34pt,text=cor]{\large \faLaptopCode};\par\vspace{4pt}
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Dev de apoio}}\par\vspace{14pt}
+{\color{cor!60}\rule{0.9\linewidth}{0.8pt}}\par{\scriptsize\color{cinza}nome}
+\end{minipage}
+\end{tcolorbox}
+\secao{\faMapSigns}{Mapa da jornada}
+{\color{cinza}3 tarefas curtas, uma por página. Marquem a bolinha quando terminarem cada uma.}\par\vspace{4pt}
+\begin{tcolorbox}[enhanced,colback=suave!60,colframe=cor!25,boxrule=0.6pt,arc=6pt,left=6pt,right=8pt,top=4pt,bottom=4pt,before skip=0pt,after skip=4pt]
+\begin{tabular}{@{}m{24pt}m{20pt}>{\raggedright\arraybackslash}m{0.52\linewidth}>{\raggedleft\arraybackslash}m{0.27\linewidth}@{}}
+\tikz\node[circle,fill=cor,text=white,minimum size=20pt,inner sep=0pt,font=\footnotesize\bfseries]{1}; &
+{\color{cor}\large \faBullseye} &
+\textbf{Metas do hotel (OKR)}\par{\scriptsize\color{cinza}\faUser\ Metas} &
+\chip{\faCalendarCheck\ Semana 1}\par\vspace{2pt}\chip{\faClock\ cerca de 1h}
+\end{tabular}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!25,boxrule=0.6pt,arc=6pt,left=6pt,right=8pt,top=4pt,bottom=4pt,before skip=0pt,after skip=4pt]
+\begin{tabular}{@{}m{24pt}m{20pt}>{\raggedright\arraybackslash}m{0.52\linewidth}>{\raggedleft\arraybackslash}m{0.27\linewidth}@{}}
+\tikz\node[circle,fill=cor,text=white,minimum size=20pt,inner sep=0pt,font=\footnotesize\bfseries]{2}; &
+{\color{cor}\large \faStopwatch} &
+\textbf{Fichas de indicadores (KPIs)}\par{\scriptsize\color{cinza}\faUser\ Metas (com o Painel)} &
+\chip{\faCalendarCheck\ Semana 2}\par\vspace{2pt}\chip{\faClock\ cerca de 1h30}
+\end{tabular}
+\end{tcolorbox}
+\begin{tcolorbox}[enhanced,colback=suave!60,colframe=cor!25,boxrule=0.6pt,arc=6pt,left=6pt,right=8pt,top=4pt,bottom=4pt,before skip=0pt,after skip=4pt]
+\begin{tabular}{@{}m{24pt}m{20pt}>{\raggedright\arraybackslash}m{0.52\linewidth}>{\raggedleft\arraybackslash}m{0.27\linewidth}@{}}
+\tikz\node[circle,fill=cor,text=white,minimum size=20pt,inner sep=0pt,font=\footnotesize\bfseries]{3}; &
+{\color{cor}\large \faChartBar} &
+\textbf{Painel de indicadores}\par{\scriptsize\color{cinza}\faUser\ Painel} &
+\chip{\faCalendarCheck\ Semana 3}\par\vspace{2pt}\chip{\faClock\ cerca de 2h}
+\end{tabular}
+\end{tcolorbox}
+\secao{\faInfoCircle}{Como usar este documento}
+\begin{enumerate}
+  \item Sigam as etapas na ordem. Cada uma diz \textbf{em que semana} fazer, \textbf{quanto tempo} leva e qual \textbf{aula da apostila} explica o assunto.
+  \item Nas tabelas, a \textbf{1ª linha é um exemplo}: usem como modelo para preencher as outras.
+  \item O \textbf{Desafio extra} é opcional: só para quem quiser ir além.
+  \item Preencham no computador pela versão \textbf{Word}; este PDF é para ler e imprimir (há espaço para escrever à mão).
+  \item Só considerem a etapa concluída quando todos os quadradinhos do \textbf{Pronto quando} estiverem marcados.
+  \item Ao terminar, enviem o arquivo pelo site da divisão de funções, em \textbf{Entregas da Frente C}, com o nome do selo \textbf{Entregar no site}.
+\end{enumerate}
+\clearpage
+\noindent\begin{tikzpicture}
+\draw[cor!25,line width=2.2pt](0.00,0)--(1.50,0);
+\draw[cor!25,line width=2.2pt](1.50,0)--(3.00,0);
+\node[circle,fill=cor,text=white,draw=suave,line width=3pt,minimum size=24pt,inner sep=0pt,font=\small\bfseries] at (0.00,0){1};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (1.50,0){2};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (3.00,0){3};
+\end{tikzpicture}
+\par\vspace{8pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{40pt}>{\raggedright\arraybackslash}m{0.78\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=36pt,inner sep=0pt]{\Large \faBullseye}; &
+{\footnotesize\bfseries ETAPA 1 DE 3}\ \ \chipbranco{\faCalendarCheck\ Semana 1}\ \chipbranco{\faClock\ cerca de 1h}\par\vspace{2pt}
+{\fontsize{17}{21}\selectfont\bfseries Metas do hotel (OKR)}\par\vspace{3pt}
+{\footnotesize\faUser\ \ Quem faz: \textbf{Metas}\ \ ·\ \ \faCompass\ \ Ajuda: Guia da Frente C, manual da sua função}
+\end{tabular}
+\end{faixa}
+\begin{apostila}\vspace{4pt}Aula 10 · OKR tem duas partes: o Objetivo (onde queremos chegar, sem números) e os Resultados-chave (números que mostram se estamos chegando lá).\end{apostila}
+\rotulo{\faBullseye}{Objetivo}
+{\large Escrever uma meta para o hotel usando o sistema, com 3 resultados que dá para medir.}\par
+\rotulo{\faShoePrints}{Passo a passo}
+\begin{enumerate}
+  \item Escrevam um objetivo sem números. Ex.: ``Deixar a recepção rápida e sem erros''.
+  \item Escrevam 3 resultados-chave com número de antes e meta (veja o exemplo).
+  \item Os números de ``antes'' podem ser estimados: digam de onde tiraram (palpite da dona, pesquisa…).
+  \item Confiram: resultado-chave não é tarefa. ``Instalar o sistema'' é tarefa; ``check-in em 3 minutos'' é resultado.
+\end{enumerate}
+\rotulo{\faPen}{Para preencher}
+{\footnotesize\color{cinza}\faHandPointDown\ A 1ª linha é um exemplo. Preencham as outras.}\par\vspace{2pt}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.297\linewidth}>{\raggedright\arraybackslash}p{0.297\linewidth}>{\raggedright\arraybackslash}p{0.297\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Resultado-chave} & \color{white}\textbf{\footnotesize Antes} & \color{white}\textbf{\footnotesize Meta} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Resultado-chave} & \color{white}\textbf{\footnotesize Antes} & \color{white}\textbf{\footnotesize Meta} \\
+\endhead
+\rowcolor{white}\textbf{Tempo médio de check-in} & 8 min & 3 min \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt} &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt} &  &  \\ \hline
+\end{longtable}
+\endgroup
+\Needspace{6\baselineskip}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!30,boxrule=0.8pt,arc=5pt,left=8pt,right=8pt,top=4pt,bottom=6pt,before skip=0pt,after skip=5pt]
+{\scriptsize\bfseries\color{cor}\MakeUppercase{Objetivo (sem números)}}\par\vspace{16pt}\noindent\tikz\draw[cor!45,dotted,line width=1.3pt](0,0)--(\linewidth,0);\par
+\end{tcolorbox}
+\vspace{4pt}
+\begin{lrbox}{\blocofinal}\begin{minipage}{\linewidth}
+\begin{tcolorbox}[enhanced,colback=suave!45,colframe=cor!35,boxrule=0.8pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt]
+\begin{minipage}[t]{0.56\linewidth}\vspace{0pt}
+{\footnotesize\bfseries\color{cor}\faCheckDouble\ \ PRONTO QUANDO}\par\vspace{2pt}
+\begin{checklist}
+  \item Objetivo sem números.
+  \item 3 resultados-chave com antes e meta.
+\end{checklist}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}
+\begin{selo}\centering
+{\LARGE\color{cor}\faUpload}\par\vspace{3pt}
+{\scriptsize\bfseries\color{cor}ENTREGAR NO SITE COMO}\par\vspace{2pt}
+{\bfseries C1-okr}
+\end{selo}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}\end{lrbox}
+\usarblocofinal
+\Needspace{6\baselineskip}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor,boxrule=1pt,arc=8pt,left=12pt,right=12pt,top=12pt,bottom=8pt,before skip=20pt,
+  overlay={\node[fill=cor,text=white,rounded corners=3pt,font=\scriptsize\bfseries,inner sep=4pt,anchor=west] at ([xshift=10pt]frame.north west) {\faMedal\ DESAFIO EXTRA · OPCIONAL};}]
+Liguem a meta à estratégia do hotel: estratégia → portfólio de projetos → projeto Estadia → OKR (Aula 10).
+\end{tcolorbox}
+\ifjaanotou\else\anotacoes\fi
+\clearpage
+\noindent\begin{tikzpicture}
+\draw[cor,line width=2.2pt](0.00,0)--(1.50,0);
+\draw[cor!25,line width=2.2pt](1.50,0)--(3.00,0);
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (0.00,0){\faCheck};
+\node[circle,fill=cor,text=white,draw=suave,line width=3pt,minimum size=24pt,inner sep=0pt,font=\small\bfseries] at (1.50,0){2};
+\node[circle,fill=white,draw=cor!40,line width=1.2pt,text=cor!70,minimum size=16pt,inner sep=0pt,font=\scriptsize\bfseries] at (3.00,0){3};
+\end{tikzpicture}
+\par\vspace{8pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{40pt}>{\raggedright\arraybackslash}m{0.78\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=36pt,inner sep=0pt]{\Large \faStopwatch}; &
+{\footnotesize\bfseries ETAPA 2 DE 3}\ \ \chipbranco{\faCalendarCheck\ Semana 2}\ \chipbranco{\faClock\ cerca de 1h30}\par\vspace{2pt}
+{\fontsize{17}{21}\selectfont\bfseries Fichas de indicadores (KPIs)}\par\vspace{3pt}
+{\footnotesize\faUser\ \ Quem faz: \textbf{Metas (com o Painel)}\ \ ·\ \ \faCompass\ \ Ajuda: Guia da Frente C, manual da sua função}
+\end{tabular}
+\end{faixa}
+\begin{apostila}\vspace{4pt}Aulas 11 e 12 · Um bom indicador mede algo importante e ajuda a tomar uma decisão. Se ninguém decide nada com ele, não precisa existir.\end{apostila}
+\rotulo{\faBullseye}{Objetivo}
+{\large Explicar 4 indicadores que o Estadia já calcula, com fórmula e meta.}\par
+\rotulo{\faShoePrints}{Passo a passo}
+\begin{enumerate}
+  \item Usem estes 4: taxa de ocupação, diária média, RevPAR e no-show (explicados no Guia da Frente C).
+  \item Preencham uma linha por indicador. A primeira já está como exemplo.
+  \item Na última coluna, digam qual decisão a dona pode tomar olhando aquele número.
+  \item Confiram as contas com o exemplo resolvido do guia.
+\end{enumerate}
+\rotulo{\faPen}{Para preencher}
+{\footnotesize\color{cinza}\faHandPointDown\ A 1ª linha é um exemplo. Preencham as outras.}\par\vspace{2pt}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.126\linewidth}>{\raggedright\arraybackslash}p{0.275\linewidth}>{\raggedright\arraybackslash}p{0.204\linewidth}>{\raggedright\arraybackslash}p{0.251\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Indicador} & \color{white}\textbf{\footnotesize Fórmula} & \color{white}\textbf{\footnotesize Meta} & \color{white}\textbf{\footnotesize Que decisão ajuda a tomar?} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Indicador} & \color{white}\textbf{\footnotesize Fórmula} & \color{white}\textbf{\footnotesize Meta} & \color{white}\textbf{\footnotesize Que decisão ajuda a tomar?} \\
+\endhead
+\rowcolor{white}\textbf{Taxa de ocupação} & quartos ocupados ÷ quartos do hotel & 70\% & Se estiver baixa, fazer promoção \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{Diária média} &  &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt}\textbf{RevPAR} &  &  &  \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{No-show} &  &  &  \\ \hline
+\end{longtable}
+\endgroup
+\begin{lrbox}{\blocofinal}\begin{minipage}{\linewidth}
+\begin{tcolorbox}[enhanced,colback=suave!45,colframe=cor!35,boxrule=0.8pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt]
+\begin{minipage}[t]{0.56\linewidth}\vspace{0pt}
+{\footnotesize\bfseries\color{cor}\faCheckDouble\ \ PRONTO QUANDO}\par\vspace{2pt}
+\begin{checklist}
+  \item 4 indicadores com fórmula, meta e decisão.
+\end{checklist}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}
+\begin{selo}\centering
+{\LARGE\color{cor}\faUpload}\par\vspace{3pt}
+{\scriptsize\bfseries\color{cor}ENTREGAR NO SITE COMO}\par\vspace{2pt}
+{\bfseries C2-indicadores}
+\end{selo}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}\end{lrbox}
+\usarblocofinal
+\ifjaanotou\else\anotacoes\fi
+\clearpage
+\noindent\begin{tikzpicture}
+\draw[cor,line width=2.2pt](0.00,0)--(1.50,0);
+\draw[cor,line width=2.2pt](1.50,0)--(3.00,0);
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (0.00,0){\faCheck};
+\node[circle,fill=cor,text=white,minimum size=16pt,inner sep=0pt,font=\scriptsize] at (1.50,0){\faCheck};
+\node[circle,fill=cor,text=white,draw=suave,line width=3pt,minimum size=24pt,inner sep=0pt,font=\small\bfseries] at (3.00,0){3};
+\end{tikzpicture}
+\par\vspace{8pt}
+\begin{faixa}[before skip=0pt]
+\begin{tabular}{@{}m{40pt}>{\raggedright\arraybackslash}m{0.78\linewidth}@{}}
+\tikz\node[circle,fill=white,text=cor,minimum size=36pt,inner sep=0pt]{\Large \faChartBar}; &
+{\footnotesize\bfseries ETAPA 3 DE 3}\ \ \chipbranco{\faCalendarCheck\ Semana 3}\ \chipbranco{\faClock\ cerca de 2h}\par\vspace{2pt}
+{\fontsize{17}{21}\selectfont\bfseries Painel de indicadores}\par\vspace{3pt}
+{\footnotesize\faUser\ \ Quem faz: \textbf{Painel}\ \ ·\ \ \faCompass\ \ Ajuda: Guia da Frente C, manual da sua função}
+\end{tabular}
+\end{faixa}
+\begin{apostila}\vspace{4pt}Aula 11 · Um painel (dashboard) mostra os indicadores de um jeito rápido de entender, com cores: verde = dentro da meta, amarelo = atenção, vermelho = problema.\end{apostila}
+\rotulo{\faBullseye}{Objetivo}
+{\large Montar um painel simples no Google Sheets ou Excel com os 4 indicadores.}\par
+\rotulo{\faShoePrints}{Passo a passo}
+\begin{enumerate}
+  \item Peçam ao dev de apoio os números de um mês na versão de demonstração (ou usem o exemplo do guia).
+  \item Façam uma tabela com os 4 indicadores: valor, meta e cor (verde, amarelo ou vermelho).
+  \item Façam 1 gráfico (ex.: ocupação por semana).
+  \item Escrevam 3 frases: o que o painel mostra e o que vocês recomendam à dona.
+\end{enumerate}
+\rotulo{\faPen}{Para preencher}
+{\footnotesize\color{cinza}\faHandPointDown\ A 1ª linha é um exemplo. Preencham as outras.}\par\vspace{2pt}
+\begingroup\small
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.146\linewidth}>{\raggedright\arraybackslash}p{0.237\linewidth}>{\raggedright\arraybackslash}p{0.237\linewidth}>{\raggedright\arraybackslash}p{0.237\linewidth}}
+\rowcolor{cor} \color{white}\textbf{\footnotesize Indicador} & \color{white}\textbf{\footnotesize Valor do mês} & \color{white}\textbf{\footnotesize Meta} & \color{white}\textbf{\footnotesize Cor} \\
+\endfirsthead
+\rowcolor{cor} \color{white}\textbf{\footnotesize Indicador} & \color{white}\textbf{\footnotesize Valor do mês} & \color{white}\textbf{\footnotesize Meta} & \color{white}\textbf{\footnotesize Cor} \\
+\endhead
+\rowcolor{white}\textbf{Taxa de ocupação} & 70\% & 70\% & Verde \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{Diária média} &  &  &  \\ \hline
+\rowcolor{white}\rule{0pt}{24pt}\textbf{RevPAR} &  &  &  \\ \hline
+\rowcolor{suave!55}\rule{0pt}{24pt}\textbf{No-show} &  &  &  \\ \hline
+\end{longtable}
+\endgroup
+\Needspace{6\baselineskip}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor!30,boxrule=0.8pt,arc=5pt,left=8pt,right=8pt,top=4pt,bottom=6pt,before skip=0pt,after skip=5pt]
+{\scriptsize\bfseries\color{cor}\MakeUppercase{O que o painel mostra (3 frases)}}\par\vspace{16pt}\noindent\tikz\draw[cor!45,dotted,line width=1.3pt](0,0)--(\linewidth,0);\par
+\end{tcolorbox}
+\vspace{4pt}
+\begin{lrbox}{\blocofinal}\begin{minipage}{\linewidth}
+\begin{tcolorbox}[enhanced,colback=suave!45,colframe=cor!35,boxrule=0.8pt,arc=8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,before skip=0pt,after skip=0pt]
+\begin{minipage}[t]{0.56\linewidth}\vspace{0pt}
+{\footnotesize\bfseries\color{cor}\faCheckDouble\ \ PRONTO QUANDO}\par\vspace{2pt}
+\begin{checklist}
+  \item Painel com os 4 indicadores coloridos.
+  \item 1 gráfico.
+  \item 3 frases de análise.
+\end{checklist}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\linewidth}\vspace{0pt}
+\begin{selo}\centering
+{\LARGE\color{cor}\faUpload}\par\vspace{3pt}
+{\scriptsize\bfseries\color{cor}ENTREGAR NO SITE COMO}\par\vspace{2pt}
+{\bfseries C3-painel (planilha ou print)}
+\end{selo}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}\end{lrbox}
+\usarblocofinal
+\Needspace{6\baselineskip}
+\begin{tcolorbox}[enhanced,colback=white,colframe=cor,boxrule=1pt,arc=8pt,left=12pt,right=12pt,top=12pt,bottom=8pt,before skip=20pt,
+  overlay={\node[fill=cor,text=white,rounded corners=3pt,font=\scriptsize\bfseries,inner sep=4pt,anchor=west] at ([xshift=10pt]frame.north west) {\faMedal\ DESAFIO EXTRA · OPCIONAL};}]
+Calculem também o \% de atingimento dos resultados-chave: (atual − antes) ÷ (meta − antes) × 100.
+\end{tcolorbox}
+\ifjaanotou\else\anotacoes\fi
+\clearpage
+\secao{\faLaptopCode}{O papel do dev de apoio}
+\begin{itemize}
+  \item Mostrar o sistema funcionando e criar usuários de teste.
+  \item Conferir o que a frente escreveu sobre o sistema.
+  \item Passar números e prints da versão de demonstração.
+  \item Explicar o que for técnico em palavras simples.
+\end{itemize}
+\secao{\faUpload}{Como entregar no site}
+\begin{enumerate}
+  \item Abram o link da divisão de funções que o grupo usa.
+  \item Na Frente C, toquem em \textbf{Enviar entrega} (ou arrastem o arquivo): Word, PDF, Excel, PowerPoint, imagem ou ZIP, até 25 MB.
+  \item O arquivo aparece na hora para todo o grupo, com o nome de quem enviou e a data. Versões novas podem ser enviadas: a mais recente fica no topo.
+  \item Sem o servidor ligado (página aberta como arquivo), o envio não funciona: mandem o arquivo para a Frente A.
+\end{enumerate}
+\vspace{16pt}
+\begin{faixa}
+\centering{\Large\faTrophy}\par\vspace{4pt}{\large\bfseries Terminaram tudo? Avisem a Frente A e comemorem!}
+\end{faixa}
+\end{document}

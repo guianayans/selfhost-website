@@ -1,0 +1,27 @@
+DIVISÃO DE FUNÇÕES · PROJETO ESTADIA
+Funciona igual ao questionário: um servidor pequeno grava as escolhas na pasta, em tempo real.
+
+1) Num computador com Node 18+ (o mesmo do questionário serve):
+     node docs/equipe/servidor.mjs
+   Ele mostra o endereço, ex.: http://0.0.0.0:8091
+2) Mande para o grupo o link com o IP da máquina, ex.: http://192.168.0.10:8091
+   (na mesma rede; para gente de fora, use um túnel como ngrok ou cloudflared apontando para a porta 8091)
+3) Cada pessoa digita o nome e toca numa vaga. Todo mundo vê a mudança na hora.
+
+As escolhas ficam em docs/equipe/divisao.json (estado) e docs/equipe/divisao.md (resumo legível).
+Para zerar tudo, pare o servidor e apague esses dois arquivos.
+Outra porta: PORTA=9000 node docs/equipe/servidor.mjs
+
+Aberto direto como arquivo (sem servidor), a página funciona, mas salva só no próprio aparelho.
+
+DOCUMENTOS E ENTREGAS
+Cada frente tem dois documentos para baixar no site, em PDF (ler e imprimir) e Word (preencher):
+"Passo a passo" (etapas, tabelas para preencher, checklist, selo de entrega) e "Guia do projeto"
+(o que é o Estadia e o que importa para a frente). Cada um na cor da sua equipe.
+Ficam em docs/equipe/documentos/. Para regerar depois de mudar o texto (conteudo.mjs):
+     node docs/equipe/documentos/gerar.mjs           (Word)
+     node docs/equipe/documentos/gerar-latex.mjs     (fontes LaTeX em documentos/latex/)
+     docs/equipe/documentos/compilar-pdf.sh          (PDF, com TeX Live em Docker; 1ª vez monta a imagem)
+As entregas enviadas pelo site ficam em docs/equipe/entregas/frente-<a-d>/ e o índice em
+docs/equipe/entregas/entregas.json. Até 25 MB por arquivo. Só quem enviou consegue remover.
+O servidor não tem senha: use só com o grupo (rede local ou túnel temporário).
