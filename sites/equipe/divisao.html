@@ -524,6 +524,37 @@
   }
 
   /* Cronograma */
+  /* Sistema de demonstração */
+  .demo { padding: 18px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .demo-foto { position: relative; display: block; border-radius: 14px; overflow: hidden; border: 1px solid var(--linha); box-shadow: var(--sombra); }
+  .demo-foto img { display: block; width: 100%; height: auto; transition: transform .6s var(--suave-ease); }
+  .demo-foto:hover img { transform: scale(1.03); }
+  .demo-foto span {
+    position: absolute; left: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px;
+    background: rgba(6, 11, 24, .72); color: #fff; font-weight: 700; font-size: 14px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .demo-foto span svg { width: 16px; height: 16px; }
+  .demo-info { display: grid; gap: 14px; min-width: 0; }
+  .demo-pontos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .demo-pontos li { position: relative; padding-left: 26px; font-size: 14px; color: var(--texto-2); }
+  .demo-pontos li::before {
+    content: ''; position: absolute; left: 0; top: 2px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--azul) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat;
+  }
+  .demo-pontos b { color: var(--texto); }
+  .demo-dicas { display: grid; gap: 6px; padding: 12px 14px; border-radius: 12px; background: var(--fundo); border: 1px solid var(--linha); }
+  .demo-dicas span { font: 700 11px var(--corpo); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-2); }
+  .demo-dicas p { margin: 0; font-size: 13.5px; }
+  .demo-dicas em { font-style: normal; font-weight: 700; color: var(--cor); margin-right: 4px; }
+  .demo-abrir { text-align: center; text-decoration: none; padding: 12px 16px; font-size: 15px; }
+  .demo-nota { margin: 0; font-size: 13px; color: var(--texto-2); }
+  @media (max-width: 860px) {
+    .demo { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 520px) {
+    .demo { padding: 14px; }
+  }
+
   /* Mapa da equipe (canvas) e o painel de quem está em foco */
   .mapa-eq {
     position: relative; height: clamp(460px, 72vh, 640px); border-radius: 20px; overflow: hidden;
@@ -1016,6 +1047,37 @@
     </article>
   </section>
 
+  <section id="demo">
+    <div class="revela" style="display:grid;gap:8px">
+      <span class="rotulo">Sistema de demonstração</span>
+      <h2>Use o Estadia de verdade</h2>
+      <p class="apoio">É o app real, com dados fictícios de uma pousada de 12 quartos e uma semana de movimento. Serve para conhecer o sistema, tirar os prints dos manuais e testar as tarefas. Abre direto, sem senha, e pode clicar em tudo.</p>
+    </div>
+    <div class="cartao demo revela">
+      <a class="demo-foto" href="/estadia/" target="_blank" rel="noopener">
+        <img src="demo.jpg" alt="Tela do Estadia: mapa do dia da Pousada Estadia, com os 12 quartos" width="1200" height="806" loading="lazy">
+        <span>Abrir o sistema <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </a>
+      <div class="demo-info">
+        <ul class="demo-pontos">
+          <li><b>Sem senha.</b> Abre direto como administrador, com todos os menus.</li>
+          <li><b>Veja pelo olhar de cada funcionário.</b> Em “Trocar funcionário”, entre como recepção, camareira, manutenção, governanta, financeiro ou gerente e compare os menus de cada um.</li>
+          <li><b>Pode mexer à vontade.</b> Reservas, check-in, caixa, cadastros: tudo funciona.</li>
+          <li><b>O que você fizer fica só no seu navegador.</b> Os colegas não veem as suas mudanças, e você não vê as deles.</li>
+          <li><b>Quer começar de novo?</b> Toque em “Recomeçar do zero” no aviso do canto da tela, ou apague os cookies do site.</li>
+        </ul>
+        <div class="demo-dicas">
+          <span>Bom para cada frente</span>
+          <p><em style="--cor:var(--violeta)">Frente B</em> Quartos, Tarifas e Usuários, para montar o backlog.</p>
+          <p><em style="--cor:var(--ouro)">Frente C</em> Relatórios e Caixa, para os indicadores e o painel.</p>
+          <p><em style="--cor:var(--verde)">Frente D</em> Mapa do dia, Reservas e Governança (no celular), para os prints dos manuais.</p>
+        </div>
+        <a class="btn azul demo-abrir" href="/estadia/" target="_blank" rel="noopener">Abrir o sistema de demonstração</a>
+        <p class="demo-nota">A pousada de demonstração é renovada todo dia, com uma semana de movimento até hoje. Dados fictícios: não coloquem informações reais.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="mapa">
     <div class="revela" style="display:grid;gap:8px">
       <span class="rotulo">Mapa da equipe · ao vivo</span>
@@ -1175,7 +1237,7 @@
         '<b>Planejamento de uma sprint</b> de uma semana (cerca de 1h).',
         '<b>Reuniões rápidas</b> (2 dailies) e uma <b>retrospectiva</b> (15 min cada).',
       ],
-      insumos: ['O Guia da Frente B (botão acima)', 'O sistema de demonstração (peça ao dev de apoio)', 'As decisões da dona do hotel (Frente D)'],
+      insumos: ['O Guia da Frente B (botão acima)', 'O <a href="#demo">sistema de demonstração</a> (o dev de apoio mostra como usar)', 'As decisões da dona do hotel (Frente D)'],
     },
     {
       id: 'c', letra: 'C', titulo: 'Metas e Indicadores',
@@ -1187,7 +1249,7 @@
         '<b>Fichas de 4 indicadores</b>: ocupação, diária média, RevPAR e no-show (cerca de 1h30).',
         '<b>Painel</b> no Google Sheets ou Excel, com cores e um gráfico (cerca de 2h).',
       ],
-      insumos: ['O Guia da Frente C, com um exemplo resolvido (botão acima)', 'Números da versão de demonstração (peça ao dev de apoio)'],
+      insumos: ['O Guia da Frente C, com um exemplo resolvido (botão acima)', 'Números do <a href="#demo">sistema de demonstração</a> (menu Relatórios)'],
     },
     {
       id: 'd', letra: 'D', titulo: 'Pessoas e Treinamento',
@@ -1200,7 +1262,7 @@
         '<b>Plano de treinamento</b> dos funcionários (cerca de 1h).',
         '<b>Quem decide o quê</b> e um aviso de privacidade para os hóspedes (cerca de 1h).',
       ],
-      insumos: ['O Guia da Frente D (botão acima)', 'O questionário da reunião (peça o link ao dev de apoio)', 'O sistema de demonstração para os prints'],
+      insumos: ['O Guia da Frente D (botão acima)', 'O questionário da reunião (peça o link ao dev de apoio)', 'O <a href="#demo">sistema de demonstração</a> para os prints (Mapa do dia, Reservas e Governança)'],
     },
   ];
   const TOTAL = 12;
@@ -2628,6 +2690,7 @@
   }
 
   mapaEquipe = criarMapaEquipe();
+
 
   // ---------- Calendário de entregas (linha do tempo em rede) ----------
   // Datas do projeto: mude aqui se o prazo mudar. As entregas seguem as semanas dos documentos de cada frente.

@@ -208,7 +208,7 @@ const servidor = createServer(async (req, res) => {
     }
 
     // Prévia do link (WhatsApp etc.) e ícone da aba. Ficam em documentos/, que o container já enxerga.
-    const imagem = { '/capa.jpg': 'image/jpeg', '/icone.png': 'image/png' }[caminho];
+    const imagem = { '/capa.jpg': 'image/jpeg', '/icone.png': 'image/png', '/demo.jpg': 'image/jpeg' }[caminho];
     if (imagem && req.method === 'GET') {
       const conteudo = await readFile(join(PASTA, 'documentos', caminho.slice(1))).catch(() => null);
       if (!conteudo) return responder(res, 404, 'Não encontrado', 'text/plain; charset=utf-8');
