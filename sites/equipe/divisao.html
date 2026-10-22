@@ -422,6 +422,86 @@
   }
 
   /* Cronograma */
+  /* Mapa da equipe (canvas) e o painel de quem está em foco */
+  .mapa-eq {
+    position: relative; height: clamp(460px, 72vh, 640px); border-radius: 20px; overflow: hidden;
+    border: 1px solid var(--linha); background: var(--papel); box-shadow: var(--sombra);
+  }
+  .mapa-eq canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; outline: none; }
+  .mapa-eq canvas:focus-visible { box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--azul) 55%, transparent); }
+  .me-cabeca { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; pointer-events: none; }
+  .me-contagem, .me-legenda {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    background: var(--papel-vidro); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--linha); color: var(--texto-2);
+  }
+  .me-contagem { color: var(--texto); font-weight: 700; }
+  .me-contagem::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulso 1.8s infinite; }
+  .me-legenda i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 4px; }
+  .me-legenda i.pes { background: linear-gradient(135deg, var(--azul), var(--violeta)); }
+  .me-legenda i.vag { border: 1.5px dashed var(--texto-2); }
+  .me-legenda i.rel { width: 16px; height: 0; border-radius: 0; border-top: 2px dotted var(--texto-2); }
+  .me-dica {
+    position: absolute; z-index: 3; pointer-events: none; transform: translate(-50%, calc(-100% - 18px));
+    padding: 8px 11px; border-radius: 10px; background: var(--papel); border: 1px solid var(--linha); box-shadow: var(--sombra-alta);
+    display: grid; font-size: 12.5px; white-space: nowrap;
+  }
+  .me-dica[hidden] { display: none; }
+  .me-dica b { font-family: var(--display); font-size: 13.5px; }
+  .me-dica small { color: var(--texto-2); }
+  .me-painel {
+    position: absolute; z-index: 4; top: 12px; right: 12px; bottom: 12px; width: 300px; overflow: auto; overscroll-behavior: contain;
+    padding: 16px; border-radius: 16px; display: flex; flex-direction: column; gap: 12px;
+    background: var(--papel-vidro); backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid var(--linha); box-shadow: var(--sombra-alta); animation: me-entra .35s var(--suave-ease);
+  }
+  .me-painel[hidden] { display: none; }
+  @keyframes me-entra { from { opacity: 0; transform: translateX(16px); } }
+  .me-p-topo { display: flex; align-items: center; gap: 10px; }
+  .me-p-tit { display: grid; gap: 2px; min-width: 0; flex: 1; }
+  .me-p-tit b { font: 800 16px var(--display); overflow-wrap: anywhere; }
+  .me-p-tit small, .me-p-nota, .me-p-texto { color: var(--texto-2); font-size: 12.5px; margin: 0; }
+  .me-p-texto { font-size: 13.5px; }
+  .me-fechar { width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--linha); background: var(--papel); color: var(--texto); display: grid; place-items: center; cursor: pointer; flex: none; align-self: flex-start; }
+  .me-fechar svg { width: 16px; height: 16px; }
+  .me-av {
+    width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none;
+    font: 800 12px var(--display); color: #fff; background: var(--cor);
+    box-shadow: 0 0 0 2px var(--papel), 0 0 0 3.5px var(--cor);
+  }
+  .me-av.vazia { background: transparent; color: var(--cor); border: 1.5px dashed var(--cor); box-shadow: none; }
+  .me-p-rotulo { font: 700 11px var(--corpo); letter-spacing: .08em; text-transform: uppercase; color: var(--texto-2); }
+  .me-lig, .me-rota { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .me-pessoa {
+    width: 100%; display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 12px; border: 0; background: none;
+    text-align: left; cursor: pointer; color: var(--texto); font: inherit; transition: background .2s;
+  }
+  .me-pessoa:hover, .me-pessoa:focus-visible { background: var(--fundo); }
+  .me-pessoa .me-av { width: 28px; height: 28px; font-size: 10.5px; }
+  .me-pessoa span:last-child { display: grid; min-width: 0; }
+  .me-pessoa b { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .me-pessoa small { font-size: 12px; color: var(--texto-2); }
+  .me-rota li { display: grid; gap: 2px; }
+  .me-liga {
+    margin-left: 21px; padding: 4px 0 4px 18px; border-left: 2px dashed var(--linha); font-size: 12px; font-weight: 600; color: var(--texto-2);
+  }
+  .me-caminho { display: grid; gap: 6px; padding-top: 10px; border-top: 1px dashed var(--linha); }
+  .me-caminho select {
+    width: 100%; min-width: 0; height: 40px; border-radius: 10px; border: 1px solid var(--linha); background: var(--papel);
+    color: var(--texto); font: 500 14px var(--corpo); padding: 0 10px;
+  }
+  .me-acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+  .me-btn {
+    flex: 1; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--linha); background: var(--papel);
+    color: var(--texto); font: 700 13px var(--corpo); cursor: pointer;
+  }
+  .me-btn.forte { background: var(--azul); border-color: var(--azul); color: #fff; }
+  @media (max-width: 720px) {
+    .mapa-eq { height: clamp(520px, 82vh, 700px); border-radius: 16px; }
+    .me-legenda { display: none; }
+    .me-painel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 52%; animation-name: me-sobe; }
+    @keyframes me-sobe { from { opacity: 0; transform: translateY(24px); } }
+  }
+
   /* Calendário de entregas: linha do tempo em rede (trilhas por frente que se juntam na entrega final) */
   .linha-tempo { padding: 18px; display: grid; gap: 14px; position: relative; overflow: hidden; }
   .lt-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -834,6 +914,23 @@
     </article>
   </section>
 
+  <section id="mapa">
+    <div class="revela" style="display:grid;gap:8px">
+      <span class="rotulo">Mapa da equipe · ao vivo</span>
+      <h2>Como todo mundo se conecta</h2>
+      <p class="apoio">Cada pessoa entra no mapa quando escolhe a vaga, e as ligações aparecem na hora. Toque em alguém para ver com quem trabalha e achar o caminho até outra pessoa do grupo.</p>
+    </div>
+    <div class="mapa-eq revela" id="mapa-eq">
+      <canvas id="mapa-canvas" tabindex="0" role="img" aria-label="Mapa da equipe"></canvas>
+      <div class="me-cabeca">
+        <span class="me-contagem" id="me-contagem">0 de 12 no mapa</span>
+        <span class="me-legenda" aria-hidden="true"><i class="pes"></i>pessoa <i class="vag"></i>vaga livre <i class="rel"></i>opina / aprova</span>
+      </div>
+      <div class="me-dica" id="me-dica" hidden></div>
+      <aside class="me-painel" id="me-painel" hidden aria-live="polite"></aside>
+    </div>
+  </section>
+
   <section>
     <div class="revela" style="display:grid;gap:8px">
       <span class="rotulo">Como o grupo se organiza</span>
@@ -1182,6 +1279,7 @@
   }
 
   let anterior = {};
+  let mapaEquipe = null;
   function render() {
     const minha = minhaVaga();
     const novos = new Set();
@@ -1249,6 +1347,7 @@
     } else $('#atualizado').textContent = 'Nenhuma escolha registrada ainda';
 
     if (carregado && total === TOTAL && Object.keys(anterior).length < TOTAL) confete();
+    mapaEquipe?.atualizar(estado.vagas, minha);
     anterior = JSON.parse(JSON.stringify(estado.vagas));
     primeiraCarga = false;
   }
@@ -1561,6 +1660,737 @@
     document.body.appendChild(box);
     setTimeout(() => box.remove(), 4200);
   }
+
+  // ---------- Mapa da equipe (rede animada, no estilo do mapa de conexões do brp) ----------
+  // Canvas 2D com física de mola: cada nó corre para o seu alvo; trocar de vista (foco, caminho) só muda os
+  // alvos. Pessoas entram no mapa quando escolhem a vaga; vaga sem dono aparece como um contorno tracejado.
+  function criarMapaEquipe() {
+    const caixa = $('#mapa-eq');
+    const canvas = $('#mapa-canvas');
+    const ctx = canvas.getContext('2d');
+    const painel = $('#me-painel');
+    const dica = $('#me-dica');
+    const TAU = Math.PI * 2;
+    const hash = (s) => { let x = 2166136261; for (const ch of s) { x ^= ch.charCodeAt(0); x = Math.imul(x, 16777619); } return ((x >>> 0) % 100000) / 100000; };
+    const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+    const mistura = (c, d, k) => c.map((v, i) => Math.round(v + (d[i] - v) * k));
+
+    // ---- tema (lido das variáveis CSS da página; muda junto com o botão de tema) ----
+    let th = {};
+    function cor(nome) {
+      const v = getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
+      if (v.startsWith('#')) {
+        const h = v.length === 4 ? v.slice(1).split('').map((x) => x + x).join('') : v.slice(1, 7);
+        return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+      }
+      const n = v.match(/[\d.]+/g);
+      return n ? n.slice(0, 3).map(Number) : [128, 128, 128];
+    }
+    function lerTema() {
+      const css = getComputedStyle(document.documentElement);
+      th = {
+        escuro: css.colorScheme.includes('dark'),
+        fundo: cor('--papel'), fundo2: cor('--fundo'), texto: cor('--texto'), texto2: cor('--texto-2'), linha: cor('--linha'),
+        azul: cor('--azul'), violeta: cor('--violeta'), ouro: cor('--ouro'), verde: cor('--verde'), laranja: cor('--vermelho'),
+        fonte: css.getPropertyValue('--corpo').trim() || 'Inter, system-ui, sans-serif',
+        titulo: css.getPropertyValue('--display').trim() || 'Manrope, system-ui, sans-serif',
+      };
+      th.cinza = mistura(th.texto2, th.azul, 0.25);
+      sprites.clear();
+      if (nos.length) for (const n of nos) n.cor = corDo(n);
+    }
+    const CORES_FRENTE = { a: 'azul', b: 'violeta', c: 'ouro', d: 'verde' };
+    function corDo(n) {
+      if (n.tipo === 'hub') return th.azul;
+      if (n.tipo === 'dona') return th.laranja;
+      if (n.tipo === 'devs') return th.cinza;
+      return th[CORES_FRENTE[n.frente]] || th.texto2;
+    }
+    const sprites = new Map();
+    function sprite(c, faisca) {
+      const k = c.join() + (faisca ? 's' : '') + (th.escuro ? 'e' : '');
+      let s = sprites.get(k);
+      if (s) return s;
+      s = document.createElement('canvas');
+      s.width = s.height = 96;
+      const g = s.getContext('2d'), gr = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+      if (faisca) {
+        gr.addColorStop(0, th.escuro ? 'rgba(255,255,255,1)' : rgba(c, 1));
+        gr.addColorStop(0.2, rgba(c, 0.9));
+        gr.addColorStop(0.5, rgba(c, 0.22));
+        gr.addColorStop(1, rgba(c, 0));
+      } else {
+        gr.addColorStop(0, rgba(c, 0.6));
+        gr.addColorStop(0.4, rgba(c, 0.18));
+        gr.addColorStop(1, rgba(c, 0));
+      }
+      g.fillStyle = gr;
+      g.fillRect(0, 0, 96, 96);
+      sprites.set(k, s);
+      return s;
+    }
+    // ícones (caminhos SVG 24×24)
+    const ICONE = {
+      dona: new Path2D('M3 21h18M5 21V8l7-5 7 5v13M9 21v-5h6v5M9 11h.01M15 11h.01'),
+      devs: new Path2D('M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16'),
+      vaga: new Path2D('M12 6v12M6 12h12'),
+    };
+
+    // ---- grafo ----
+    let nos = [], arestas = [], porId = {}, vizinhos = new Map();
+    let vagasAntes = null, minhaId = null;
+    const PAPEL_DE = {};
+    FRENTES.forEach((f) => f.vagas.forEach(([id, papel]) => { PAPEL_DE[id] = { papel, frente: f.id, letra: f.letra, titulo: f.titulo }; }));
+    const DONA_APROVA = { a: 'Aprova o Canvas', b: 'Aprova o backlog', c: 'Aprova as metas', d: 'Aprova os manuais' };
+    // Frente que faz (R) consulta frente (C), tirado da tabela "quem faz o quê"
+    const CONSULTAS = {};
+    RACI.forEach(([titulo, letras]) => {
+      const r = [...letras.slice(0, 4)].findIndex((x) => x === 'R');
+      if (r < 0) return;
+      [...letras.slice(0, 4)].forEach((x, i) => {
+        if (x !== 'C' || i === r) return;
+        const k = 'abcd'[r] + 'abcd'[i];
+        (CONSULTAS[k] ||= []).push(titulo.split(' e ')[0].replace(/^Conversa com a dona do hotel$/, 'Conversa com a dona'));
+      });
+    });
+    const CUSTO = { dupla: 0.8, membro: 1, apoio: 1, dev: 1.1, cliente: 1, consulta: 1.6, aprova: 2.2, projeto: 3 };
+
+    function no(id, dados) {
+      let n = porId[id];
+      if (!n) {
+        n = { id, x: 0, y: 0, vx: 0, vy: 0, r: 0, a: 0, ph: hash(id), entrou: -1 };
+        nos.push(n);
+      }
+      Object.assign(n, dados);
+      n.cor = corDo(n);
+      porId[id] = n;
+      return n;
+    }
+    function ligar(s, t, k, rotulo, fluxo = 1) {
+      arestas.push({ s, t, k, rotulo, fluxo, a: porId[s], b: porId[t], curva: (hash(s + t) - 0.5) * 0.34, h: hash(t + s) });
+    }
+
+    function montarGrafo(vagas) {
+      const ids = new Set(['hub', 'dona', 'devs', ...FRENTES.map((f) => 'f-' + f.id), ...Object.keys(PAPEL_DE)]);
+      nos = nos.filter((n) => ids.has(n.id));
+      porId = Object.fromEntries(nos.map((n) => [n.id, n]));
+      no('hub', { tipo: 'hub', rotulo: 'Projeto Estadia', sub: 'o trabalho do grupo', raio: 32 });
+      no('dona', { tipo: 'dona', rotulo: 'Dona do hotel', sub: 'a cliente', raio: 25 });
+      no('devs', { tipo: 'devs', rotulo: 'Time de dev', sub: 'construiu o sistema', raio: 23 });
+      const CURTO = { a: 'Organização', b: 'Produto', c: 'Indicadores', d: 'Pessoas' };
+      FRENTES.forEach((f) => no('f-' + f.id, { tipo: 'frente', frente: f.id, rotulo: `Frente ${f.letra}`, sub: CURTO[f.id] || f.titulo, letra: f.letra, raio: 26 }));
+      for (const [id, info] of Object.entries(PAPEL_DE)) {
+        const v = vagas[id];
+        no(id, v
+          ? { tipo: 'pessoa', frente: info.frente, rotulo: v.nome, curto: primeiro(v.nome), sub: info.papel, iniciais: iniciais(v.nome), raio: 20, eu: id === minhaId, dev: id.endsWith('-dev') }
+          : { tipo: 'vaga', frente: info.frente, rotulo: info.papel, curto: info.papel, sub: 'vaga livre', raio: 13, eu: false, dev: id.endsWith('-dev') });
+      }
+      arestas = [];
+      FRENTES.forEach((f) => {
+        ligar('hub', 'f-' + f.id, 'projeto', 'Frente do projeto');
+        const [v1, v2, vd] = f.vagas.map(([id]) => id);
+        f.vagas.forEach(([id, papel]) => ligar('f-' + f.id, id, 'membro', `${papel} · Frente ${f.letra}`));
+        ligar(v1, v2, 'dupla', `Dupla da Frente ${f.letra}`, 0);
+        ligar(vd, v1, 'apoio', 'Dev de apoio');
+        ligar(vd, v2, 'apoio', 'Dev de apoio');
+        ligar('devs', vd, 'dev', 'Time de desenvolvimento');
+        ligar('dona', 'f-' + f.id, 'aprova', DONA_APROVA[f.id], -1);
+      });
+      ligar('d1', 'dona', 'cliente', 'Conversa com a dona');
+      for (const [par, lista] of Object.entries(CONSULTAS))
+        ligar('f-' + par[0], 'f-' + par[1], 'consulta', `${par[1].toUpperCase()} opina: ${lista[0]}${lista.length > 1 ? ` +${lista.length - 1}` : ''}`);
+      vizinhos = new Map(nos.map((n) => [n.id, []]));
+      for (const e of arestas) {
+        vizinhos.get(e.s).push({ no: e.b, aresta: e });
+        vizinhos.get(e.t).push({ no: e.a, aresta: e });
+      }
+    }
+    const roteavel = (n) => n.tipo !== 'vaga';
+
+    // ---- caminhos (Dijkstra; até 3 rotas, penalizando as ligações já usadas, como no brp) ----
+    function acharCaminhos(aId, bId, k = 3) {
+      const pena = new Map(), saida = [], vistos = new Set();
+      for (let rodada = 0; rodada < k + 3 && saida.length < k; rodada++) {
+        const dist = new Map(nos.map((n) => [n.id, Infinity])), ant = new Map(), feito = new Set();
+        dist.set(aId, 0);
+        for (;;) {
+          let u = null, melhor = Infinity;
+          for (const [id, d] of dist) if (!feito.has(id) && d < melhor) { melhor = d; u = id; }
+          if (u === null || u === bId) break;
+          feito.add(u);
+          if (u !== aId && !roteavel(porId[u])) continue;
+          for (const { no: v, aresta: e } of vizinhos.get(u)) {
+            if (!roteavel(v) || feito.has(v.id)) continue;
+            const c = (CUSTO[e.k] ?? 1) * (pena.get(e) || 1) + (v.tipo === 'hub' && v.id !== bId ? 1 : 0);
+            if (melhor + c < dist.get(v.id)) { dist.set(v.id, melhor + c); ant.set(v.id, [u, e]); }
+          }
+        }
+        if (!isFinite(dist.get(bId))) break;
+        const rota = { nos: [porId[bId]], arestas: [] };
+        for (let v = bId; ant.has(v); v = ant.get(v)[0]) { rota.nos.unshift(porId[ant.get(v)[0]]); rota.arestas.unshift(ant.get(v)[1]); }
+        const chave = rota.nos.map((n) => n.id).join('>');
+        if (!vistos.has(chave)) { vistos.add(chave); saida.push(rota); }
+        rota.arestas.forEach((e) => pena.set(e, (pena.get(e) || 1) * 5));
+      }
+      return saida;
+    }
+
+    // ---- vista: alvos de cada nó ----
+    let W = 0, H = 0, dpr = 1, t = 0, foco = null, sobre = null, caminho = null, vertical = false;
+    const cam = { x: 0, y: 0, z: 0.8, tx: 0, ty: 0, tz: 0.8 };
+    const choques = [];
+    function distribuir() {
+      vertical = W < H * 0.95;
+      const fx = vertical ? 140 : 300, fy = vertical ? 285 : 165;
+      const pos = { a: [-fx, -fy], b: [fx, -fy], c: [fx, fy], d: [-fx, fy] };
+      const ativos = caminho ? new Set(caminho.rotas[caminho.i].nos.map((n) => n.id)) : null;
+      const perto = foco ? new Set([foco.id, ...vizinhos.get(foco.id).map((v) => v.no.id)]) : null;
+      for (const n of nos) {
+        let x = 0, y = 0;
+        if (n.tipo === 'dona') y = -(fy + (vertical ? 175 : 150));
+        else if (n.tipo === 'devs') y = fy + (vertical ? 175 : 150);
+        else if (n.tipo === 'frente') [x, y] = pos[n.frente];
+        else if (n.tipo === 'pessoa' || n.tipo === 'vaga') {
+          const [cx, cy] = pos[n.frente], fora = Math.atan2(cy, cx);
+          const ordem = FRENTES.find((f) => f.id === n.frente).vagas.findIndex(([id]) => id === n.id);
+          // a dupla fica para fora do mapa; o dev de apoio, virado para o time de dev
+          const paraDevs = Math.atan2(fy + (vertical ? 175 : 150) - cy, -cx);
+          const ang = ordem === 2 ? paraDevs : fora + (ordem === 0 ? -0.72 : 0.72);
+          const raio = vertical ? 118 : 138;
+          x = cx + Math.cos(ang) * raio;
+          y = cy + Math.sin(ang) * raio;
+        }
+        n.tx = x; n.ty = y;
+        n.tr = n.raio * (foco === n ? 1.18 : 1);
+        n.ta = ativos ? (ativos.has(n.id) ? 1 : 0.12) : perto ? (perto.has(n.id) ? 1 : 0.28) : 1;
+        n.passo = 0;
+      }
+      if (caminho) {
+        // a rota em linha, com os passos numerados (como o layout "caminho" do brp)
+        const rota = caminho.rotas[caminho.i], q = rota.nos.length;
+        const gap = Math.min(vertical ? 150 : 250, (vertical ? 860 : 1300) / Math.max(1, q - 1));
+        rota.nos.forEach((n, i) => {
+          const o = (i - (q - 1) / 2) * gap, onda = (i % 2 ? -1 : 1) * (i > 0 && i < q - 1 ? (vertical ? 46 : 56) : 0);
+          if (vertical) { n.tx = onda; n.ty = o; } else { n.tx = o; n.ty = onda; }
+          n.passo = i + 1;
+          n.tr = n.raio * (i === 0 || i === q - 1 ? 1.15 : 1);
+        });
+        // os outros vão para o fundo, afastados
+        for (const n of nos) if (!ativos.has(n.id)) { n.tx *= 1.6; n.ty *= 1.6; }
+      }
+      enquadrar();
+    }
+    function enquadrar() {
+      const vis = nos.filter((n) => n.ta > 0.5);
+      if (!vis.length || !W) return;
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const n of vis) { x0 = Math.min(x0, n.tx - n.raio - 60); x1 = Math.max(x1, n.tx + n.raio + 60); y0 = Math.min(y0, n.ty - n.raio - 30); y1 = Math.max(y1, n.ty + n.raio + 46); }
+      const ins = margens();
+      const w = W - ins.esq - ins.dir, h = H - ins.topo - ins.base;
+      cam.tz = Math.max(0.3, Math.min(caminho ? 1.25 : 1.1, Math.min(w / (x1 - x0), h / (y1 - y0))));
+      cam.tx = (x0 + x1) / 2 - ((ins.esq - ins.dir) / 2) / cam.tz;
+      cam.ty = (y0 + y1) / 2 - ((ins.topo - ins.base) / 2) / cam.tz;
+    }
+    function margens() {
+      const m = { esq: 12, dir: 12, topo: 46, base: 40 };
+      if (!painel.hidden) {
+        if (W > 720) m.dir += painel.offsetWidth + 12;
+        else m.base += Math.min(painel.offsetHeight, H * 0.55);
+      }
+      return m;
+    }
+
+    // ---- física ----
+    const reduz = reduzMov;
+    function passo(dt) {
+      t += dt;
+      const k = reduz ? 1 : 0.075, amort = reduz ? 0 : 0.8;
+      for (const n of nos) {
+        if (t < (n.atraso || 0)) continue;
+        const deriva = reduz || caminho ? 0 : 5;
+        const ax = n.tx + Math.sin(t * 0.45 + n.ph * 9) * deriva, ay = n.ty + Math.cos(t * 0.38 + n.ph * 7) * deriva;
+        n.vx = (n.vx + (ax - n.x) * k) * amort;
+        n.vy = (n.vy + (ay - n.y) * k) * amort;
+        n.x += n.vx; n.y += n.vy;
+        n.r += (n.tr - n.r) * (reduz ? 1 : 0.14);
+        n.a += (n.ta - n.a) * (reduz ? 1 : 0.1);
+      }
+      const z = reduz ? 1 : 0.1;
+      cam.x += (cam.tx - cam.x) * z; cam.y += (cam.ty - cam.y) * z; cam.z += (cam.tz - cam.z) * z;
+    }
+    const sx = (x) => W / 2 + (x - cam.x) * cam.z;
+    const sy = (y) => H / 2 + (y - cam.y) * cam.z;
+
+    // ---- desenho ----
+    const poeira = Array.from({ length: 46 }, (_, i) => ({ x: hash('px' + i), y: hash('py' + i), z: 0.3 + hash('pz' + i) * 0.9, r: 0.6 + hash('pr' + i) * 1.4, ph: hash('pp' + i) * TAU }));
+    let mouse = { x: 0, y: 0 };
+    function desenhar() {
+      const c = ctx;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.globalCompositeOperation = 'source-over';
+      c.globalAlpha = 1;
+      c.fillStyle = rgba(th.fundo, 1);
+      c.fillRect(0, 0, W, H);
+      // brilho de fundo em volta do foco (ou do projeto)
+      const centro = foco || porId.hub, cc = centro.cor;
+      const fx = sx(centro.x), fy = sy(centro.y);
+      const g = c.createRadialGradient(fx, fy, 0, fx, fy, Math.max(W, H) * 0.7);
+      g.addColorStop(0, rgba(cc, th.escuro ? 0.16 : 0.09));
+      g.addColorStop(0.5, rgba(cc, th.escuro ? 0.04 : 0.025));
+      g.addColorStop(1, rgba(cc, 0));
+      c.fillStyle = g;
+      c.fillRect(0, 0, W, H);
+      // poeira com paralaxe
+      for (const p of poeira) {
+        const x = (((p.x * W - cam.x * cam.z * p.z * 0.2 + mouse.x * p.z * 18 + Math.sin(t * 0.1 + p.ph) * 10) % W) + W) % W;
+        const y = (((p.y * H - cam.y * cam.z * p.z * 0.2 + mouse.y * p.z * 18 + Math.cos(t * 0.08 + p.ph) * 10) % H) + H) % H;
+        c.fillStyle = rgba(th.escuro ? [170, 195, 255] : th.texto2, (th.escuro ? 0.4 : 0.18) * p.z * (0.6 + 0.4 * Math.sin(t * 0.8 + p.ph * 3)));
+        c.beginPath(); c.arc(x, y, p.r * p.z, 0, TAU); c.fill();
+      }
+      // ondas de choque (alguém entrou, ou um nó ganhou foco)
+      for (let i = choques.length - 1; i >= 0; i--) {
+        const ch = choques[i], idade = t - ch.t0;
+        if (idade > 1.6) { choques.splice(i, 1); continue; }
+        const n = porId[ch.id];
+        if (!n) continue;
+        for (let j = 0; j < 2; j++) {
+          const a2 = idade - j * 0.18;
+          if (a2 < 0) continue;
+          const pr = n.r * cam.z + (1 - Math.pow(1 - Math.min(1, a2 / 1.4), 3)) * Math.max(W, H) * 0.35;
+          c.strokeStyle = rgba(n.cor, (1 - a2 / 1.4) * (th.escuro ? 0.45 : 0.32));
+          c.lineWidth = 2 - j;
+          c.beginPath(); c.arc(sx(n.x), sy(n.y), pr, 0, TAU); c.stroke();
+        }
+      }
+      const naRota = caminho ? new Set(caminho.rotas[caminho.i].arestas) : null;
+      const destaque = naRota ? null : sobre || foco;
+      const ligados = destaque ? new Set([destaque.id, ...vizinhos.get(destaque.id).map((v) => v.no.id)]) : null;
+      // arestas
+      c.lineCap = 'round';
+      const faiscas = [];
+      for (const e of arestas) desenharAresta(e, destaque, naRota, faiscas);
+      c.globalCompositeOperation = th.escuro ? 'lighter' : 'source-over';
+      for (const [x, y, col, a, tam] of faiscas) {
+        const s = 13 * tam * Math.max(0.75, Math.min(1.3, cam.z));
+        c.globalAlpha = Math.min(1, a);
+        c.drawImage(sprite(col, true), x - s / 2, y - s / 2, s, s);
+      }
+      c.globalAlpha = 1;
+      c.globalCompositeOperation = 'source-over';
+      // nós (os apagados primeiro)
+      const ordem = [...nos].sort((p, q) => p.a - q.a || p.raio - q.raio);
+      for (const n of ordem) desenharNo(n, ligados ? (ligados.has(n.id) ? 1 : 0.35) : 1);
+      // rótulos das ligações: na rota, ou de quem está em destaque
+      if (naRota) for (const e of naRota) rotuloAresta(e, 1);
+      else if (destaque) for (const { aresta } of vizinhos.get(destaque.id)) if (roteavel(aresta.a) && roteavel(aresta.b)) rotuloAresta(aresta, 0.95);
+      for (const n of ordem) rotuloNo(n, ligados ? (ligados.has(n.id) ? 1 : 0.35) : 1);
+    }
+    function curva(e) {
+      const A = e.a, B = e.b, ax = sx(A.x), ay = sy(A.y), bx = sx(B.x), by = sy(B.y);
+      const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1;
+      return { ax, ay, bx, by, len, qx: (ax + bx) / 2 - (dy / len) * e.curva * len, qy: (ay + by) / 2 + (dx / len) * e.curva * len };
+    }
+    function desenharAresta(e, destaque, naRota, faiscas) {
+      const c = ctx, A = e.a, B = e.b;
+      const vazia = A.tipo === 'vaga' || B.tipo === 'vaga';
+      let rel = Math.min(A.a, B.a) * (vazia ? 0.32 : e.k === 'projeto' || e.k === 'aprova' ? 0.4 : e.k === 'consulta' ? 0.45 : 0.7);
+      if (naRota) rel = naRota.has(e) ? 1 : rel * 0.25;
+      else if (destaque) rel = e.s === destaque.id || e.t === destaque.id ? 0.95 : rel * 0.35;
+      if (rel < 0.02) return;
+      const p = curva(e);
+      const gr = c.createLinearGradient(p.ax, p.ay, p.bx, p.by);
+      gr.addColorStop(0, rgba(A.cor, rel));
+      gr.addColorStop(1, rgba(B.cor, rel));
+      c.strokeStyle = gr;
+      const base = e.k === 'dupla' ? 2.4 : e.k === 'membro' || e.k === 'cliente' ? 2 : e.k === 'consulta' ? 1.4 : 1.6;
+      c.lineWidth = base * Math.max(0.7, Math.min(1.4, cam.z)) * (naRota?.has(e) ? 1.8 : destaque && (e.s === destaque.id || e.t === destaque.id) ? 1.4 : 1);
+      c.setLineDash(vazia ? [3, 6] : e.k === 'consulta' || e.k === 'aprova' ? [1, 5] : []);
+      c.beginPath(); c.moveTo(p.ax, p.ay); c.quadraticCurveTo(p.qx, p.qy, p.bx, p.by); c.stroke();
+      c.setLineDash([]);
+      // faíscas que correm pela ligação
+      if (!reduz && !vazia && rel >= 0.2 && p.len > 24) {
+        const qtd = naRota?.has(e) ? 3 : e.k === 'dupla' ? 2 : 1, vel = 0.14 + e.h * 0.12;
+        for (let i = 0; i < qtd; i++) {
+          let u = (t * vel + i / qtd + e.h) % 1;
+          const dir = e.fluxo === -1 || (e.fluxo === 0 && i % 2) ? -1 : 1;
+          if (dir < 0) u = 1 - u;
+          const iu = 1 - u, x = iu * iu * p.ax + 2 * iu * u * p.qx + u * u * p.bx, y = iu * iu * p.ay + 2 * iu * u * p.qy + u * u * p.by;
+          faiscas.push([x, y, dir > 0 ? A.cor : B.cor, rel * Math.sin(u * Math.PI) * 1.5, naRota?.has(e) ? 1.3 : 1]);
+        }
+      }
+    }
+    function desenharNo(n, dim) {
+      const c = ctx, x = sx(n.x), y = sy(n.y), r = n.r * cam.z, a = n.a * dim, col = n.cor;
+      if (r < 1 || a < 0.02) return;
+      const emFoco = foco === n || (caminho && (n.passo === 1 || n.passo === caminho.rotas[caminho.i].nos.length));
+      // brilho
+      if (n.tipo !== 'vaga') {
+        c.globalCompositeOperation = th.escuro ? 'lighter' : 'source-over';
+        c.globalAlpha = a * (emFoco ? (th.escuro ? 0.9 : 0.55) : th.escuro ? 0.5 : 0.28);
+        const gs = r * (emFoco ? 3.6 : 3);
+        c.drawImage(sprite(col), x - gs, y - gs, gs * 2, gs * 2);
+        c.globalCompositeOperation = 'source-over';
+      }
+      c.globalAlpha = a;
+      // anel tracejado girando + pulso (nó em foco)
+      if (emFoco && !reduz) {
+        c.save(); c.translate(x, y); c.rotate(t * 0.25);
+        c.setLineDash([2, 7]); c.lineWidth = 1.4; c.strokeStyle = rgba(col, 0.6);
+        c.beginPath(); c.arc(0, 0, r * 1.32 + 3, 0, TAU); c.stroke();
+        c.setLineDash([]); c.restore();
+        const pa = (t % 2.6) / 2.6;
+        c.strokeStyle = rgba(col, (1 - pa) * 0.5); c.lineWidth = 2;
+        c.beginPath(); c.arc(x, y, r * (1.05 + pa * 0.55) + 2, 0, TAU); c.stroke();
+      }
+      if (n.tipo === 'vaga') {
+        c.fillStyle = rgba(th.fundo, 1);
+        c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill();
+        c.setLineDash([3, 4]); c.lineWidth = 1.5; c.strokeStyle = rgba(col, 0.75);
+        c.save(); c.translate(x, y); c.rotate(reduz ? 0 : t * 0.15); c.beginPath(); c.arc(0, 0, r, 0, TAU); c.stroke(); c.restore();
+        c.setLineDash([]);
+        icone('vaga', x, y, r * 1.1, rgba(col, 0.85), 2);
+        c.globalAlpha = 1;
+        return;
+      }
+      // anel colorido (cônico no foco, como no brp)
+      if (emFoco && c.createConicGradient) {
+        const cg = c.createConicGradient(t * 0.6, x, y);
+        cg.addColorStop(0, rgba(col, 1)); cg.addColorStop(0.5, rgba(col, 0.25)); cg.addColorStop(1, rgba(col, 1));
+        c.fillStyle = cg;
+      } else c.fillStyle = rgba(col, 1);
+      c.beginPath(); c.arc(x, y, r + Math.max(2, r * 0.1), 0, TAU); c.fill();
+      // miolo
+      const claro = mistura(col, [255, 255, 255], 0.28), escuroC = mistura(col, [0, 0, 0], 0.12);
+      const gg = c.createLinearGradient(x, y - r, x, y + r);
+      if (n.tipo === 'hub') { gg.addColorStop(0, rgba(th.azul, 1)); gg.addColorStop(1, rgba(th.violeta, 1)); }
+      else { gg.addColorStop(0, rgba(claro, 1)); gg.addColorStop(1, rgba(escuroC, 1)); }
+      c.fillStyle = n.tipo === 'pessoa' || n.tipo === 'hub' || n.tipo === 'frente' ? gg : rgba(th.fundo, 1);
+      c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill();
+      c.fillStyle = '#fff';
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      if (n.tipo === 'pessoa') { c.font = `800 ${Math.max(9, r * 0.72)}px ${th.titulo}`; c.fillText(n.iniciais, x, y + 1); }
+      else if (n.tipo === 'frente') { c.font = `800 ${Math.max(10, r * 0.85)}px ${th.titulo}`; c.fillText(n.letra, x, y + 1); }
+      else if (n.tipo === 'hub') estrela(x, y, r * 0.5, r * 0.22);
+      else icone(n.tipo, x, y, r * 1.1, rgba(col, 1), 2);
+      c.textBaseline = 'alphabetic';
+      // "você"
+      if (n.eu) {
+        const w = 34, h = 16, bx = x - w / 2, by = y - r - h - 6;
+        c.fillStyle = rgba(th.texto, 1); arredondado(bx, by, w, h, 8); c.fill();
+        c.fillStyle = rgba(th.fundo, 1); c.font = `700 10px ${th.fonte}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillText('você', x, by + h / 2 + 0.5); c.textBaseline = 'alphabetic';
+      }
+      // número do passo, no caminho
+      if (n.passo) {
+        const bx = x - r * 0.74, by = y - r * 0.74, br = 9;
+        c.fillStyle = rgba(th.texto, 1); c.beginPath(); c.arc(bx, by, br, 0, TAU); c.fill();
+        c.strokeStyle = rgba(th.fundo, 1); c.lineWidth = 2; c.stroke();
+        c.fillStyle = rgba(th.fundo, 1); c.font = `700 10.5px ${th.fonte}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillText(String(n.passo), bx, by + 0.5); c.textBaseline = 'alphabetic';
+      }
+      c.globalAlpha = 1;
+    }
+    function rotuloNo(n, dim) {
+      const a = n.a * dim;
+      if (a < 0.2) return;
+      const c = ctx, x = sx(n.x), y = sy(n.y) + n.r * cam.z + 15;
+      const enxuto = cam.z < 0.8 && !caminho && foco !== n;
+      if (enxuto && n.tipo === 'vaga') return;
+      c.globalAlpha = a;
+      c.textAlign = 'center';
+      const nome = n.tipo === 'pessoa' ? (enxuto ? n.curto : n.rotulo.split(' ').slice(0, 2).join(' ')) : n.rotulo;
+      c.font = `${n.tipo === 'vaga' ? 600 : 700} ${n.tipo === 'vaga' ? 11 : n.tipo === 'hub' ? 13.5 : 12.5}px ${n.tipo === 'vaga' ? th.fonte : th.titulo}`;
+      // contorno com a cor do fundo, para ler por cima das linhas
+      c.lineWidth = 4; c.strokeStyle = rgba(th.fundo, 0.9); c.lineJoin = 'round';
+      c.strokeText(nome, x, y); c.fillStyle = rgba(n.tipo === 'vaga' ? th.texto2 : th.texto, 1); c.fillText(nome, x, y);
+      if ((n.tipo !== 'vaga' || foco === n) && !(enxuto && n.tipo !== 'hub')) {
+        c.font = `500 11px ${th.fonte}`;
+        c.strokeText(n.sub, x, y + 14); c.fillStyle = rgba(th.texto2, 1); c.fillText(n.sub, x, y + 14);
+      }
+      c.globalAlpha = 1;
+    }
+    function rotuloAresta(e, a) {
+      const p = curva(e), c = ctx;
+      const alfa = Math.min(e.a.a, e.b.a) * a;
+      if (alfa < 0.3) return;
+      c.font = `600 11px ${th.fonte}`;
+      const w = c.measureText(e.rotulo).width + 16, h = 20;
+      // só desenha se couber entre os dois nós (senão cobre os nomes; o painel lista as ligações)
+      const livre = p.len - (e.a.r + e.b.r) * cam.z - 24;
+      if (livre < w + 8) return;
+      const x = 0.25 * p.ax + 0.5 * p.qx + 0.25 * p.bx, y = 0.25 * p.ay + 0.5 * p.qy + 0.25 * p.by;
+      c.globalAlpha = alfa;
+      c.fillStyle = rgba(th.fundo, 0.94); arredondado(x - w / 2, y - h / 2, w, h, 10); c.fill();
+      c.strokeStyle = rgba(mistura(e.a.cor, e.b.cor, 0.5), 0.55); c.lineWidth = 1; c.stroke();
+      c.fillStyle = rgba(th.texto, 1); c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText(e.rotulo, x, y + 0.5); c.textBaseline = 'alphabetic';
+      c.globalAlpha = 1;
+    }
+    function arredondado(x, y, w, h, r) {
+      ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+    }
+    function icone(nome, x, y, tam, cor, lw) {
+      const c = ctx, s = tam / 24;
+      c.save(); c.translate(x - 12 * s, y - 12 * s); c.scale(s, s);
+      c.strokeStyle = cor; c.lineWidth = lw / s * 0.9; c.lineCap = 'round'; c.lineJoin = 'round';
+      c.stroke(ICONE[nome]); c.restore();
+    }
+    function estrela(x, y, R, r) {
+      const c = ctx; c.beginPath();
+      for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + (k * Math.PI) / 5, q = k % 2 ? r : R; k ? c.lineTo(x + q * Math.cos(a), y + q * Math.sin(a)) : c.moveTo(x + q * Math.cos(a), y + q * Math.sin(a)); }
+      c.closePath(); c.fill();
+    }
+
+    // ---- interação ----
+    function noEm(px, py) {
+      let melhor = null, d = Infinity;
+      for (const n of nos) {
+        if (n.a < 0.2) continue;
+        const dd = Math.hypot(sx(n.x) - px, sy(n.y) - py);
+        if (dd < Math.max(16, n.r * cam.z + 6) && dd < d) { d = dd; melhor = n; }
+      }
+      return melhor;
+    }
+    function ponto(e) { const b = canvas.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; }
+    let cursor = null; // última posição do mouse sobre o mapa (null: fora ou toque)
+    function conferirSobre() {
+      // os nós se mexem sozinhos: confere a cada quadro o que está embaixo do mouse parado
+      const n = cursor ? noEm(cursor[0], cursor[1]) : null;
+      if (n !== sobre) {
+        sobre = n;
+        canvas.style.cursor = n ? 'pointer' : 'default';
+      }
+      if (n) mostrarDica(n, cursor[0], cursor[1]); else dica.hidden = true;
+    }
+    canvas.addEventListener('pointermove', (e) => {
+      const [x, y] = ponto(e);
+      mouse = { x: x / W - 0.5, y: y / H - 0.5 };
+      cursor = e.pointerType === 'mouse' ? [x, y] : null;
+      conferirSobre();
+    });
+    canvas.addEventListener('pointerleave', () => { cursor = null; conferirSobre(); });
+    canvas.addEventListener('click', (e) => {
+      const n = noEm(...ponto(e));
+      if (n) focar(n);
+      else if (!caminho) fechar();
+    });
+    canvas.addEventListener('keydown', (e) => {
+      const lista = nos.filter((n) => n.a > 0.5);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const i = lista.indexOf(foco), j = (i + (e.key === 'ArrowRight' ? 1 : -1) + lista.length) % lista.length;
+        focar(lista[j < 0 ? 0 : j]);
+      } else if (e.key === 'Escape') { caminho ? fecharCaminho() : fechar(); }
+    });
+    function mostrarDica(n, x, y) {
+      dica.replaceChildren(el('b', null, n.rotulo), el('small', null, n.tipo === 'pessoa' ? `${n.sub} · Frente ${PAPEL_DE[n.id].letra}` : n.sub));
+      dica.style.left = x + 'px';
+      dica.style.top = y + 'px';
+      dica.hidden = false;
+    }
+
+    function focar(n) {
+      if (caminho && !caminho.rotas[caminho.i].nos.includes(n)) caminho = null;
+      foco = n;
+      choques.push({ id: n.id, t0: t });
+      distribuir();
+      abrirPainel();
+    }
+    function fechar() {
+      foco = null; caminho = null;
+      painel.hidden = true;
+      distribuir();
+    }
+    function fecharCaminho() {
+      caminho = null;
+      distribuir();
+      abrirPainel();
+    }
+    function tracar(aId, bId) {
+      const rotas = acharCaminhos(aId, bId);
+      caminho = rotas.length ? { a: porId[aId], b: porId[bId], rotas, i: 0 } : null;
+      if (!rotas.length) avisar('Não achei uma ligação entre essas duas pessoas.');
+      distribuir();
+      abrirPainel();
+      if (caminho) choques.push({ id: bId, t0: t });
+    }
+
+    // ---- painel lateral (computador) / de baixo (celular) ----
+    function bolinha(n) {
+      const b = el('span', 'me-av' + (n.tipo === 'vaga' ? ' vazia' : ''), n.tipo === 'pessoa' ? n.iniciais : n.tipo === 'frente' ? n.letra : n.tipo === 'hub' ? '★' : n.tipo === 'dona' ? 'D' : n.tipo === 'devs' ? '</>' : '+');
+      b.style.setProperty('--cor', rgba(n.cor, 1));
+      return b;
+    }
+    function abrirPainel() {
+      if (!foco && !caminho) { painel.hidden = true; return; }
+      painel.replaceChildren();
+      const topo = el('div', 'me-p-topo');
+      const fechar_ = el('button', 'me-fechar');
+      fechar_.type = 'button';
+      fechar_.setAttribute('aria-label', 'Fechar');
+      fechar_.innerHTML = icone_x;
+      fechar_.addEventListener('click', fechar);
+      if (caminho) {
+        const R = caminho.rotas[caminho.i];
+        const tit = el('div', 'me-p-tit');
+        tit.append(el('b', null, `Caminho de ${caminho.a.curto || caminho.a.rotulo} até ${caminho.b.curto || caminho.b.rotulo}`), el('small', null, `${R.arestas.length} ${R.arestas.length === 1 ? 'ligação' : 'ligações'}${caminho.rotas.length > 1 ? ` · rota ${caminho.i + 1} de ${caminho.rotas.length}` : ''}`));
+        topo.append(tit, fechar_);
+        painel.append(topo);
+        const ol = el('ol', 'me-rota');
+        R.nos.forEach((n, i) => {
+          const li = el('li');
+          const b = el('button', 'me-pessoa');
+          b.type = 'button';
+          b.append(bolinha(n));
+          const tx = el('span');
+          tx.append(el('b', null, n.rotulo), el('small', null, n.tipo === 'pessoa' ? `${n.sub} · Frente ${PAPEL_DE[n.id].letra}` : n.sub));
+          b.append(tx);
+          b.addEventListener('click', () => { choques.push({ id: n.id, t0: t }); });
+          li.append(b);
+          if (i < R.arestas.length) li.append(el('span', 'me-liga', R.arestas[i].rotulo));
+          ol.append(li);
+        });
+        painel.append(ol);
+        const acoes = el('div', 'me-acoes');
+        if (caminho.rotas.length > 1) {
+          const outra = el('button', 'me-btn', 'Outra rota');
+          outra.type = 'button';
+          outra.addEventListener('click', () => { caminho.i = (caminho.i + 1) % caminho.rotas.length; distribuir(); abrirPainel(); });
+          acoes.append(outra);
+        }
+        const sair = el('button', 'me-btn forte', 'Fechar caminho');
+        sair.type = 'button';
+        sair.addEventListener('click', fecharCaminho);
+        acoes.append(sair);
+        painel.append(acoes);
+      } else {
+        const n = foco;
+        const tit = el('div', 'me-p-tit');
+        tit.append(el('b', null, n.rotulo), el('small', null, n.tipo === 'pessoa' ? `${n.sub} · Frente ${PAPEL_DE[n.id].letra} · ${PAPEL_DE[n.id].titulo}` : n.tipo === 'vaga' ? `Vaga livre · Frente ${PAPEL_DE[n.id].letra}` : n.sub));
+        topo.append(bolinha(n), tit, fechar_);
+        painel.append(topo);
+        if (n.tipo === 'vaga') {
+          painel.append(el('p', 'me-p-texto', 'Ninguém escolheu esta vaga ainda. Quando alguém escolher, a pessoa aparece aqui e se liga ao resto do grupo.'));
+          const ir = el('button', 'me-btn forte', 'Ver a vaga');
+          ir.type = 'button';
+          ir.addEventListener('click', () => $('#frente-' + n.frente)?.scrollIntoView({ behavior: reduzMov ? 'auto' : 'smooth', block: 'start' }));
+          const ac = el('div', 'me-acoes'); ac.append(ir); painel.append(ac);
+        } else {
+          const lig = vizinhos.get(n.id).filter((v) => v.no.tipo !== 'vaga');
+          painel.append(el('span', 'me-p-rotulo', `Conexões (${lig.length})`));
+          const ul = el('ul', 'me-lig');
+          for (const { no: v, aresta } of lig) {
+            const li = el('li'), b = el('button', 'me-pessoa');
+            b.type = 'button';
+            b.append(bolinha(v));
+            const tx = el('span');
+            tx.append(el('b', null, v.rotulo), el('small', null, aresta.rotulo));
+            b.append(tx);
+            b.addEventListener('click', () => focar(v));
+            li.append(b);
+            ul.append(li);
+          }
+          painel.append(ul);
+          const vagas = Object.keys(PAPEL_DE).filter((id) => porId[id].tipo === 'vaga').length;
+          if (vagas) painel.append(el('p', 'me-p-nota', `${vagas} ${vagas === 1 ? 'vaga ainda está livre' : 'vagas ainda estão livres'}; as ligações aparecem quando alguém escolher.`));
+          // caminho até outra pessoa
+          const destinos = nos.filter((x) => x !== n && (x.tipo === 'pessoa' || x.tipo === 'dona'));
+          if (destinos.length) {
+            const bloco = el('div', 'me-caminho');
+            const rot = el('label', 'me-p-rotulo', 'Caminho até outra pessoa');
+            rot.htmlFor = 'me-destino';
+            const sel = el('select');
+            sel.id = 'me-destino';
+            sel.append(new Option('Escolha a pessoa…', ''));
+            for (const d of destinos.sort((p, q) => p.rotulo.localeCompare(q.rotulo, 'pt-BR'))) sel.append(new Option(d.tipo === 'pessoa' ? `${d.rotulo} · ${d.sub}` : d.rotulo, d.id));
+            sel.addEventListener('change', () => { if (sel.value) tracar(n.id, sel.value); });
+            bloco.append(rot, sel);
+            painel.append(bloco);
+          }
+        }
+      }
+      painel.hidden = false;
+      enquadrar();
+    }
+    const icone_x = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+
+    // ---- tamanho, laço e visibilidade ----
+    function medir() {
+      const b = caixa.getBoundingClientRect();
+      W = Math.round(b.width); H = Math.round(b.height);
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      distribuir();
+    }
+    let rodando = false, visivel = false, ultimo = 0, introFeita = false;
+    function laco(agora) {
+      if (!visivel || document.hidden) { rodando = false; return; }
+      const dt = Math.min(0.05, (agora - (ultimo || agora)) / 1000);
+      ultimo = agora;
+      passo(dt);
+      if (cursor) conferirSobre();
+      desenhar();
+      requestAnimationFrame(laco);
+    }
+    function ligar_() { if (!rodando && visivel && !document.hidden) { rodando = true; ultimo = 0; requestAnimationFrame(laco); } }
+    function intro() {
+      // todos saem do centro e se espalham numa onda (como a abertura do mapa do brp)
+      introFeita = true;
+      for (const n of nos) {
+        n.x = n.y = 0; n.vx = n.vy = 0; n.r = 0; n.a = 0;
+        n.atraso = t + (n.tipo === 'hub' ? 0 : n.tipo === 'frente' ? 0.15 : n.tipo === 'pessoa' || n.tipo === 'vaga' ? 0.35 + n.ph * 0.4 : 0.25);
+      }
+      cam.x = cam.tx; cam.y = cam.ty; cam.z = cam.tz * 0.7;
+      choques.push({ id: 'hub', t0: t + 0.1 });
+    }
+    new IntersectionObserver((itens) => {
+      visivel = itens.some((i) => i.isIntersecting);
+      if (visivel && !introFeita) { medir(); intro(); }
+      ligar_();
+    }, { threshold: 0.15 }).observe(caixa);
+    document.addEventListener('visibilitychange', ligar_);
+    new ResizeObserver(() => { const b = caixa.getBoundingClientRect(); if (Math.round(b.width) !== W || Math.round(b.height) !== H) { medir(); if (!rodando) desenhar(); } }).observe(caixa);
+    new MutationObserver(() => lerTema()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    lerTema();
+
+    // ---- API: a página chama a cada mudança nas vagas ----
+    return {
+      atualizar(vagas, minha) {
+        minhaId = minha;
+        const antes = vagasAntes;
+        montarGrafo(vagas);
+        if (antes) {
+          for (const id of Object.keys(PAPEL_DE)) {
+            const agora = vagas[id], era = antes[id];
+            if (agora && (!era || era.nome !== agora.nome)) {
+              // alguém entrou: o nó nasce do centro da frente, com onda de choque
+              const n = porId[id], f = porId['f-' + n.frente];
+              n.x = f.x; n.y = f.y; n.r = 0; n.a = 0; n.atraso = t + 0.1;
+              choques.push({ id, t0: t + 0.15 });
+            }
+          }
+        }
+        vagasAntes = JSON.parse(JSON.stringify(vagas));
+        if (foco && !porId[foco.id]) foco = null;
+        if (foco) foco = porId[foco.id];
+        if (caminho) {
+          const a = caminho.a.id, b = caminho.b.id;
+          caminho = null;
+          if (porId[a]?.tipo !== 'vaga' && porId[b]?.tipo !== 'vaga') tracar(a, b);
+        }
+        const cheias = Object.keys(PAPEL_DE).filter((id) => vagas[id]).length;
+        $('#me-contagem').textContent = `${cheias} de ${Object.keys(PAPEL_DE).length} no mapa`;
+        canvas.setAttribute('aria-label', `Mapa da equipe: ${cheias} de 12 pessoas. ${Object.entries(vagas).map(([id, v]) => `${v.nome}, ${PAPEL_DE[id]?.papel}`).join('; ')}`);
+        if (W) distribuir();
+        if (foco || caminho) abrirPainel();
+        if (!rodando && W) desenhar();
+      },
+    };
+  }
+
+  mapaEquipe = criarMapaEquipe();
 
   // ---------- Calendário de entregas (linha do tempo em rede) ----------
   // Datas do projeto: mude aqui se o prazo mudar. As entregas seguem as semanas dos documentos de cada frente.
