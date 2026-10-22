@@ -1,0 +1,53 @@
+# Divisão de funções (equipe) com gravação em tempo real — container à parte, sem mexer no app.
+# Mesmo modelo do docker-compose.questionario.yml: o Traefik manda
+# website.gvtserver.online/equipe/ para cá (prioridade maior que o roteador do website-manager).
+#
+# Subir:  docker compose -f /pendriver/website-manager/docker-compose.equipe.yml up -d
+# Dados:  /pendriver/equipe-dados/ (divisao.json, divisao.md e entregas/ com os uploads),
+#         fora de sites/, então o rsync --delete do deploy não apaga.
+services:
+  equipe:
+    image: node:22-alpine
+    container_name: equipe
+    working_dir: /dados
+    # servidor.mjs grava na pasta onde ele está: copia ele para /dados e liga a página e os
+    # documentos por symlink (editar em sites/equipe vale na hora, sem reiniciar).
+    command:
+      - sh
+      - -c
+      - >-
+        cp /src/servidor.mjs /dados/servidor.mjs &&
+        ln -sfn /src/divisao.html /src/documentos /dados/ &&
+        exec node /dados/servidor.mjs
+    volumes:
+      - /pendriver/website-manager/sites/equipe:/src:ro
+      - /pendriver/equipe-dados:/dados
+    environment:
+      PORTA: "8091"
+    restart: unless-stopped
+    networks:
+      - coolify
+    labels:
+      - traefik.enable=true
+      - 'traefik.http.routers.equipe.rule=Host(`website.gvtserver.online`) && PathPrefix(`/equipe`)'
+      - traefik.http.routers.equipe.priority=100
+      - traefik.http.routers.equipe.entrypoints=https
+      - traefik.http.routers.equipe.tls=true
+      - traefik.http.routers.equipe.middlewares=equipe-barra,equipe-prefixo,equipe-sec
+      - traefik.http.services.equipe.loadbalancer.server.port=8091
+      # /equipe → /equipe/ (a página usa caminhos relativos "api/..." e "documentos/...").
+      # Sem "$" de propósito: o Coolify não desfaz o "$$" do compose. Temporário (302) para
+      # um erro nunca ficar preso no cache do navegador.
+      - 'traefik.http.middlewares.equipe-barra.redirectregex.regex=^https?://[^/]+/equipe\z'
+      - 'traefik.http.middlewares.equipe-barra.redirectregex.replacement=https://website.gvtserver.online/equipe/'
+      - traefik.http.middlewares.equipe-barra.redirectregex.permanent=false
+      - traefik.http.middlewares.equipe-prefixo.stripprefix.prefixes=/equipe
+      - traefik.http.middlewares.equipe-sec.headers.forceSTSHeader=true
+      - traefik.http.middlewares.equipe-sec.headers.stsSeconds=31536000
+      - traefik.http.middlewares.equipe-sec.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.equipe-sec.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.equipe-sec.headers.customResponseHeaders.X-Frame-Options=SAMEORIGIN
+
+networks:
+  coolify:
+    external: true
