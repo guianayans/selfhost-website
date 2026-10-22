@@ -1,0 +1,64 @@
+# Questionário com gravação em tempo real — container à parte, sem mexer no app.
+# O Traefik manda website.gvtserver.online/questionario/ para cá (prioridade maior que o
+# roteador do website-manager); o resto do domínio continua indo para o app.
+#
+# Subir:  docker compose -f /pendriver/website-manager/docker-compose.questionario.yml up -d
+# Respostas: /pendriver/questionario-respostas/respostas.md (fora de sites/, então o
+# rsync --delete do deploy não apaga).
+services:
+  questionario:
+    image: node:22-alpine
+    container_name: questionario
+    working_dir: /dados
+    # servidor.mjs grava na pasta onde ele está: copia ele para /dados e liga HTML/CSS/capa/imagens
+    # por symlink (editar o HTML em sites/questionario vale na hora, sem reiniciar).
+    command:
+      - sh
+      - -c
+      - >-
+        cp /src/servidor.mjs /dados/servidor.mjs &&
+        ln -sfn /src/questionario.html /src/estilo.css /src/capa.jpg /src/imagens /dados/ &&
+        exec node /dados/servidor.mjs
+    volumes:
+      - /pendriver/website-manager/sites/questionario:/src:ro
+      - /pendriver/questionario-respostas:/dados
+    environment:
+      PORTA: "8090"
+    restart: unless-stopped
+    networks:
+      - coolify
+    labels:
+      - traefik.enable=true
+      - 'traefik.http.routers.questionario.rule=Host(`website.gvtserver.online`) && PathPrefix(`/questionario`)'
+      - traefik.http.routers.questionario.priority=100
+      - traefik.http.routers.questionario.entrypoints=https
+      - traefik.http.routers.questionario.tls=true
+      - traefik.http.routers.questionario.middlewares=questionario-barra,questionario-prefixo,questionario-sec
+      - traefik.http.services.questionario.loadbalancer.server.port=8090
+      # /questionario → /questionario/ (a página usa caminho relativo "api/respostas").
+      # Sem "$" de propósito: o Coolify não desfaz o "$$" do compose e o Traefik recebia "${1}".
+      - 'traefik.http.middlewares.questionario-barra.redirectregex.regex=^https?://[^/]+/questionario\z'
+      - 'traefik.http.middlewares.questionario-barra.redirectregex.replacement=https://website.gvtserver.online/questionario/'
+      # Temporário (302): um 301 errado fica preso no cache do navegador.
+      - traefik.http.middlewares.questionario-barra.redirectregex.permanent=false
+      - traefik.http.middlewares.questionario-prefixo.stripprefix.prefixes=/questionario
+      # Navegadores que guardaram o antigo 301 para /${1}/ voltam para o questionário.
+      # (\x{24} é o "$", escrito assim pelo mesmo motivo do Coolify acima.)
+      - 'traefik.http.routers.questionario-antigo.rule=Host(`website.gvtserver.online`) && PathRegexp(`^/\x{24}\{1\}/?\z`)'
+      - traefik.http.routers.questionario-antigo.priority=100
+      - traefik.http.routers.questionario-antigo.entrypoints=https
+      - traefik.http.routers.questionario-antigo.tls=true
+      - traefik.http.routers.questionario-antigo.service=questionario
+      - traefik.http.routers.questionario-antigo.middlewares=questionario-antigo
+      - 'traefik.http.middlewares.questionario-antigo.redirectregex.regex=.*'
+      - 'traefik.http.middlewares.questionario-antigo.redirectregex.replacement=https://website.gvtserver.online/questionario/'
+      - traefik.http.middlewares.questionario-antigo.redirectregex.permanent=false
+      - traefik.http.middlewares.questionario-sec.headers.forceSTSHeader=true
+      - traefik.http.middlewares.questionario-sec.headers.stsSeconds=31536000
+      - traefik.http.middlewares.questionario-sec.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.questionario-sec.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.questionario-sec.headers.customResponseHeaders.X-Frame-Options=SAMEORIGIN
+
+networks:
+  coolify:
+    external: true
