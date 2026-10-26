@@ -5,6 +5,6 @@ app/data/
 docker-compose.override.yml
 *.log
 .DS_Store
-# Demo do Estadia: o app montado e o simulador vêm do repositório privado do app (não publicar)
-sites/estadia/app/
-sites/estadia/simulador.mjs
+# Os sites publicados ficam só no servidor; no git vai apenas a pasta vazia (estrutura do painel)
+sites/*
+!sites/.gitkeep
