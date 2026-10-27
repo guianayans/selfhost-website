@@ -22,8 +22,8 @@ APPS=$(docker ps --filter status=running --format '{{.Label "com.docker.compose.
   | grep -vE "\|.*($TERCEIROS)" \
   | cut -d'|' -f1 | sort -u | wc -l)
 
-gh repo list "$USUARIO" --limit 1000 --json isFork,primaryLanguage -q "
-  [.[] | select(.isFork | not)] as \$r
+gh repo list "$USUARIO" --limit 1000 --json name,isFork,primaryLanguage -q "
+  [.[] | select((.isFork | not) and (.name | ascii_downcase) != (\"$USUARIO\" | ascii_downcase))] as \$r
   | {
       apps: $APPS,
       total: (\$r | length),
