@@ -22,7 +22,7 @@ services:
     environment:
       POSTGRES_DB: hotelaria
       POSTGRES_USER: hotel_owner
-      POSTGRES_PASSWORD: ***REMOVIDO***
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina no .env}
       TZ: America/Sao_Paulo
       PGTZ: America/Sao_Paulo
     volumes:
@@ -54,10 +54,10 @@ services:
       PORTA: '8080'
       BANCO_HOST: estadia-db:5432
       BANCO_DONO: hotel_owner
-      BANCO_DONO_SENHA: ***REMOVIDO***
+      BANCO_DONO_SENHA: ${BANCO_DONO_SENHA:?defina no .env}
       DB_APP_USER: hotel_app
-      DB_APP_PASSWORD: ***REMOVIDO***
-      SEED_DEMO_SENHA: ***REMOVIDO***
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?defina no .env}
+      SEED_DEMO_SENHA: ${SEED_DEMO_SENHA:?defina no .env}
       SEED_DEMO_MODELO: um_andar
       DEMO_LOGIN: admin
       HOTEL_NOME: Pousada Estadia
