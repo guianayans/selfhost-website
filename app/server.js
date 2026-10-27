@@ -30,6 +30,30 @@ const RSYNC_REMOTE_PATH = process.env.RSYNC_REMOTE_PATH || '/pendriver/website-m
 const RSYNC_REMOTE_SITES = process.env.RSYNC_REMOTE_SITES || `${RSYNC_REMOTE_PATH}/sites`;
 
 app.set('trust proxy', 1);
+
+// Painel /bio/admin e analytics do /bio (bio-admin/, módulo ESM no modelo do painel do Notchly).
+// Fica antes do express.json(): o painel lê o corpo das requisições sozinho.
+const bioAdmin = import('./bio-admin/index.js').catch((err) => {
+  console.error('Painel /bio/admin desligado:', err);
+  return null;
+});
+app.use('/api/bio', async (req, res, next) => {
+  const mod = await bioAdmin;
+  if (mod && (await mod.adminRoute(req, res, new URL(req.originalUrl, 'http://x')))) return;
+  next();
+});
+// a página do painel só carrega scripts e estilos do próprio site, e não entra em buscadores
+app.use('/bio/admin', (_req, res, next) => {
+  res.set({
+    'Content-Security-Policy':
+      "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
+    'X-Robots-Tag': 'noindex, nofollow',
+    'Cache-Control': 'no-store',
+    'Referrer-Policy': 'no-referrer',
+  });
+  next();
+});
+
 app.use(express.json({ limit: '1mb' }));
 
 app.use(
@@ -274,6 +298,69 @@ app.get('/api/sites/:slug/files/download', requireAuth, async (req, res) => {
   }
 });
 
+// Contador público de visualizações por site, guardado em DATA_DIR/views.json.
+// O mesmo visitante (IP + navegador) só conta de novo depois de 30 minutos.
+const VIEWS_FILE = path.join(DATA_DIR, 'views.json');
+const VIEW_WINDOW_MS = 30 * 60 * 1000;
+let views = null;
+const recentViews = new Map();
+let saveTimer = null;
+
+function loadViews() {
+  if (views) return views;
+  try {
+    views = JSON.parse(fs.readFileSync(VIEWS_FILE, 'utf8'));
+  } catch {
+    views = {};
+  }
+  return views;
+}
+
+function scheduleViewsSave() {
+  if (saveTimer) return;
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    const tmp = `${VIEWS_FILE}.tmp`;
+    fsp.writeFile(tmp, JSON.stringify(views))
+      .then(() => fsp.rename(tmp, VIEWS_FILE))
+      .catch((err) => console.error('Falha ao salvar visualizações:', err));
+  }, 2000);
+}
+
+function viewSlug(req) {
+  const slug = sanitizeSlug(req.params.slug);
+  if (!slug || isReservedSlug(slug)) return null;
+  const sitePath = resolveSafePath(SITES_ROOT, slug);
+  if (!sitePath || !fs.existsSync(path.join(sitePath, 'index.html'))) return null;
+  return slug;
+}
+
+app.get('/api/views/:slug', (req, res) => {
+  const slug = viewSlug(req);
+  if (!slug) return res.status(404).json({ error: 'Site não encontrado.' });
+  res.set('Cache-Control', 'no-store');
+  res.json({ total: loadViews()[slug] || 0 });
+});
+
+app.post('/api/views/:slug', (req, res) => {
+  const slug = viewSlug(req);
+  if (!slug) return res.status(404).json({ error: 'Site não encontrado.' });
+  const counts = loadViews();
+  const now = Date.now();
+  const ip = req.get('cf-connecting-ip') || req.ip;
+  const key = `${slug}|${ip}|${req.get('user-agent') || ''}`;
+  if (now - (recentViews.get(key) || 0) > VIEW_WINDOW_MS) {
+    counts[slug] = (counts[slug] || 0) + 1;
+    scheduleViewsSave();
+  }
+  recentViews.set(key, now);
+  if (recentViews.size > 20000) {
+    for (const [k, t] of recentViews) if (now - t > VIEW_WINDOW_MS) recentViews.delete(k);
+  }
+  res.set('Cache-Control', 'no-store');
+  res.json({ total: counts[slug] || 0 });
+});
+
 const publicDir = path.join(__dirname, 'public');
 
 app.get('/favicon.ico', (_req, res) => {
@@ -297,7 +384,8 @@ app.use('/:slug', (req, res, next) => {
     dotfiles: 'deny',
     fallthrough: false,
   })(req, res, (err) => {
-    if (err) return next(err);
+    // arquivo que não existe é 404, sem mostrar o caminho interno do servidor
+    if (err && err.status !== 404 && err.statusCode !== 404) return next(err);
     return res.status(404).type('text/plain').send('Arquivo não encontrado.');
   });
 });
