@@ -369,6 +369,47 @@ app.get('/favicon.ico', (_req, res) => {
 
 app.use(express.static(publicDir, { index: false, maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0 }));
 
+// Lista pública das subpastas de um site que têm index.html próprio (um nível só).
+// Serve para páginas-índice montarem os atalhos sozinhas: é só criar a subpasta.
+// Rótulos vêm de <meta name="hub-title|hub-desc|hub-emoji"> da sub, com recuo para o <title>.
+app.get('/:slug/__subsites.json', (req, res) => {
+  const slug = sanitizeSlug(req.params.slug);
+  if (!slug || isReservedSlug(slug)) return res.status(404).json({ subsites: [] });
+
+  const sitePath = resolveSafePath(SITES_ROOT, slug);
+  if (!sitePath || !fs.existsSync(sitePath)) return res.status(404).json({ subsites: [] });
+
+  const pick = (html, re) => { const m = html.match(re); return m ? m[1].trim() : ''; };
+  const subsites = [];
+  let entries = [];
+  try { entries = fs.readdirSync(sitePath, { withFileTypes: true }); } catch { /* vazio */ }
+
+  for (const entry of entries) {
+    if (!entry.isDirectory() || entry.name.startsWith('.') || entry.name.startsWith('_')) continue;
+    const indexPath = path.join(sitePath, entry.name, 'index.html');
+    if (!fs.existsSync(indexPath)) continue;
+
+    let title = entry.name;
+    let description = '';
+    let emoji = '';
+    try {
+      const html = fs.readFileSync(indexPath, 'utf8').slice(0, 6000);
+      title =
+        pick(html, /<meta\s+name=["']hub-title["']\s+content=["']([^"']*)["']/i) ||
+        pick(html, /<title>([^<]*)<\/title>/i).split(/\s[—–-]\s/)[0].trim() ||
+        entry.name;
+      description = pick(html, /<meta\s+name=["'](?:hub-desc|description)["']\s+content=["']([^"']*)["']/i);
+      emoji = pick(html, /<meta\s+name=["']hub-emoji["']\s+content=["']([^"']*)["']/i);
+    } catch { /* usa o nome da pasta */ }
+
+    subsites.push({ path: entry.name, title, description, emoji });
+  }
+
+  subsites.sort((a, b) => a.path.localeCompare(b.path));
+  res.set('Cache-Control', 'no-store');
+  res.json({ subsites });
+});
+
 app.use('/:slug', (req, res, next) => {
   const slug = sanitizeSlug(req.params.slug);
   if (!slug || isReservedSlug(slug)) return next();
