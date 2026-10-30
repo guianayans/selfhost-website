@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const fsp = require('fs/promises');
 
-const { sanitizeSlug, isReservedSlug, resolveSafePath } = require('./lib/security');
+const { sanitizeSlug, isReservedSlug, resolveSafePath, sanitizeFileName } = require('./lib/security');
 const { listSites, createSite, deleteSite, getSiteDirectory } = require('./lib/sites');
 const {
   listDirectory,
@@ -359,6 +359,138 @@ app.post('/api/views/:slug', (req, res) => {
   }
   res.set('Cache-Control', 'no-store');
   res.json({ total: counts[slug] || 0 });
+});
+
+// ============ Releases do Painel do Mercado (/paneltv/release) ============
+// Sobe/baixa versões do app (.apk/.aab). Os binários ficam em DATA_DIR/releases/paneltv
+// (volume persistente, FORA de sites/, por isso o rsync do Mac não os apaga nem incham o git).
+// Teto de RELEASE_MAX_VERSIONS: ao subir uma a mais, a mais antiga (por data) é apagada.
+const RELEASES_DIR = path.join(DATA_DIR, 'releases', 'paneltv');
+const RELEASE_EXTS = new Set(['.apk', '.aab']);
+const RELEASE_MAX_VERSIONS = 5;
+const RELEASE_MAX_MB = Number(process.env.RELEASE_MAX_MB || 300);
+
+function sanitizeVersion(input) {
+  if (!input || typeof input !== 'string') return null;
+  const v = input.trim().replace(/[^A-Za-z0-9._-]/g, '');
+  if (!v || v === '.' || v === '..' || v.startsWith('.')) return null;
+  return v.slice(0, 40);
+}
+
+async function listReleaseVersions() {
+  let entries = [];
+  try { entries = await fsp.readdir(RELEASES_DIR, { withFileTypes: true }); } catch { return []; }
+  const out = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const dir = path.join(RELEASES_DIR, entry.name);
+    const st = await fsp.stat(dir).catch(() => null);
+    if (!st) continue;
+    const files = [];
+    let names = [];
+    try { names = await fsp.readdir(dir); } catch { names = []; }
+    for (const name of names) {
+      const fst = await fsp.stat(path.join(dir, name)).catch(() => null);
+      if (fst && fst.isFile()) files.push({ name, size: fst.size });
+    }
+    out.push({ version: entry.name, uploadedAt: st.mtimeMs, files });
+  }
+  out.sort((a, b) => b.uploadedAt - a.uploadedAt); // mais recente primeiro
+  return out;
+}
+
+async function enforceReleaseCap() {
+  const versions = await listReleaseVersions();
+  if (versions.length <= RELEASE_MAX_VERSIONS) return [];
+  const removed = [];
+  for (const v of versions.slice(RELEASE_MAX_VERSIONS)) {
+    const dir = resolveSafePath(RELEASES_DIR, v.version);
+    if (dir) { await fsp.rm(dir, { recursive: true, force: true }).catch(() => {}); removed.push(v.version); }
+  }
+  return removed;
+}
+
+const releaseUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: RELEASE_MAX_MB * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    if (RELEASE_EXTS.has(ext)) return cb(null, true);
+    cb(new Error('Envie um arquivo .apk ou .aab.'));
+  },
+});
+
+// A página estática (sites/paneltv/release/) carrega só scripts/estilos do próprio site e não é indexada.
+app.use('/paneltv/release', (_req, res, next) => {
+  res.set({
+    'Content-Security-Policy':
+      "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
+    'X-Robots-Tag': 'noindex, nofollow',
+    'Cache-Control': 'no-store',
+    'Referrer-Policy': 'no-referrer',
+  });
+  next();
+});
+
+app.get('/api/paneltv-release/list', async (_req, res) => {
+  const versions = await listReleaseVersions();
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    max: RELEASE_MAX_VERSIONS,
+    versions: versions.map((v) => ({
+      version: v.version,
+      uploadedAt: Math.round(v.uploadedAt),
+      files: v.files.map((f) => ({
+        name: f.name,
+        size: f.size,
+        url: `/api/paneltv-release/download?v=${encodeURIComponent(v.version)}&name=${encodeURIComponent(f.name)}`,
+      })),
+    })),
+  });
+});
+
+app.post('/api/paneltv-release/upload', requireAuth, releaseUpload.single('file'), async (req, res) => {
+  try {
+    const version = sanitizeVersion(req.body?.version);
+    if (!version) return res.status(400).json({ error: 'Versão inválida (use dígitos, ponto ou hífen).' });
+    if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
+    const name = sanitizeFileName(req.file.originalname);
+    const ext = path.extname(name || '').toLowerCase();
+    if (!name || !RELEASE_EXTS.has(ext)) return res.status(400).json({ error: 'Arquivo deve ser .apk ou .aab.' });
+    const dir = resolveSafePath(RELEASES_DIR, version);
+    if (!dir) return res.status(400).json({ error: 'Versão inválida.' });
+    await fsp.mkdir(dir, { recursive: true });
+    const dest = resolveSafePath(dir, name);
+    if (!dest) return res.status(400).json({ error: 'Nome de arquivo inválido.' });
+    await fsp.writeFile(dest, req.file.buffer);
+    const now = new Date();
+    await fsp.utimes(dir, now, now).catch(() => {}); // marca como a mais recente p/ a ordenação
+    const deleted = await enforceReleaseCap();
+    res.status(201).json({ ok: true, version, file: name, deleted });
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Erro no upload.' });
+  }
+});
+
+app.get('/api/paneltv-release/download', async (req, res) => {
+  const version = sanitizeVersion(req.query.v);
+  const name = sanitizeFileName(req.query.name);
+  if (!version || !name) return res.status(400).json({ error: 'Parâmetros inválidos.' });
+  const dir = resolveSafePath(RELEASES_DIR, version);
+  const filePath = dir && resolveSafePath(dir, name);
+  if (!filePath) return res.status(400).json({ error: 'Caminho inválido.' });
+  const st = await fsp.stat(filePath).catch(() => null);
+  if (!st || !st.isFile()) return res.status(404).json({ error: 'Arquivo não encontrado.' });
+  res.download(filePath, name);
+});
+
+app.delete('/api/paneltv-release/version', requireAuth, async (req, res) => {
+  const version = sanitizeVersion(req.query.v);
+  if (!version) return res.status(400).json({ error: 'Versão inválida.' });
+  const dir = resolveSafePath(RELEASES_DIR, version);
+  if (!dir) return res.status(400).json({ error: 'Versão inválida.' });
+  await fsp.rm(dir, { recursive: true, force: true }).catch(() => {});
+  res.json({ ok: true, deleted: version });
 });
 
 const publicDir = path.join(__dirname, 'public');
