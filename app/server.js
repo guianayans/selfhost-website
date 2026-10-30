@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const fsp = require('fs/promises');
+const crypto = require('crypto');
 
 const { sanitizeSlug, isReservedSlug, resolveSafePath, sanitizeFileName } = require('./lib/security');
 const { listSites, createSite, deleteSite, getSiteDirectory } = require('./lib/sites');
@@ -75,6 +76,78 @@ function requireAuth(req, res, next) {
   if (req.session?.authenticated) return next();
   return res.status(401).json({ error: 'Não autenticado.' });
 }
+
+// ============ Portão por senha das páginas de /paneltv ============
+// Tudo sob /paneltv exige a sessão do Website Manager, MENOS as páginas públicas:
+// política de privacidade, download por QR code (/paneltv/apk) e feedback.
+// As APIs já se protegem sozinhas (requireAuth nas escritas); aqui trancamos o HTML.
+// O portão responde ANTES do CSP estrito do /paneltv/release, então usa o seu próprio.
+const PANELTV_PUBLIC = ['/paneltv/privacidade', '/paneltv/apk', '/paneltv/feedback'];
+
+function isPaneltvPublicPath(p) {
+  return PANELTV_PUBLIC.some((base) => p === base || p.startsWith(base + '/'));
+}
+
+function gateHtml(nonce) {
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>Área restrita — Painel do Mercado</title>
+<style>
+  :root{ --bg:#05070b; --fg:#eef2f6; --muted:#9aa6b2; --line:#1b2230; --accent:#2FD15B; --warn:#ff5a52; }
+  *{ box-sizing:border-box; } html,body{ margin:0; min-height:100%; }
+  body{ background:var(--bg); color:var(--fg); display:flex; align-items:center; justify-content:center;
+        min-height:100vh; padding:24px; font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif; }
+  .box{ width:100%; max-width:360px; background:rgba(20,26,34,.72); border:1px solid var(--line);
+        border-radius:18px; padding:26px 22px; box-shadow:0 20px 50px rgba(0,0,0,.4); }
+  .dot{ width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); display:inline-block; margin-right:8px; }
+  h1{ font-size:16px; margin:0 0 4px; font-weight:650; }
+  p{ color:var(--muted); font-size:13px; margin:0 0 16px; }
+  input{ width:100%; background:#0a0e14; border:1px solid var(--line); color:var(--fg);
+         border-radius:11px; padding:11px 13px; font:inherit; outline:none; margin-bottom:10px; }
+  input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,209,91,.15); }
+  button{ width:100%; border:1px solid var(--accent); background:var(--accent); color:#06160c;
+          border-radius:11px; padding:11px 18px; font:inherit; font-weight:600; cursor:pointer; }
+  button[disabled]{ opacity:.5; cursor:default; }
+  .err{ color:var(--warn); font-size:13px; margin:10px 2px 0; min-height:1em; }
+</style></head><body>
+  <form class="box" id="f" autocomplete="off">
+    <h1><span class="dot"></span>Área restrita</h1>
+    <p>Entre com o login do Website Manager para ver esta página.</p>
+    <input id="u" type="text" placeholder="usuário" autocomplete="username" spellcheck="false">
+    <input id="p" type="password" placeholder="senha" autocomplete="current-password">
+    <button type="submit" id="b">Entrar</button>
+    <div class="err" id="e"></div>
+  </form>
+<script nonce="${nonce}">
+  const f=document.getElementById('f'),e=document.getElementById('e'),b=document.getElementById('b');
+  f.addEventListener('submit',async(ev)=>{ev.preventDefault();e.textContent='';b.disabled=true;
+    try{const r=await fetch('/api/login',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({username:document.getElementById('u').value.trim(),password:document.getElementById('p').value})});
+      if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||'Login inválido.');}
+      location.reload();
+    }catch(err){e.textContent=err.message;b.disabled=false;}});
+</script></body></html>`;
+}
+
+function sendGate(res) {
+  const nonce = crypto.randomBytes(16).toString('base64');
+  res.status(401).set({
+    'Content-Security-Policy':
+      `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'`,
+    'X-Robots-Tag': 'noindex, nofollow',
+    'Cache-Control': 'no-store',
+    'Referrer-Policy': 'no-referrer',
+    'Content-Type': 'text/html; charset=utf-8',
+  }).send(gateHtml(nonce));
+}
+
+app.use((req, res, next) => {
+  const p = req.path;
+  if (p !== '/paneltv' && p !== '/paneltv/' && !p.startsWith('/paneltv/')) return next();
+  if (isPaneltvPublicPath(p)) return next();
+  if (req.session?.authenticated) return next();
+  return sendGate(res);
+});
 
 function buildProjectRsyncMeta() {
   const localPath = `${RSYNC_LOCAL_PATH}/`;
@@ -509,6 +582,81 @@ app.get('/paneltv/apk/painel-do-mercado.apk', async (req, res, next) => {
     }
   } catch { /* cai no fallback estático */ }
   return next();
+});
+
+// ============ Feedback dos usuários (/paneltv/feedback) ============
+// A página pública /paneltv/feedback grava aqui; a lista (/paneltv/feedback-admin) é só do admin.
+// Guardado em DATA_DIR/feedback/paneltv.json (volume persistente). Mantém os últimos N.
+const FEEDBACK_DIR = path.join(DATA_DIR, 'feedback');
+const FEEDBACK_FILE = path.join(FEEDBACK_DIR, 'paneltv.json');
+const FEEDBACK_MAX = 2000;
+const FEEDBACK_RATE_WINDOW_MS = 10 * 60 * 1000;
+const FEEDBACK_RATE_MAX = 6;
+const feedbackHits = new Map();
+
+async function readFeedback() {
+  try { return JSON.parse(await fsp.readFile(FEEDBACK_FILE, 'utf8')); }
+  catch { return []; }
+}
+async function writeFeedback(list) {
+  await fsp.mkdir(FEEDBACK_DIR, { recursive: true });
+  const tmp = `${FEEDBACK_FILE}.tmp`;
+  await fsp.writeFile(tmp, JSON.stringify(list));
+  await fsp.rename(tmp, FEEDBACK_FILE);
+}
+function clampStr(v, max) {
+  if (v == null) return '';
+  return String(v).slice(0, max);
+}
+
+app.post('/api/paneltv-feedback', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const message = clampStr(body.message, 4000).trim();
+    if (message.length < 2) return res.status(400).json({ error: 'Escreva a sua mensagem.' });
+    // limite por IP, para a página pública não virar depósito de spam
+    const ip = req.get('cf-connecting-ip') || req.ip || '';
+    const now = Date.now();
+    const hits = (feedbackHits.get(ip) || []).filter((t) => now - t < FEEDBACK_RATE_WINDOW_MS);
+    if (hits.length >= FEEDBACK_RATE_MAX) return res.status(429).json({ error: 'Muitos envios seguidos. Tente mais tarde.' });
+    hits.push(now); feedbackHits.set(ip, hits);
+
+    let rating = parseInt(body.rating, 10);
+    if (!(rating >= 1 && rating <= 5)) rating = null;
+    const entry = {
+      id: crypto.randomUUID(),
+      at: now,
+      name: clampStr(body.name, 120).trim(),
+      contact: clampStr(body.contact, 160).trim(),
+      device: clampStr(body.device, 160).trim(),
+      rating,
+      message,
+      ua: clampStr(req.get('user-agent'), 300),
+      ip,
+    };
+    const list = await readFeedback();
+    list.unshift(entry);
+    if (list.length > FEEDBACK_MAX) list.length = FEEDBACK_MAX;
+    await writeFeedback(list);
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message || 'Erro ao enviar.' });
+  }
+});
+
+app.get('/api/paneltv-feedback/list', requireAuth, async (_req, res) => {
+  const list = await readFeedback();
+  res.set('Cache-Control', 'no-store');
+  res.json({ total: list.length, items: list });
+});
+
+app.delete('/api/paneltv-feedback/:id', requireAuth, async (req, res) => {
+  const id = String(req.params.id || '');
+  const list = await readFeedback();
+  const next = list.filter((f) => f.id !== id);
+  if (next.length === list.length) return res.status(404).json({ error: 'Não encontrado.' });
+  await writeFeedback(next);
+  res.json({ ok: true, deleted: id });
 });
 
 const publicDir = path.join(__dirname, 'public');
