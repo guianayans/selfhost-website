@@ -493,6 +493,24 @@ app.delete('/api/paneltv-release/version', requireAuth, async (req, res) => {
   res.json({ ok: true, deleted: version });
 });
 
+// O link fixo /paneltv/apk/painel-do-mercado.apk entrega SEMPRE o .apk da versão mais recente do release.
+// É o que o QR e o código do Downloader (7243556) apontam: subir uma versão aqui já atualiza o download,
+// sem copiar nada. Sem nenhuma versão no release, cai no arquivo estático de sites/paneltv/apk/ (fallback).
+app.get('/paneltv/apk/painel-do-mercado.apk', async (req, res, next) => {
+  try {
+    const versions = await listReleaseVersions(); // mais recente primeiro
+    for (const v of versions) {
+      const apk = v.files.find((f) => f.name.toLowerCase().endsWith('.apk'));
+      if (!apk) continue;
+      const dir = resolveSafePath(RELEASES_DIR, v.version);
+      const fp = dir && resolveSafePath(dir, apk.name);
+      const st = fp && (await fsp.stat(fp).catch(() => null));
+      if (st && st.isFile()) return res.download(fp, 'painel-do-mercado.apk');
+    }
+  } catch { /* cai no fallback estático */ }
+  return next();
+});
+
 const publicDir = path.join(__dirname, 'public');
 
 app.get('/favicon.ico', (_req, res) => {
