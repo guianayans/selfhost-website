@@ -24,6 +24,10 @@ services:
       - /pendriver/questionario-respostas:/dados
     environment:
       PORTA: "8090"
+      # Congelado até segunda ordem: a página abre e carrega as respostas salvas, mas o servidor
+      # não grava mais nada por cima. Para voltar a aceitar respostas, apague esta linha e refaça
+      # o `docker compose -f docker-compose.questionario.yml up -d`.
+      CONGELADO: "1"
     restart: unless-stopped
     networks:
       - coolify
